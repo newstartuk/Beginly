@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import { calculateReadinessScore } from "@/lib/readiness-score";
 import type { Task } from "@/types";
 
@@ -33,7 +33,7 @@ describe("readiness-score", () => {
 
   it("totalScore is 0 when no tasks completed", () => {
     const tasks = [makeTask({ taskId: "T1" }), makeTask({ taskId: "T2" })];
-    const userTasks = [];
+    const userTasks: { taskId: string; status: "complete" | "in_progress" }[] = [];
     const result = calculateReadinessScore(tasks, userTasks);
     expect(result.overallPercentage).toBe(0);
   });

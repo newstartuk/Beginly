@@ -108,10 +108,10 @@ describe("seed-data", () => {
       // TypeScript ensures these exist — this is a compile-time check more than runtime
       // We verify the shape is correct by accessing and confirming they don't throw
       expect(() => {
-        const _deps = (task as Record<string, unknown>).dependencies;
-        const _reminder = (task as Record<string, unknown>).reminderTrigger;
-        const _escalation = (task as Record<string, unknown>).escalationFlag;
-        const _review = (task as Record<string, unknown>).reviewStatus;
+        const _deps = (task as unknown as Record<string, unknown>).dependencies;
+        const _reminder = (task as unknown as Record<string, unknown>).reminderTrigger;
+        const _escalation = (task as unknown as Record<string, unknown>).escalationFlag;
+        const _review = (task as unknown as Record<string, unknown>).reviewStatus;
         return { _deps, _reminder, _escalation, _review };
       }).not.toThrow();
     });
