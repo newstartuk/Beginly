@@ -20,7 +20,7 @@ const FEATURES = [
   {
     icon: CheckCircle,
     title: "Personalised 90-Day Roadmap",
-    desc: "A checklist built around your arrival date, city, university, and accommodation — not generic advice.",
+    desc: "A checklist built around your arrival date, city, and situation — not generic advice.",
     color: "text-primary",
     bg: "bg-teal-50",
   },
@@ -41,7 +41,7 @@ const FEATURES = [
   {
     icon: Shield,
     title: "Scam & Mistake Alerts",
-    desc: "Regular alerts on the scams targeting international students — so you can spot them before they happen.",
+    desc: "Regular alerts on the scams targeting newcomers to the UK — so you can spot them before they happen.",
     color: "text-red-500",
     bg: "bg-red-50",
   },
@@ -62,7 +62,7 @@ const FEATURES = [
 ];
 
 const HOW_IT_WORKS = [
-  { num: "01", title: "Tell us about your arrival", desc: "City, university, accommodation type, and when you're arriving." },
+  { num: "01", title: "Tell us about your arrival", desc: "City, accommodation type, and when you're arriving." },
   { num: "02", title: "Get your personalised roadmap", desc: "A 90-day checklist built around your exact situation." },
   { num: "03", title: "Track, complete, and progress", desc: "Mark tasks done, get guidance, and watch your score rise." },
   { num: "04", title: "Settle in with confidence", desc: "Avoid common mistakes, stay safe, and build your UK life." },
@@ -108,7 +108,7 @@ export default function LandingPage() {
       <section className="max-w-6xl mx-auto px-4 pt-16 pb-20 text-center">
         <div className="inline-flex items-center gap-1.5 bg-teal-50 border border-teal-200 text-primary text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
           <CheckCircle className="w-3 h-3" />
-          Built for international students arriving in the UK
+          Free settlement guide for everyone arriving in the UK
         </div>
         <h1 className="text-4xl sm:text-5xl font-extrabold text-navy leading-tight mb-5 max-w-3xl mx-auto">
           Your UK settlement journey<br className="hidden sm:block" /> starts here.
@@ -217,7 +217,7 @@ export default function LandingPage() {
         <div className="card bg-teal-50 border-primary/20">
           <h2 className="text-sm font-bold text-navy mb-3 flex items-center gap-2">
             <Scale className="w-4 h-4 text-primary" />
-            How we work — and how we don't
+            How we work — and how we don&apos;t
           </h2>
           <p className="text-sm text-civic-700 leading-relaxed mb-3">
             NewStart UK is a settlement support platform — not a legal, immigration, financial, or professional advice service. We help you understand what you need to do and point you to the official sources that make the decisions.
@@ -238,7 +238,7 @@ export default function LandingPage() {
             Your first 90 days start now.
           </h2>
           <p className="text-teal-100 text-sm leading-relaxed mb-8 max-w-xl mx-auto">
-            Join international students using NewStart UK to settle in confidently. Free forever. No credit card needed.
+            Join newcomers from around the world using NewStart UK to settle in confidently. Free forever. No credit card needed.
           </p>
           <Link href="/signup" className="inline-flex items-center gap-2 bg-white text-primary font-bold text-sm px-8 py-3 rounded-xl hover:bg-teal-50 transition-colors">
             Create your roadmap now <ArrowRight className="w-4 h-4" />
