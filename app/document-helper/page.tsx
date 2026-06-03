@@ -7,7 +7,7 @@ import Disclaimer from "@/components/Disclaimer";
 import Navigation from "@/components/Navigation";
 
 const DISCLAIMER =
-  "Nia is an AI-assisted guide created by NewStart UK. Nia does not provide legal, immigration, financial, tax, medical, or housing advice. Nia helps you understand what documents mean so you can make your own decisions. Always verify important information with official sources or a qualified professional.";
+  "Nia is an AI-assisted guide created by SettleMap. Nia does not provide legal, immigration, financial, tax, medical, or housing advice. Nia helps you understand what documents mean so you can make your own decisions. Always verify important information with official sources or a qualified professional.";
 
 const NIA_INTRO =
   "Hi, I'm Nia! I'm here to help you understand UK documents in plain English. I can explain tenancy agreements, council tax letters, student status letters, bank letters, and NHS forms — without the jargon. I don't give legal or financial advice — I help you understand so you can decide for yourself.";
@@ -36,7 +36,7 @@ export default function DocumentHelperPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-navy">Document Helper</h1>
-            <p className="text-xs text-muted">Powered by Nia — your NewStart UK guide</p>
+            <p className="text-xs text-muted">Powered by Nia — your SettleMap guide</p>
           </div>
         </div>
 

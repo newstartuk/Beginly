@@ -3,9 +3,9 @@ import "./globals.css";
 import Nia from "@/components/Nia";
 
 export const metadata: Metadata = {
-  title: "NewStart UK — Your UK Settlement Guide",
+  title: "SettleMap — Your UK Settlement Guide",
   description:
-    "NewStart UK helps international students settle into the UK within 90 days — personalised checklists, plain-English guidance, and local support.",
+    "SettleMap helps everyone arriving in the UK get settled within 90 days — personalised checklists, plain-English guidance, and a UK-readiness score.",
   icons: { icon: "/favicon.svg" },
 };
 

@@ -37,7 +37,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "Your university portal is the single source of truth for enrolment. gov.uk/student-visa for visa guidance.",
     disclaimer:
-      "NewStart UK provides general settlement guidance. This does not constitute legal, immigration, financial, tax, medical, or housing advice. For official matters, consult qualified professionals or official government sources.",
+      "SettleMap provides general settlement guidance. This does not constitute legal, immigration, financial, tax, medical, or housing advice. For official matters, consult qualified professionals or official government sources.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_PRE_001", "STU_PRE_002", "STU_PRE_003", "STU_PRE_004", "STU_PRE_005", "STU_PRE_006", "STU_PRE_007", "STU_PRE_008"],
   },
@@ -75,7 +75,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
       "If at any point you feel unsafe or threatened, leave the area and go to a public place. Call 999 for emergencies.",
     sourceSignpost: "UK Emergency Services: 999 | Non-emergency police: 101",
     disclaimer:
-      "NewStart UK provides general settlement guidance. This is not a substitute for official travel, immigration, or safety guidance.",
+      "SettleMap provides general settlement guidance. This is not a substitute for official travel, immigration, or safety guidance.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_D1_001", "STU_D1_002", "STU_D1_003", "STU_D1_004", "STU_D1_005", "STU_D1_006"],
   },
@@ -147,7 +147,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "Action Fraud: actionfraud.police.uk | Take Five to Stop Fraud: takefive-stopfraud.org.uk | Property Redress Scheme: propertyredress.co.uk",
     disclaimer:
-      "NewStart UK provides scam awareness guidance. This is not legal or financial advice. If you have been the victim of fraud, contact Action Fraud and your bank immediately.",
+      "SettleMap provides scam awareness guidance. This is not legal or financial advice. If you have been the victim of fraud, contact Action Fraud and your bank immediately.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_PRE_002", "STU_D30_007"],
   },
@@ -185,7 +185,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "MSE Student Bank Account Guide: moneysavingexpert.com | FCA regulated banks: fca.org.uk | Which? Best Buy: which.co.uk",
     disclaimer:
-      "NewStart UK provides general financial guidance. This is not financial advice. Compare products carefully before choosing a bank account.",
+      "SettleMap provides general financial guidance. This is not financial advice. Compare products carefully before choosing a bank account.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_PRE_005", "STU_D7_002", "STU_D30_001"],
   },
@@ -219,7 +219,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "NHS GP registration: nhs.uk/nhs-services/gps/how-to-register-with-a-gp | NHS App: nhs.uk/nhs-app",
     disclaimer:
-      "NewStart UK provides general health signposting. This is not medical advice. For medical concerns, contact the NHS or your GP.",
+      "SettleMap provides general health signposting. This is not medical advice. For medical concerns, contact the NHS or your GP.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_D7_003", "STU_D7_004", "STU_D30_002"],
   },
@@ -254,7 +254,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "NHS 111: dial 111 | NHS App: nhs.uk/nhs-app | Find a GP: nhs.uk/service-search/find-a-gp | HC2 certificate: nhs.uk/healthcosts",
     disclaimer:
-      "NewStart UK provides general health signposting. This is not medical advice. Always seek professional medical help for health concerns.",
+      "SettleMap provides general health signposting. This is not medical advice. Always seek professional medical help for health concerns.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_D7_003", "STU_D7_004", "STU_D30_002", "STU_D30_010", "STU_D90_007"],
   },
@@ -291,7 +291,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "gov.uk/council-tax | gov.uk/guidance/council-tax-discounts#full-time-students | Citizens Advice: citizensadvice.org.uk",
     disclaimer:
-      "NewStart UK provides general information about council tax. This is not legal or tax advice.",
+      "SettleMap provides general information about council tax. This is not legal or tax advice.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_D7_006", "STU_D30_008"],
   },
@@ -325,7 +325,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "Your university's official website is the only source of truth for how to request a student status letter.",
     disclaimer:
-      "NewStart UK provides general administrative guidance. Check with your university for their specific student status letter process.",
+      "SettleMap provides general administrative guidance. Check with your university for their specific student status letter process.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_D30_005", "STU_D30_001", "STU_D30_008"],
   },
@@ -358,7 +358,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "giffgaff: giffgaff.com | Lebara: lebara.com | Voxi: voxi.co.uk | Smarty: smarty.co.uk | Ofcom coverage checker: broadbandchecker.ofcom.org.uk",
     disclaimer:
-      "NewStart UK provides general guidance. Compare all providers and read terms before purchasing any SIM or eSIM plan.",
+      "SettleMap provides general guidance. Compare all providers and read terms before purchasing any SIM or eSIM plan.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_PRE_007", "STU_D1_005"],
   },
@@ -392,7 +392,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "16–25 Railcard: 16-25railcard.co.uk | 18+ Student Oyster: tfl.gov.uk/18plus | Trainline: thetrainline.com | National Express: nationalexpress.com",
     disclaimer:
-      "NewStart UK provides general transport guidance. Discount eligibility and prices change — check official provider websites for current information.",
+      "SettleMap provides general transport guidance. Discount eligibility and prices change — check official provider websites for current information.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_PRE_004", "STU_D7_005"],
   },
@@ -427,7 +427,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "MSE Student Budget Guide: moneysavingexpert.com | Money Helper: moneyhelper.org.uk",
     disclaimer:
-      "NewStart UK provides general financial guidance. This is not financial advice. Seek professional advice for significant financial decisions.",
+      "SettleMap provides general financial guidance. This is not financial advice. Seek professional advice for significant financial decisions.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_PRE_005", "STU_D30_004", "STU_D90_001", "STU_D90_002", "STU_D90_008"],
   },
@@ -497,7 +497,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "TDS: tenancydepositscheme.com | DPS: depositprotection.com | MyDeposits: mydeposits.co.uk | Shelter: shelterengland.org",
     disclaimer:
-      "NewStart UK provides general information about deposit protection. For legal advice, contact Shelter or a qualified solicitor.",
+      "SettleMap provides general information about deposit protection. For legal advice, contact Shelter or a qualified solicitor.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_D7_010", "STU_D90_003"],
   },
@@ -532,7 +532,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "Home Office student visa work guidance: gov.uk/student-visa/work | Acas: acas.org.uk | National Minimum Wage: gov.uk/national-minimum-wage | DWP NI number: gov.uk/apply-national-insurance-number",
     disclaimer:
-      "NewStart UK provides general guidance on working as a student. This is not legal or immigration advice.",
+      "SettleMap provides general guidance on working as a student. This is not legal or immigration advice.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_D30_003", "STU_D30_006", "STU_D30_009", "STU_D90_005"],
   },
@@ -565,7 +565,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "HMRC NI number: gov.uk/apply-national-insurance-number | DWP: dwp.gov.uk",
     disclaimer:
-      "NewStart UK provides general guidance on National Insurance. For tax advice, contact HMRC or a qualified accountant.",
+      "SettleMap provides general guidance on National Insurance. For tax advice, contact HMRC or a qualified accountant.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_D30_003", "STU_D30_006"],
   },
@@ -598,7 +598,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "Home Office right-to-work checks: gov.uk/prove-right-to-work | Employer guidance: gov.uk/guidance/employers-right-to-work-checks",
     disclaimer:
-      "NewStart UK provides general guidance on right-to-work. For immigration advice, consult a qualified immigration solicitor.",
+      "SettleMap provides general guidance on right-to-work. For immigration advice, consult a qualified immigration solicitor.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_D30_003", "STU_D30_006", "STU_D30_009"],
   },
@@ -633,7 +633,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "Action Fraud: actionfraud.police.uk | Take Five to Stop Fraud: takefive-stopfraud.org.uk | Citizens Advice Employment: citizensadvice.org.uk/employment",
     disclaimer:
-      "NewStart UK provides general guidance on job scams. This is not legal advice. If you have been a victim of fraud, contact Action Fraud and your bank immediately.",
+      "SettleMap provides general guidance on job scams. This is not legal advice. If you have been a victim of fraud, contact Action Fraud and your bank immediately.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_D30_006", "STU_D30_009", "STU_D90_005"],
   },
@@ -667,7 +667,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     sourceSignpost:
       "999 — Emergency (police, ambulance, fire) | 111 — NHS non-emergency | 101 — Police non-emergency | Action Fraud: 0300 123 2040 | Samaritans: 116 123 (free) | Mind (mental health): 0300 123 3393",
     disclaimer:
-      "NewStart UK provides general emergency contact information. Always use official emergency services for genuine emergencies.",
+      "SettleMap provides general emergency contact information. Always use official emergency services for genuine emergencies.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_D1_001", "STU_D1_002"],
   },
@@ -681,12 +681,12 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     whyItMatters:
       "The first 90 days are intense — full of admin tasks, cultural adjustment, and new experiences. Taking time to reflect at the 90-day mark helps you see what is going well, what needs attention, and where you want to focus in the next phase of your time in the UK.",
     whatToPrepare: [
-      "Your NewStart UK checklist progress",
+      "Your SettleMap checklist progress",
       "Notes from your first weeks",
       "A blank document or notebook",
     ],
     stepsToTake: [
-      "Open your NewStart UK checklist — how many of your 90-day tasks are complete?",
+      "Open your SettleMap checklist — how many of your 90-day tasks are complete?",
       "Write down your three biggest achievements in the first 90 days.",
       "Write down the one or two things that are still causing you stress or uncertainty.",
       "Identify any outstanding admin tasks — go to your checklist and check.",
@@ -701,9 +701,9 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     ],
     safetyWarning: undefined,
     sourceSignpost:
-      "NewStart UK guidance library: guides | Your university student support | Citizens Advice: citizensadvice.org.uk",
+      "SettleMap guidance library: guides | Your university student support | Citizens Advice: citizensadvice.org.uk",
     disclaimer:
-      "NewStart UK provides general settlement guidance. This is not professional advice. Seek support from qualified professionals for health, legal, immigration, or financial concerns.",
+      "SettleMap provides general settlement guidance. This is not professional advice. Seek support from qualified professionals for health, legal, immigration, or financial concerns.",
     lastReviewed: "May 2026",
     relatedTaskIds: ["STU_D90_001", "STU_D90_002", "STU_D90_003", "STU_D90_004", "STU_D90_005", "STU_D90_006", "STU_D90_007", "STU_D90_008", "STU_D90_009", "STU_D90_010"],
   },

@@ -38,7 +38,7 @@ export function middleware(request: NextRequest) {
   if (isProtected(pathname) && !session) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.searchParams.set("from", pathname);
+    url.searchParams.set("redirect", pathname);
     return NextResponse.redirect(url);
   }
 

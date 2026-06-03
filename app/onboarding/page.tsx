@@ -383,7 +383,7 @@ export default function OnboardingPage() {
               <div>
                 <p className="text-sm font-semibold text-navy">Enable task reminders?</p>
                 <p className="text-xs text-civic-600 mt-0.5">
-                  NewStart UK can notify you when tasks are due — no spam, unsubscribe anytime.
+                  SettleMap can notify you when tasks are due — no spam, unsubscribe anytime.
                 </p>
               </div>
             </div>

@@ -13,7 +13,7 @@ interface NavbarProps {
   showLogo?: boolean;
 }
 
-export default function Navbar({ items, title = "NewStart UK", showLogo = true }: NavbarProps) {
+export default function Navbar({ items, title = "SettleMap", showLogo = true }: NavbarProps) {
   const pathname = usePathname();
 
   return (

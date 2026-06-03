@@ -1,10 +1,10 @@
-# NewStart UK
+# SettleMap
 
-**Your guided settlement platform for the UK — built for international students, in the UK within 90 days.**
+**Your guided settlement platform for the UK — built for everyone arriving in the UK, within 90 days.**
 
-NewStart UK helps new immigrants arriving in the UK on a student visa get settled quickly, safely, and with confidence. From opening a bank account to understanding the NHS, NewStart UK provides a personalised checklist, step-by-step guidance, and a UK-readiness score — all in one place.
+SettleMap helps new immigrants, international students, skilled workers, and all newcomers arriving in the UK get settled quickly, safely, and with confidence. From opening a bank account to understanding the NHS, SettleMap provides a personalised checklist, step-by-step guidance, and a UK-readiness score — all in one place.
 
-> 🚨 **Note:** NewStart UK is an orientation and information tool. It does **not** provide immigration, legal, medical, or financial advice. Always verify critical information at [GOV.UK](https://www.gov.uk) and consult qualified professionals for anything requiring regulated advice. See our [full disclaimer](#disclaimer) below.
+> 🚨 **Note:** SettleMap is an orientation and information tool. It does **not** provide immigration, legal, medical, or financial advice. Always verify critical information at [GOV.UK](https://www.gov.uk) and consult qualified professionals for anything requiring regulated advice. See our [full disclaimer](#disclaimer) below.
 
 ---
 
@@ -14,7 +14,7 @@ NewStart UK helps new immigrants arriving in the UK on a student visa get settle
 - **UK Readiness Score** — a weighted score showing how settled you are, updated as you complete tasks
 - **Task-level guidance** — step-by-step instructions, common mistakes, and official source links for every task
 - **Document Helper** — plain-English explanations of official UK documents, with guardrails and safe next steps
-- **Nia — The NewStart Navigator** — AI-assisted guide for orientation questions, transparently disclosed as not a regulated adviser
+- **Nia — The SettleMap Navigator** — AI-assisted guide for orientation questions, transparently disclosed as not a regulated adviser
 - **Budget Planner** — income, expenses, and savings tracker with a printable summary
 - **NHS Guide** — practical guide to using the NHS, from GP registration to prescriptions
 - **Emergency Contacts** — vetted official numbers: 999, 111, 101, Samaritans, and more
@@ -28,7 +28,7 @@ NewStart UK helps new immigrants arriving in the UK on a student visa get settle
 - Profile-led, compliance-safe settlement assistant
 - All checklist tasks pointing to official GOV.UK/NHS sources
 - Disclaimers and risk warnings on all sensitive content
-- Onboarding with full student profile collection
+- Onboarding with full profile collection
 - Weighted UK Readiness Score
 - Supabase Auth + Postgres schema (draft prepared, backend not yet connected)
 
@@ -58,8 +58,8 @@ See the [Developer Action Prompt](./docs/DEVELOPER_ACTION_PROMPT.md) for full v1
 ### Installation
 
 ```bash
-git clone https://github.com/newstartUK/NewstartUK.git
-cd NewstartUK
+git clone https://github.com/settlemap/SettleMap.git
+cd SettleMap
 npm install
 ```
 
@@ -81,7 +81,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3456](http://localhost:3456) in your browser.
 
 ### Build for Production
 
@@ -101,10 +101,10 @@ npm run lint
 ## 📁 Project Structure
 
 ```
-NewstartUK/
+SettleMap/
 ├── app/                        # Next.js App Router pages
 │   ├── page.tsx                 # Landing page
-│   ├── onboarding/              # Student onboarding wizard
+│   ├── onboarding/              # Onboarding wizard
 │   ├── dashboard/               # Main dashboard + UK Readiness Score
 │   ├── checklist/               # Personalised task checklist
 │   ├── budget/                  # Budget planner
@@ -114,16 +114,16 @@ NewstartUK/
 │   ├── bank/                    # Banking guide
 │   ├── emergency/               # Emergency contacts
 │   ├── support/                # Support form
-│   ├── settings/                # User preferences
+│   ├── settings/               # User preferences
 │   ├── admin/                   # Admin dashboard (stubs)
 │   │   ├── tasks/               # Task management (stub)
 │   │   └── guides/              # Guidance management (stub)
 │   └── document-helper/        # Document Helper AI tool
 ├── components/                  # Reusable UI components
-│   ├── Nia.tsx                  # Nia — AI guide (The NewStart Navigator)
+│   ├── Nia.tsx                  # Nia — AI guide (The SettleMap Navigator)
 │   ├── Navigation.tsx           # Desktop navigation
 │   ├── MobileNav.tsx            # Mobile bottom tab navigation
-│   ├── DashboardSkeleton.tsx    # Loading skeleton
+│   ├── DashboardSkeleton.tsx     # Loading skeleton
 │   ├── ChecklistSkeleton.tsx     # Loading skeleton
 │   ├── Disclaimer.tsx            # Reusable disclaimer component
 │   ├── StepList.tsx             # Step-by-step list component
@@ -147,9 +147,9 @@ NewstartUK/
 
 ---
 
-## 🤖 Nia — The NewStart Navigator
+## 🤖 Nia — The SettleMap Navigator
 
-Nia is NewStart UK's AI-assisted orientation guide. She helps users understand their checklist tasks, find official sources, and navigate daily UK life.
+Nia is SettleMap's AI-assisted orientation guide. She helps users understand their checklist tasks, find official sources, and navigate daily UK life.
 
 **Transparency:** Nia is explicitly disclosed as an AI tool — not a real adviser, not affiliated with any government body, not a substitute for professional advice. See [components/Nia.tsx](./components/Nia.tsx) for full implementation.
 
@@ -164,7 +164,7 @@ Nia is **not** designed to answer:
 ## 🔐 Data & Privacy
 
 - **Client-side only (current):** All user data is stored in your browser's `localStorage`. Nothing is sent to a server.
-- **No tracking:** NewStart UK does not use analytics trackers or third-party tracking.
+- **No tracking:** SettleMap does not use analytics trackers or third-party tracking.
 - **Future backend:** When Supabase is connected, data will be stored in Supabase Postgres with Row Level Security policies.
 
 ---
@@ -189,7 +189,7 @@ RLS (Row Level Security) is configured on all tables. A service role key is requ
 
 ## ⚠️ Disclaimer
 
-NewStart UK is an **information and orientation tool only**.
+SettleMap is an **information and orientation tool only**.
 
 - We are **not** affiliated with the UK Government, GOV.UK, UKVI, NHS, or any official body.
 - Nothing on this platform constitutes **immigration advice, legal advice, medical advice, or financial advice**.
@@ -202,8 +202,8 @@ NewStart UK is an **information and orientation tool only**.
 
 ## 📄 License
 
-MIT — NewStart UK is an open-source project.
+MIT — SettleMap is an open-source project.
 
 ---
 
-Built with care for international students arriving in the UK. 🇬🇧
+Built with care for everyone arriving in the UK. 🇬🇧

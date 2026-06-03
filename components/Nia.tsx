@@ -3,8 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import { Send, X, Bot, RefreshCw, ExternalLink, AlertTriangle } from "lucide-react";
 
 /* ──────────────────────────────────────────────────────────────
-   Nia — The NewStart Navigator
-   "Nia" is NewStart UK's AI-assisted guide. She is:
+   Nia — The SettleMap Navigator
+   "Nia" is SettleMap's AI-assisted guide. She is:
    - NOT a real adviser or immigration/legal professional
    - NOT affiliated with any government body
    - NOT a substitute for professional advice
@@ -25,7 +25,7 @@ interface NiaMessage {
   timestamp: Date;
 }
 
-const NIA_DISCLAIMER = `👋 Hi, I'm **Nia** — The NewStart Navigator.
+const NIA_DISCLAIMER = `👋 Hi, I'm **Nia** — The SettleMap Navigator.
 
 I'm your AI-assisted guide, here to help you find your way around settling in the UK. I can help with:
 • Explaining your checklist tasks
@@ -58,7 +58,7 @@ function generateNiaReply(userMessage: string): string {
 
   // Greetings
   if (/^(hi|hello|hey|nia's?|start|help)/.test(msg)) {
-    return `Welcome! I'm here to help you work through your NewStart UK checklist. Here's a quick overview of what you can ask me:\n\n**Your checklist** — I can explain what any task means and why it matters.\n**Official sources** — I can point you to GOV.UK, NHS, or university pages.\n**UK life** — Questions about how things work — banking, transport, student discounts.\n\nWhat's on your mind today?`;
+    return `Welcome! I'm here to help you work through your SettleMap checklist. Here's a quick overview of what you can ask me:\n\n**Your checklist** — I can explain what any task means and why it matters.\n**Official sources** — I can point you to GOV.UK, NHS, or university pages.\n**UK life** — Questions about how things work — banking, transport, student discounts.\n\nWhat's on your mind today?`;
   }
 
   // Task explanations
@@ -180,7 +180,7 @@ export default function Nia({ autoOpen = false }: { autoOpen?: boolean }) {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          aria-label="Open Nia — The NewStart Navigator"
+          aria-label="Open Nia — The SettleMap Navigator"
           className="fixed bottom-22 right-4 z-50 w-14 h-14 rounded-full bg-primary shadow-lg hover:scale-105 transition-transform flex items-center justify-center"
           style={{ bottom: "6rem" }}
         >
@@ -213,7 +213,7 @@ export default function Nia({ autoOpen = false }: { autoOpen?: boolean }) {
               <div className="bg-primary px-4 py-3 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2">
                   <Bot className="w-5 h-5 text-white" />
-                  <span className="text-white font-semibold text-sm">Nia — The NewStart Navigator</span>
+                  <span className="text-white font-semibold text-sm">Nia — The SettleMap Navigator</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <button
