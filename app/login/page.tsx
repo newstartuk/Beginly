@@ -45,7 +45,7 @@ export default function LoginPage() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">S</span>
             </div>
-            <span className="font-bold text-navy">SettleMap</span>
+            <span className="font-bold text-navy">Beginly</span>
           </Link>
           <h1 className="text-2xl font-bold text-navy">Welcome back</h1>
           <p className="text-sm text-muted mt-1">

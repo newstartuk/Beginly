@@ -29,7 +29,7 @@ export default function NHSPage() {
         {/* Disclaimer */}
         <div className="disclaimer-box flex items-start gap-2">
           <AlertTriangle className="w-4 h-4 text-muted shrink-0 mt-0.5" />
-          <p>This guide is for general information only. SettleMap does not provide medical advice. For health concerns, contact the NHS directly or visit your GP.</p>
+          <p>This guide is for general information only. Beginly does not provide medical advice. For health concerns, contact the NHS directly or visit your GP.</p>
         </div>
 
         {/* NHS Overview */}

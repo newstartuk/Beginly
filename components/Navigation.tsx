@@ -126,7 +126,7 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="font-bold text-navy text-sm leading-tight">SettleMap</p>
+              <p className="font-bold text-navy text-sm leading-tight">Beginly</p>
               <p className="text-xs text-muted leading-tight">UK Settlers</p>
             </div>
           )}
@@ -252,7 +252,7 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
             <div className="w-7 h-7 bg-teal rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-xs">S</span>
             </div>
-            <span className="font-bold text-navy text-sm">SettleMap</span>
+            <span className="font-bold text-navy text-sm">Beginly</span>
           </div>
           <button onClick={() => setMobileOpen(false)} className="p-1.5 rounded-lg hover:bg-civic-50">
             <X className="w-4 h-4 text-muted" />
@@ -336,7 +336,7 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
             <div className="w-7 h-7 bg-teal rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-xs">S</span>
             </div>
-            <span className="font-bold text-navy text-sm">SettleMap</span>
+            <span className="font-bold text-navy text-sm">Beginly</span>
           </div>
           <button
             onClick={() => setMobileOpen(true)}

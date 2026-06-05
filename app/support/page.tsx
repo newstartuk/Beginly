@@ -16,7 +16,7 @@ const CATEGORIES: { value: SupportCategory; label: string; desc: string }[] = [
 ];
 
 const DISCLAIMER =
-  "SettleMap provides general settlement guidance only. We do not provide legal, immigration, financial, tax, medical, or housing advice. For urgent or regulated matters, please contact official services or qualified professionals.";
+  "Beginly provides general settlement guidance only. We do not provide legal, immigration, financial, tax, medical, or housing advice. For urgent or regulated matters, please contact official services or qualified professionals.";
 
 export default function SupportPage() {
   const [category, setCategory] = useState<SupportCategory | "">("");

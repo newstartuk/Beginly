@@ -104,7 +104,7 @@ export default function BudgetPage() {
       <div className="max-w-5xl mx-auto space-y-5 animate-fade-in">
         {/* Print-only header */}
         <div className="hidden print:block mb-6">
-          <h1 className="text-2xl font-bold text-navy">SettleMap — Budget Planner</h1>
+          <h1 className="text-2xl font-bold text-navy">Beginly — Budget Planner</h1>
           <p className="text-sm text-muted">Generated on {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
           <div className="mt-4 border-t border-border" />
         </div>

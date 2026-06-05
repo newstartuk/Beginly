@@ -195,7 +195,7 @@ export default function TaskDetailPage() {
           </Link>
         )}
 
-        <Disclaimer text="SettleMap provides general settlement guidance, checklist support, document explanation, and signposting. We do not provide legal, immigration, financial, tax, medical, or housing advice. For official or regulated matters, please use official sources or speak to a qualified professional." type="general" />
+        <Disclaimer text="Beginly provides general settlement guidance, checklist support, document explanation, and signposting. We do not provide legal, immigration, financial, tax, medical, or housing advice. For official or regulated matters, please use official sources or speak to a qualified professional." type="general" />
       </div>
     </Navigation>
   );

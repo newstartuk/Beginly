@@ -91,7 +91,7 @@ export default function LandingPage() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">S</span>
             </div>
-            <span className="font-bold text-navy text-base">SettleMap</span>
+            <span className="font-bold text-navy text-base">Beginly</span>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/login" className="btn-ghost text-sm py-1.5 px-3">
@@ -114,7 +114,7 @@ export default function LandingPage() {
           Your UK settlement journey<br className="hidden sm:block" /> starts here.
         </h1>
         <p className="text-lg text-civic-600 max-w-2xl mx-auto mb-8 leading-relaxed">
-          SettleMap helps you navigate your first 90 days in the UK — from airport to settled. A clear, guided checklist, personalised for your situation, and pointing you to the right official sources at every step.
+          Beginly helps you navigate your first 90 days in the UK — from airport to settled. A clear, guided checklist, personalised for your situation, and pointing you to the right official sources at every step.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/signup" className="btn-primary text-base px-8 py-3 justify-center">
@@ -220,7 +220,7 @@ export default function LandingPage() {
             How we work — and how we don&apos;t
           </h2>
           <p className="text-sm text-civic-700 leading-relaxed mb-3">
-            SettleMap is a settlement support platform — not a legal, immigration, financial, or professional advice service. We help you understand what you need to do and point you to the official sources that make the decisions.
+            Beginly is a settlement support platform — not a legal, immigration, financial, or professional advice service. We help you understand what you need to do and point you to the official sources that make the decisions.
           </p>
           <p className="text-sm text-civic-700 leading-relaxed mb-3">
             Our content is built around official GOV.UK guidance, NHS guidance, and university-published information. It is reviewed before publication — but it does not substitute for advice from a qualified immigration solicitor, financial adviser, or other regulated professional.
@@ -238,7 +238,7 @@ export default function LandingPage() {
             Your first 90 days start now.
           </h2>
           <p className="text-teal-100 text-sm leading-relaxed mb-8 max-w-xl mx-auto">
-            Join newcomers from around the world using SettleMap to settle in confidently. Free forever. No credit card needed.
+            Join newcomers from around the world using Beginly to settle in confidently. Free forever. No credit card needed.
           </p>
           <Link href="/signup" className="inline-flex items-center gap-2 bg-white text-primary font-bold text-sm px-8 py-3 rounded-xl hover:bg-teal-50 transition-colors">
             Create your roadmap now <ArrowRight className="w-4 h-4" />
@@ -259,7 +259,7 @@ export default function LandingPage() {
             <Link href="/signup" className="hover:text-primary">Sign up</Link>
           </div>
           <p className="text-center text-xs text-muted">
-            © 2026 SettleMap. SettleMap is an independent platform and is not affiliated with the UK government, the NHS, or any university.
+            © 2026 SettleMap. Beginly is an independent platform and is not affiliated with the UK government, the NHS, or any university.
           </p>
         </div>
       </footer>

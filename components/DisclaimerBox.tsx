@@ -14,17 +14,17 @@ const DISCLAIMER_CONTENT: Record<
   general: {
     title: "General guidance only",
     body:
-      "SettleMap provides general settlement guidance, checklist support, document explanation, and signposting. We do not provide legal, immigration, financial, tax, medical, or housing advice. For official or regulated matters, please use official sources or speak to a qualified professional.",
+      "Beginly provides general settlement guidance, checklist support, document explanation, and signposting. We do not provide legal, immigration, financial, tax, medical, or housing advice. For official or regulated matters, please use official sources or speak to a qualified professional.",
   },
   medical: {
     title: "Not medical advice",
     body:
-      "This page is for general information only. SettleMap does not provide medical advice. For health concerns, contact the NHS directly or consult a qualified healthcare professional. In an emergency, call 999.",
+      "This page is for general information only. Beginly does not provide medical advice. For health concerns, contact the NHS directly or consult a qualified healthcare professional. In an emergency, call 999.",
   },
   legal: {
     title: "Not legal advice",
     body:
-      "This page is for general information only and does not constitute legal advice. SettleMap is not a law firm. For immigration, tenancy, or other legal matters, consult a qualified legal adviser. Your university's student advice centre is a good starting point.",
+      "This page is for general information only and does not constitute legal advice. Beginly is not a law firm. For immigration, tenancy, or other legal matters, consult a qualified legal adviser. Your university's student advice centre is a good starting point.",
   },
   financial: {
     title: "Not financial advice",
@@ -34,7 +34,7 @@ const DISCLAIMER_CONTENT: Record<
   ai: {
     title: "Nia is not a professional adviser",
     body:
-      "Nia is an AI-assisted orientation tool created by SettleMap. She is not a regulated immigration adviser, lawyer, doctor, or financial adviser. She helps you understand information — she does not make decisions for you. Always verify important matters with a qualified professional.",
+      "Nia is an AI-assisted orientation tool created by Beginly. She is not a regulated immigration adviser, lawyer, doctor, or financial adviser. She helps you understand information — she does not make decisions for you. Always verify important matters with a qualified professional.",
   },
 };
 

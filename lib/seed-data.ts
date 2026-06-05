@@ -1066,7 +1066,7 @@ export const SEED_TASKS: Task[] = [
       "Use a free CV template from Indeed, Totaljobs, or the University Careers Service.",
       "UK CV format: personal profile, education, work experience, skills, references.",
       "Get your CV reviewed by your university careers service — it is free for students.",
-      "Learn the job scam warning signs: job scams guide in the SettleMap guidance library.",
+      "Learn the job scam warning signs: job scams guide in the Beginly guidance library.",
       "Never pay money to get a job — legitimate employers do not charge application fees.",
     ],
     commonMistakes: [
@@ -1295,7 +1295,7 @@ export const SEED_TASKS: Task[] = [
     ],
     riskWarning: undefined,
     sourceSignpost:
-      "SettleMap 90-Day Review guidance: settlemap.com/guides/90-day-review",
+      "Beginly 90-Day Review guidance: beginly.com/guides/90-day-review",
   },
   {
     taskId: "STU_D90_007",

@@ -3,9 +3,9 @@ import "./globals.css";
 import Nia from "@/components/Nia";
 
 export const metadata: Metadata = {
-  title: "SettleMap — Your UK Settlement Guide",
+  title: "Beginly — Your UK Settlement Guide",
   description:
-    "SettleMap helps everyone arriving in the UK get settled within 90 days — personalised checklists, plain-English guidance, and a UK-readiness score.",
+    "Beginly helps everyone arriving in the UK get settled within 90 days — personalised checklists, plain-English guidance, and a UK-readiness score.",
   icons: { icon: "/favicon.svg" },
 };
 

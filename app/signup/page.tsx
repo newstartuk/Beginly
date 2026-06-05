@@ -7,7 +7,7 @@ import Disclaimer from "@/components/Disclaimer";
 import { AlertCircle } from "lucide-react";
 
 const DISCLAIMER =
-  "SettleMap provides general settlement guidance, checklist support, document explanation, and signposting. We do not provide legal, immigration, financial, tax, medical, or housing advice.";
+  "Beginly provides general settlement guidance, checklist support, document explanation, and signposting. We do not provide legal, immigration, financial, tax, medical, or housing advice.";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -51,7 +51,7 @@ export default function SignupPage() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">S</span>
             </div>
-            <span className="font-bold text-navy">SettleMap</span>
+            <span className="font-bold text-navy">Beginly</span>
           </Link>
           <h1 className="text-2xl font-bold text-navy">Create your free account</h1>
           <p className="text-sm text-muted mt-1">

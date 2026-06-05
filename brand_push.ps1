@@ -9,7 +9,7 @@ function Write-Log {
     Write-Host $msg
 }
 
-Push-Location "C:\Users\akino\.qclaw-oversea\workspace\SettleMap"
+Push-Location "C:\Users\akino\.qclaw-oversea\workspace\Beginly"
 Write-Log "=== Staging and committing ==="
 git add app/page.tsx
 git status --short | Out-File -FilePath $log -Append

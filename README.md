@@ -1,10 +1,10 @@
-# SettleMap
+# Beginly
 
 **Your guided settlement platform for the UK — built for everyone arriving in the UK, within 90 days.**
 
-SettleMap helps new immigrants, international students, skilled workers, and all newcomers arriving in the UK get settled quickly, safely, and with confidence. From opening a bank account to understanding the NHS, SettleMap provides a personalised checklist, step-by-step guidance, and a UK-readiness score — all in one place.
+Beginly helps new immigrants, international students, skilled workers, and all newcomers arriving in the UK get settled quickly, safely, and with confidence. From opening a bank account to understanding the NHS, Beginly provides a personalised checklist, step-by-step guidance, and a UK-readiness score — all in one place.
 
-> 🚨 **Note:** SettleMap is an orientation and information tool. It does **not** provide immigration, legal, medical, or financial advice. Always verify critical information at [GOV.UK](https://www.gov.uk) and consult qualified professionals for anything requiring regulated advice. See our [full disclaimer](#disclaimer) below.
+> 🚨 **Note:** Beginly is an orientation and information tool. It does **not** provide immigration, legal, medical, or financial advice. Always verify critical information at [GOV.UK](https://www.gov.uk) and consult qualified professionals for anything requiring regulated advice. See our [full disclaimer](#disclaimer) below.
 
 ---
 
@@ -14,7 +14,7 @@ SettleMap helps new immigrants, international students, skilled workers, and all
 - **UK Readiness Score** — a weighted score showing how settled you are, updated as you complete tasks
 - **Task-level guidance** — step-by-step instructions, common mistakes, and official source links for every task
 - **Document Helper** — plain-English explanations of official UK documents, with guardrails and safe next steps
-- **Nia — The SettleMap Navigator** — AI-assisted guide for orientation questions, transparently disclosed as not a regulated adviser
+- **Nia — The Beginly Navigator** — AI-assisted guide for orientation questions, transparently disclosed as not a regulated adviser
 - **Budget Planner** — income, expenses, and savings tracker with a printable summary
 - **NHS Guide** — practical guide to using the NHS, from GP registration to prescriptions
 - **Emergency Contacts** — vetted official numbers: 999, 111, 101, Samaritans, and more
@@ -58,8 +58,8 @@ See the [Developer Action Prompt](./docs/DEVELOPER_ACTION_PROMPT.md) for full v1
 ### Installation
 
 ```bash
-git clone https://github.com/settlemap/SettleMap.git
-cd SettleMap
+git clone https://github.com/newstartUK/Beginly.git
+cd Beginly
 npm install
 ```
 
@@ -101,7 +101,7 @@ npm run lint
 ## 📁 Project Structure
 
 ```
-SettleMap/
+Beginly/
 ├── app/                        # Next.js App Router pages
 │   ├── page.tsx                 # Landing page
 │   ├── onboarding/              # Onboarding wizard
@@ -120,7 +120,7 @@ SettleMap/
 │   │   └── guides/              # Guidance management (stub)
 │   └── document-helper/        # Document Helper AI tool
 ├── components/                  # Reusable UI components
-│   ├── Nia.tsx                  # Nia — AI guide (The SettleMap Navigator)
+│   ├── Nia.tsx                  # Nia — AI guide (The Beginly Navigator)
 │   ├── Navigation.tsx           # Desktop navigation
 │   ├── MobileNav.tsx            # Mobile bottom tab navigation
 │   ├── DashboardSkeleton.tsx     # Loading skeleton
@@ -147,9 +147,9 @@ SettleMap/
 
 ---
 
-## 🤖 Nia — The SettleMap Navigator
+## 🤖 Nia — The Beginly Navigator
 
-Nia is SettleMap's AI-assisted orientation guide. She helps users understand their checklist tasks, find official sources, and navigate daily UK life.
+Nia is Beginly's AI-assisted orientation guide. She helps users understand their checklist tasks, find official sources, and navigate daily UK life.
 
 **Transparency:** Nia is explicitly disclosed as an AI tool — not a real adviser, not affiliated with any government body, not a substitute for professional advice. See [components/Nia.tsx](./components/Nia.tsx) for full implementation.
 
@@ -164,7 +164,7 @@ Nia is **not** designed to answer:
 ## 🔐 Data & Privacy
 
 - **Client-side only (current):** All user data is stored in your browser's `localStorage`. Nothing is sent to a server.
-- **No tracking:** SettleMap does not use analytics trackers or third-party tracking.
+- **No tracking:** Beginly does not use analytics trackers or third-party tracking.
 - **Future backend:** When Supabase is connected, data will be stored in Supabase Postgres with Row Level Security policies.
 
 ---
@@ -189,7 +189,7 @@ RLS (Row Level Security) is configured on all tables. A service role key is requ
 
 ## ⚠️ Disclaimer
 
-SettleMap is an **information and orientation tool only**.
+Beginly is an **information and orientation tool only**.
 
 - We are **not** affiliated with the UK Government, GOV.UK, UKVI, NHS, or any official body.
 - Nothing on this platform constitutes **immigration advice, legal advice, medical advice, or financial advice**.
@@ -202,7 +202,7 @@ SettleMap is an **information and orientation tool only**.
 
 ## 📄 License
 
-MIT — SettleMap is an open-source project.
+MIT — Beginly is an open-source project.
 
 ---
 
