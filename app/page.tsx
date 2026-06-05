@@ -259,7 +259,7 @@ export default function LandingPage() {
             <Link href="/signup" className="hover:text-primary">Sign up</Link>
           </div>
           <p className="text-center text-xs text-muted">
-            © 2026 SettleMap. Beginly is an independent platform and is not affiliated with the UK government, the NHS, or any university.
+            © 2026 Beginly. Beginly is an independent platform and is not affiliated with the UK government, the NHS, or any university.
           </p>
         </div>
       </footer>
