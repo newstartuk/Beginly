@@ -122,7 +122,7 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
         >
           {/* Logo mark */}
           <div className="w-8 h-8 bg-teal rounded-xl flex items-center justify-center shrink-0 shadow-sm">
-            <span className="text-white font-bold text-sm leading-none">S</span>
+            <span className="text-white font-bold text-sm leading-none">B</span>
           </div>
           {!collapsed && (
             <div className="min-w-0">
@@ -250,7 +250,7 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
         <div className="flex items-center justify-between px-4 py-4 border-b border-border">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 bg-teal rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-xs">S</span>
+              <span className="text-white font-bold text-xs">B</span>
             </div>
             <span className="font-bold text-navy text-sm">Beginly</span>
           </div>
@@ -334,7 +334,7 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
         <header className="bg-white border-b border-border px-4 py-3 flex items-center justify-between md:hidden sticky top-0 z-30">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 bg-teal rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-xs">S</span>
+              <span className="text-white font-bold text-xs">B</span>
             </div>
             <span className="font-bold text-navy text-sm">Beginly</span>
           </div>

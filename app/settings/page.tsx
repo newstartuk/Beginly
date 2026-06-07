@@ -6,6 +6,7 @@ import type { ReminderPrefs, ArrivalProfile } from "@/types";
 import { User, Bell, Trash2, CheckCircle, AlertCircle, BellRing } from "lucide-react";
 import Disclaimer from "@/components/Disclaimer";
 import Navigation from "@/components/Navigation";
+import SettingsSkeleton from "@/components/SettingsSkeleton";
 
 
 export default function SettingsPage() {
@@ -37,7 +38,7 @@ export default function SettingsPage() {
     router.push("/login");
   };
 
-  if (!user) return null;
+  if (!user) return <SettingsSkeleton />;
 
   return (
     <Navigation>

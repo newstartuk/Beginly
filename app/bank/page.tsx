@@ -17,7 +17,7 @@ const UK_BANKS = [
 ];
 
 const DOCUMENTS_NEEDED = [
-  "Passport or BRP (Biometric Residence Permit) — primary ID",
+  "Passport or UKVI eVisa — primary ID",
   "Proof of address — tenancy agreement, university letter, or utility bill (dated within last 3 months)",
   "Student status letter — from your university (ask student services)",
   "UK phone number — required by most banks (get a free SIM on arrival)",
@@ -26,7 +26,7 @@ const DOCUMENTS_NEEDED = [
 
 const STEPS = [
   "Get a UK phone number (free SIM: giffgaff, Lebara, or Lycamobile)",
-  "Gather your documents (passport, BRP, proof of address, student letter)",
+  "Gather your documents (passport, UKVI eVisa, proof of address, student letter)",
   "Apply online or visit a branch — Monzo/Starling are fully digital and fastest",
   "Wait for your sort code and account number (usually 1–5 working days)",
   "Receive your debit card by post (3–7 working days)",
@@ -61,7 +61,7 @@ export default function BankPage() {
             ))}
           </div>
           <p className="text-xs text-muted">
-            <strong>Note:</strong> Some banks accept your passport + BRP as primary ID. Others may require additional documents. Check the bank's website before visiting.
+            <strong>Note:</strong> Most banks accept your passport + UKVI eVisa as primary ID. If you have an older physical BRP card (no longer issued for new arrivals), check with your bank first. Some may still accept it. Check the bank's website before visiting.
           </p>
         </div>
 

@@ -9,6 +9,7 @@ import {
   ResponsiveContainer, Legend,
 } from "recharts";
 import { TrendingUp, Trash2, Plus, AlertTriangle, Printer } from "lucide-react";
+import BudgetSkeleton from "@/components/BudgetSkeleton";
 
 const STORAGE_KEY = "nsk_budget";
 
@@ -97,7 +98,7 @@ export default function BudgetPage() {
     saveBudget(updated);
   };
 
-  if (!mounted) return null;
+  if (!mounted) return <BudgetSkeleton />;
 
   return (
     <Navigation>
