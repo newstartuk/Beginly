@@ -70,8 +70,8 @@ export default function ProgressRing({
         {showPercentage && (
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span
-              className="font-bold leading-none"
-              style={{ fontSize: size * 0.2, color: "var(--color-teal)" }}
+              className="font-extrabold leading-none"
+              style={{ fontSize: size * 0.2, color }}
             >
               {Math.round(clampedPct)}%
             </span>
