@@ -22,6 +22,9 @@ export default function DocumentHelperPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const docTypes = getAvailableDocTypes();
 
+  // Debug: show build version — remove after verification
+  const BUILD_VERSION = "v2-doc-upload";
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -83,8 +86,11 @@ export default function DocumentHelperPage() {
           <div className="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center">
             <Bot className="w-5 h-5 text-primary" />
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-navy">Document Helper</h1>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-bold text-navy">Document Helper</h1>
+              <span className="text-[10px] font-mono bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded">Upload v2</span>
+            </div>
             <p className="text-xs text-muted">Powered by Nia — your Beginly guide</p>
           </div>
         </div>
