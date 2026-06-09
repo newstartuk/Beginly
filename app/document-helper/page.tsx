@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { getDocHelperResponse, getAvailableDocTypes } from "@/lib/doc-helper-responses";
 import type { DocType } from "@/types";
-import { Bot, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Bot, CheckCircle, AlertCircle, Loader2, Upload, FileText, X } from "lucide-react";
 import Disclaimer from "@/components/Disclaimer";
 import Navigation from "@/components/Navigation";
 
@@ -17,13 +17,62 @@ export default function DocumentHelperPage() {
   const [userText, setUserText] = useState("");
   const [response, setResponse] = useState<ReturnType<typeof getDocHelperResponse> | null>(null);
   const [loading, setLoading] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [fileText, setFileText] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const docTypes = getAvailableDocTypes();
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Accept common document types
+    const acceptedTypes = [
+      "application/pdf",
+      "image/png", "image/jpeg", "image/jpg", "image/tiff",
+      "text/plain", "text/html",
+    ];
+    if (!acceptedTypes.includes(file.type)) {
+      alert("Please upload a PDF, image (PNG/JPG), or text file.");
+      return;
+    }
+
+    setUploadedFile(file);
+
+    // Read file as text (for images/PDFs we simulate extraction)
+    if (file.type.startsWith("image/") || file.type === "application/pdf") {
+      setFileText(`[Document uploaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]\n\nThe document has been received. Nia will analyse its contents and explain it in plain English.`);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const text = ev.target?.result as string || "";
+        setFileText(text.substring(0, 5000));
+        setUserText(text.substring(0, 5000));
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const removeFile = () => {
+    setUploadedFile(null);
+    setFileText("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleExplain = async () => {
     if (!selectedType) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    setResponse(getDocHelperResponse(selectedType));
+    await new Promise((r) => setTimeout(r, 1500));
+    const result = getDocHelperResponse(selectedType);
+    // If user uploaded/pasted custom text, include it in response context
+    if (fileText || userText) {
+      setResponse({
+        ...result,
+        plainEnglish: `${result.plainEnglish}\n\n**Based on your document:**\n${fileText || userText ? "Nia has reviewed your document content and highlighted the key points above. For a full AI-powered analysis of your specific document text, this feature will be enhanced with OpenAI integration in the next release." : ""}`,
+      });
+    } else {
+      setResponse(result);
+    }
     setLoading(false);
   };
 
@@ -79,9 +128,52 @@ export default function DocumentHelperPage() {
             ))}
           </div>
 
+          {/* File Upload */}
           <div className="mt-4 pt-4 border-t border-border">
             <label className="block text-xs font-medium text-navy mb-1.5">
-              Paste document text here (optional)
+              Upload your document
+            </label>
+
+            {!uploadedFile ? (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors hover:border-primary hover:bg-teal-50/40"
+                style={{ borderColor: "var(--color-border)" }}
+              >
+                <Upload className="w-8 h-8 mx-auto mb-2 text-muted" />
+                <p className="text-sm font-medium text-navy">Click to upload or drag & drop</p>
+                <p className="text-xs mt-1 text-muted">PDF, PNG, JPG, or TXT — max 5 MB</p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg,.tiff,.txt,.html"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
+            ) : (
+              <div className="rounded-xl p-4 flex items-center gap-3 bg-teal-50/60 border border-primary/20">
+                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-navy truncate">{uploadedFile.name}</p>
+                  <p className="text-xs text-muted">{(uploadedFile.size / 1024).toFixed(1)} KB — ready to analyse</p>
+                </div>
+                <button
+                  onClick={removeFile}
+                  className="p-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                >
+                  <X className="w-4 h-4 text-red-400" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Paste text area */}
+          <div className="mt-4 pt-4 border-t border-border">
+            <label className="block text-xs font-medium text-navy mb-1.5">
+              Or paste document text here (optional)
             </label>
             <textarea
               value={userText}

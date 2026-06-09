@@ -476,24 +476,23 @@ export default function LandingPage() {
       <section className="pb-20 px-6">
         <div className="max-w-3xl mx-auto">
           <div
-            className="rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden"
-            style={{ background: "linear-gradient(135deg, #102A43 0%, #1A3A5C 100%)" }}
+            className="rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden bg-[#102A43]"
           >
-            {/* Decorative */}
+            {/* Decorative circles */}
             <div
-              className="absolute rounded-full opacity-10"
+              className="absolute rounded-full opacity-15 pointer-events-none"
               style={{
-                width: 200, height: 200,
-                background: "radial-gradient(circle, #0B7285 0%, transparent 70%)",
-                top: -60, right: -60,
+                width: 280, height: 280,
+                background: "radial-gradient(circle, #0B7285 0%, transparent 65%)",
+                top: -80, right: -80,
               }}
             />
             <div
-              className="absolute rounded-full opacity-10"
+              className="absolute rounded-full opacity-12 pointer-events-none"
               style={{
-                width: 150, height: 150,
-                background: "radial-gradient(circle, #7C3AED 0%, transparent 70%)",
-                bottom: -40, left: -40,
+                width: 220, height: 220,
+                background: "radial-gradient(circle, #7C3AED 0%, transparent 65%)",
+                bottom: -60, left: -60,
               }}
             />
 
@@ -504,19 +503,19 @@ export default function LandingPage() {
                 Your first 90 days start now.
               </h2>
               <p
-                className="text-sm mb-8 max-w-xl mx-auto"
-                style={{ color: "rgba(255,255,255,0.7)" }}
+                className="text-sm mb-8 max-w-xl mx-auto leading-relaxed"
+                style={{ color: "rgba(255,255,255,0.75)" }}
               >
                 Join newcomers from around the world using Beginly to settle in confidently.
                 Free forever. No credit card needed.
               </p>
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 text-sm font-bold px-8 py-3.5 rounded-xl"
+                className="inline-flex items-center gap-2 text-sm font-bold px-8 py-3.5 rounded-xl transition-transform hover:scale-[1.03]"
                 style={{
                   background: "var(--color-teal)",
                   color: "#fff",
-                  boxShadow: "0 4px 16px rgba(11,114,133,0.4)",
+                  boxShadow: "0 4px 16px rgba(11,114,133,0.45)",
                 }}
               >
                 Create your roadmap now
