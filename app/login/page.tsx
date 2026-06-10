@@ -2,7 +2,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getUser, verifyPassword } from "@/lib/utils";
 import { AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
@@ -19,22 +18,28 @@ export default function LoginPage() {
     if (!email || !password) { setError("Please enter your email and password."); return; }
 
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 500));
 
-    const user = getUser();
-    if (!user || user.email !== email.toLowerCase()) {
-      setError("No account found with that email. Please check and try again.");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Login failed.");
+        setLoading(false);
+        return;
+      }
+
+      // Login successful — redirect to dashboard or onboarding
+      router.push(data.user.profileCompleted ? "/dashboard" : "/onboarding");
+    } catch {
+      setError("Network error. Please check your connection and try again.");
       setLoading(false);
-      return;
     }
-
-    if (!verifyPassword(password, user.passwordHash)) {
-      setError("Incorrect password. Please try again.");
-      setLoading(false);
-      return;
-    }
-
-    router.push(user.profileCompleted ? "/dashboard" : "/onboarding");
   };
 
   return (

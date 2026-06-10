@@ -2,7 +2,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createUser, setUser, getUser } from "@/lib/utils";
 import Disclaimer from "@/components/Disclaimer";
 import { AlertCircle } from "lucide-react";
 
@@ -28,18 +27,28 @@ export default function SignupPage() {
     if (password !== confirm) { setError("Passwords do not match."); return; }
 
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
 
-    const existing = getUser();
-    if (existing && existing.email === email) {
-      setError("An account with this email already exists. Please sign in instead.");
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), email: email.toLowerCase(), password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Something went wrong.");
+        setLoading(false);
+        return;
+      }
+
+      // Account created — redirect to onboarding
+      router.push("/onboarding");
+    } catch {
+      setError("Network error. Please check your connection and try again.");
       setLoading(false);
-      return;
     }
-
-    const user = createUser(name.trim(), email.toLowerCase(), password);
-    setUser(user);
-    router.push("/onboarding");
   };
 
   return (

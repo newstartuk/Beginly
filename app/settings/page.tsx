@@ -8,20 +8,60 @@ import Disclaimer from "@/components/Disclaimer";
 import Navigation from "@/components/Navigation";
 import SettingsSkeleton from "@/components/SettingsSkeleton";
 
+// API-based user data (for Supabase auth)
+interface ApiUser {
+  id: string;
+  name: string;
+  email: string;
+  profile_completed?: boolean;
+}
+
+interface ApiProfile {
+  arrival_type?: string;
+  status?: string;
+  arrival_date?: string;
+  city?: string;
+  university?: string;
+  accommodation?: string;
+  nationality?: string;
+  english_level?: string;
+  work_interest?: string;
+}
+
 
 export default function SettingsPage() {
   const router = useRouter();
-  const [user, setUser] = useState<ReturnType<typeof getUser>>(null);
-  const [profile, setProfile] = useState<ReturnType<typeof getArrivalProfile>>(null);
+  const [user, setUser] = useState<ApiUser | null>(null);
+  const [profile, setProfile] = useState<ApiProfile | null>(null);
   const [reminders, setReminders] = useState<ReminderPrefs>({ emailReminders: false, frequency: "weekly" });
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [notifPerm, setNotifPerm] = useState<NotificationPermission>("default");
 
   useEffect(() => {
-    setUser(getUser());
-    setProfile(getArrivalProfile());
-    setReminders(getReminderPrefs());
+    // Fetch from Supabase API (primary), fallback to localStorage
+    async function loadUserData() {
+      try {
+        const res = await fetch("/api/user");
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+          setProfile(data.profile);
+          if (data.reminders) {
+            setReminders({
+              emailReminders: data.reminders.email_reminders ?? false,
+              frequency: data.reminders.frequency || "weekly",
+            });
+          }
+          return;
+        }
+      } catch { /* fall through */ }
+      // Fallback to localStorage for backward compat
+      setUser(getUser() as any);
+      setProfile(getArrivalProfile() as any);
+      setReminders(getReminderPrefs());
+    }
+    loadUserData();
     if ("Notification" in window) {
       setNotifPerm(Notification.permission);
     }

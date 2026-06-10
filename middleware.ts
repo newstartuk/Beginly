@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Protected routes require a valid session cookie
 const PROTECTED_PATHS = [
   "/dashboard",
   "/checklist",
@@ -10,9 +9,9 @@ const PROTECTED_PATHS = [
   "/support",
   "/tasks",
   "/admin",
+  "/onboarding",
 ];
 
-// Routes only accessible to admin users
 const ADMIN_PATHS = ["/admin"];
 
 function isProtected(path: string): boolean {
@@ -23,11 +22,36 @@ function isAdmin(path: string): boolean {
   return ADMIN_PATHS.some((p) => path === p || path.startsWith(p + "/"));
 }
 
+// Simple JWT verification (mirrors lib/auth.ts for edge compatibility)
+function verifyToken(token: string): { sub?: string; isAdmin?: boolean; exp?: number } | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+
+    const crypto = require("crypto");
+    const secret = process.env.JWT_SECRET || "beginly_jwt_secret_2026_change_me_in_production_abc123xyz";
+    const [header, payload, signature] = parts;
+    const expectedSig = crypto
+      .createHmac("sha256", secret)
+      .update(`${header}.${payload}`)
+      .digest("base64url");
+
+    if (signature !== expectedSig) return null;
+
+    const decoded = JSON.parse(Buffer.from(payload, "base64").toString());
+    if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) return null;
+
+    return decoded;
+  } catch {
+    return null;
+  }
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip Next.js internals (redundant with matcher but belt-and-suspenders)
-  if (pathname.startsWith("/_next") || pathname === "/favicon.ico") {
+  // Skip Next.js internals
+  if (pathname.startsWith("/_next") || pathname === "/favicon.ico" || pathname.startsWith("/api/")) {
     return NextResponse.next();
   }
 
@@ -42,6 +66,20 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Verify JWT on protected routes (extra safety)
+  if (isProtected(pathname) && session) {
+    const payload = verifyToken(session);
+    if (!payload) {
+      // Token invalid — clear cookies and redirect to login
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      const response = NextResponse.redirect(url);
+      response.cookies.set("nsk_session", "", { maxAge: 0, path: "/" });
+      response.cookies.set("nsk_is_admin", "", { maxAge: 0, path: "/" });
+      return response;
+    }
+  }
+
   // Block non-admins from admin routes
   if (isAdmin(pathname) && !isAdminUser) {
     const url = request.nextUrl.clone();
@@ -54,7 +92,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Exclude Next.js internals and static assets
-    "/((?!_next/static|_next/image|favicon).*)",
+    "/((?!_next/static|_next/image|favicon|api).*)",
   ],
 };

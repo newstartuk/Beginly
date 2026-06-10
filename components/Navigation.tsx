@@ -97,8 +97,14 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
     setCollapsed(next);
   };
 
-  const handleLogout = () => {
-    clearAllData();
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch { /* ignore */ }
+    // Clear local cache
+    if (typeof window !== "undefined") {
+      localStorage.clear();
+    }
     window.location.href = "/login";
   };
 
