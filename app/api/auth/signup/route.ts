@@ -48,9 +48,12 @@ export async function POST(request: NextRequest) {
       .select('id, name, email, is_admin, profile_completed, created_at')
       .single();
 
-    if (error) {
-      console.error('Signup error:', error);
-      return NextResponse.json({ error: 'Failed to create account. Please try again.' }, { status: 500 });
+    if (error || !user) {
+      console.error('Signup error — SUPABASE_SERVICE_ROLE_KEY may be missing or misconfigured:', error);
+      return NextResponse.json(
+        { error: 'Server configuration error. Please contact support or try again in a moment.' },
+        { status: 500 }
+      );
     }
 
     // Sign a JWT token
