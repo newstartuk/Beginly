@@ -190,7 +190,7 @@ export default function SettingsPage() {
             <h2 className="text-base font-semibold text-danger">Delete account &amp; data</h2>
           </div>
           <p className="text-sm text-civic-600 mb-4">
-            This deletes all your data from this device. Your GitHub repository is unaffected.
+            This deletes all your data from Beginly. You have 14 days to reverse the deletion after which your profile will be taken off completely.
           </p>
           {!confirmDelete ? (
             <button onClick={() => setConfirmDelete(true)} className="bg-red-500 hover:bg-red-600 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors">

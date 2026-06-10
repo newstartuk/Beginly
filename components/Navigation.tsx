@@ -49,6 +49,7 @@ const NAV_ITEMS = [
   { href: "/emergency",          label: "Emergency",       icon: Shield },
   { href: "/settings",          label: "Settings",        icon: Settings },
   { href: "/support",           label: "Support",         icon: LifeBuoy },
+  { href: "#signout",          label: "Sign out",        icon: LogOut },
 ];
 
 const SIDEBAR_COLLAPSED_KEY = "nsk_sidebar_collapsed";
@@ -263,6 +264,23 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
         <nav className="flex-1 py-3 px-3 space-y-0.5 overflow-y-auto">
           {visibleItems.map(({ href, label, icon: Icon }) => {
             const active = pathname === href || pathname.startsWith(href + "/");
+
+            // Sign out is an action, not a route
+            if (href === "#signout") {
+              return (
+                <button
+                  key={href}
+                  onClick={handleLogout}
+                  className={["flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
+                    "text-civic-500 hover:bg-red-50 hover:text-red-500 w-full"
+                  ].join(" ")}
+                >
+                  <Icon className="w-4 h-4 shrink-0" />
+                  {label}
+                </button>
+              );
+            }
+
             return (
               <Link
                 key={href}
