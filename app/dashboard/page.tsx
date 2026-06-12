@@ -59,7 +59,7 @@ export default function DashboardPage() {
   if (!mounted || loading) return <DashboardSkeleton />;
   if (!user) return null;
 
-  const stage = calculateStage(profile?.arrivalDate);
+  const stage = calculateStage(profile?.arrivalDate as string | undefined);
   const score = calculateReadinessScore(SEED_TASKS, tasks);
   const highPriority = SEED_TASKS.filter(
     (t) =>
@@ -216,7 +216,7 @@ export default function DashboardPage() {
                   <p className="text-xs text-teal-200 mt-0.5">
                     {profile?.city ? `${profile.city}` : ""}
                     {profile?.city && profile?.university ? " · " : ""}
-                    {profile?.university ? `${profile.university.split(" ")[0]} University` : "No university set"}
+                    {profile?.university ? `${(profile.university as string).split(" ")[0]} University` : "No university set"}
                   </p>
                 </div>
               </div>

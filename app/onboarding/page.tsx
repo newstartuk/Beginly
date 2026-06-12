@@ -429,8 +429,8 @@ export default function OnboardingPage() {
           {step < STEPS.length - 1 ? (
             <button
               onClick={next}
-              disabled={loading}
               disabled={
+                loading ||
                 (step === 1 && !profile.arrivalStatus) ||
                 (step === 2 && (!profile.city || !profile.university))
               }

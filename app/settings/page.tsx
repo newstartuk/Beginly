@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import type { ReminderPrefs, ArrivalProfile } from "@/types";
+import type { ReminderPrefs } from "@/types";
 import { User, Bell, Trash2, CheckCircle, AlertCircle, BellRing } from "lucide-react";
 import Disclaimer from "@/components/Disclaimer";
 import Navigation from "@/components/Navigation";
@@ -58,9 +58,14 @@ export default function SettingsPage() {
     loadSession();
   }, [router]);
 
-  const handleReminderSave = () => {
-    setReminderPrefs(reminders);
+  const handleReminderSave = async () => {
     setSaved(true);
+    await fetch("/api/user", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ reminders }),
+    }).catch(() => {});
     setTimeout(() => setSaved(false), 2000);
   };
 
