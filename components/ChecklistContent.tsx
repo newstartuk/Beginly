@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getUserTasks, upsertUserTask } from "@/lib/utils";
+
 import { SEED_TASKS } from "@/lib/seed-data";
 import type { TaskStatus, TaskStage, TaskCategory } from "@/types";
 import {
@@ -59,16 +59,24 @@ export default function ChecklistContent() {
   const [categoryFilter, setCategoryFilter] = useState<TaskCategory | "ALL">("ALL");
   const [statusFilter, setStatusFilter] = useState<TaskStatus | "ALL">("ALL");
   const [search, setSearch] = useState("");
-  const [userTasks, setUserTasks] = useState<ReturnType<typeof getUserTasks>>([]);
+  const [tasks, setTasks] = useState<{ taskId: string; status: TaskStatus; completedAt?: string }[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
-    setUserTasks(getUserTasks());
+    async function loadSession() {
+      const res = await fetch("/api/user", { credentials: "include" });
+      if (!res.ok) return;
+      const data = await res.json();
+      setTasks(data.tasks || []);
+      setLoading(false);
+    }
+    loadSession();
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted || loading) return null;
 
-  const refresh = () => setUserTasks(getUserTasks());
+  const refresh = () => setTasks((prev) => [...prev]);
 
   const toggle = (taskId: string, current: TaskStatus) => {
     const next: TaskStatus =
@@ -77,12 +85,25 @@ export default function ChecklistContent() {
         : current === "in_progress"
         ? "complete"
         : "in_progress";
-    upsertUserTask(taskId, next);
-    refresh();
+    // Optimistic update
+    setTasks((prev) => {
+      const exists = prev.find((t) => t.taskId === taskId);
+      if (exists) {
+        return prev.map((t) => t.taskId === taskId ? { ...t, status: next } : t);
+      }
+      return [...prev, { taskId, status: next }];
+    });
+    // Persist via API
+    fetch("/api/user", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ tasks: [{ taskId, status: next }] }),
+    }).catch(() => { /* silently fail — already updated optimistically */ });
   };
 
   const getStatus = (taskId: string): TaskStatus => {
-    return userTasks.find((t) => t.taskId === taskId)?.status ?? "not_started";
+    return tasks.find((t) => t.taskId === taskId)?.status ?? "not_started";
   };
 
   const filtered = SEED_TASKS.filter((t) => {
@@ -101,7 +122,7 @@ export default function ChecklistContent() {
     return true;
   });
 
-  const completed = userTasks.filter((t) => t.status === "complete").length;
+  const completed = tasks.filter((t) => t.status === "complete").length;
   const total = SEED_TASKS.filter((t) => t.active && t.required).length;
 
   return (

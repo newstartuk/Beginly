@@ -13,7 +13,7 @@ export async function POST() {
   });
 
   response.cookies.set('nsk_is_admin', '', {
-    httpOnly: false,
+    httpOnly: true,
     sameSite: 'lax',
     maxAge: 0,
     path: '/',

@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     });
 
     response.cookies.set('nsk_is_admin', String(user.is_admin), {
-      httpOnly: false,
+      httpOnly: true,
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 30,
       path: '/',
@@ -100,7 +100,8 @@ function signToken(user: any): string {
     exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 30),
   }));
 
-  const secret = process.env.JWT_SECRET || 'beginly_jwt_secret_2026_change_me_in_production_abc123xyz';
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error('JWT_SECRET environment variable is not set');
   
   // Simple HMAC for MVP (use proper library in production)
   const crypto = require('crypto');

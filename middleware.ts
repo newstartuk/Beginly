@@ -29,7 +29,9 @@ function verifyToken(token: string): { sub?: string; isAdmin?: boolean; exp?: nu
     if (parts.length !== 3) return null;
 
     const crypto = require("crypto");
-    const secret = process.env.JWT_SECRET || "beginly_jwt_secret_2026_change_me_in_production_abc123xyz";
+    const secret = process.env.JWT_SECRET;
+    // If no secret is configured, reject all protected routes to prevent token forgery
+    if (!secret) return null;
     const [header, payload, signature] = parts;
     const expectedSig = crypto
       .createHmac("sha256", secret)

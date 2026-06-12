@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getUser, getArrivalProfile, getReminderPrefs, setReminderPrefs, clearAllData } from "@/lib/utils";
+
 import type { ReminderPrefs, ArrivalProfile } from "@/types";
 import { User, Bell, Trash2, CheckCircle, AlertCircle, BellRing } from "lucide-react";
 import Disclaimer from "@/components/Disclaimer";
@@ -39,33 +39,24 @@ export default function SettingsPage() {
   const [notifPerm, setNotifPerm] = useState<NotificationPermission>("default");
 
   useEffect(() => {
-    // Fetch from Supabase API (primary), fallback to localStorage
-    async function loadUserData() {
-      try {
-        const res = await fetch("/api/user");
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.user);
-          setProfile(data.profile);
-          if (data.reminders) {
-            setReminders({
-              emailReminders: data.reminders.email_reminders ?? false,
-              frequency: data.reminders.frequency || "weekly",
-            });
-          }
-          return;
-        }
-      } catch { /* fall through */ }
-      // Fallback to localStorage for backward compat
-      setUser(getUser() as any);
-      setProfile(getArrivalProfile() as any);
-      setReminders(getReminderPrefs());
+    async function loadSession() {
+      const res = await fetch("/api/user", { credentials: "include" });
+      if (!res.ok) { router.push("/login"); return; }
+      const data = await res.json();
+      setUser(data.user);
+      setProfile(data.profile);
+      if (data.reminders) {
+        setReminders({
+          emailReminders: data.reminders.email_reminders ?? false,
+          frequency: data.reminders.frequency || "weekly",
+        });
+      }
+      if ("Notification" in window) {
+        setNotifPerm(Notification.permission);
+      }
     }
-    loadUserData();
-    if ("Notification" in window) {
-      setNotifPerm(Notification.permission);
-    }
-  }, []);
+    loadSession();
+  }, [router]);
 
   const handleReminderSave = () => {
     setReminderPrefs(reminders);
@@ -73,8 +64,8 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const handleDelete = () => {
-    clearAllData();
+  const handleDelete = async () => {
+    await fetch("/api/user", { method: "DELETE", credentials: "include" }).catch(() => {});
     router.push("/login");
   };
 

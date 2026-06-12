@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getUser, setArrivalProfile } from "@/lib/utils";
+
 import type { ArrivalProfile, AccommodationType, EnglishLevel } from "@/types";
 import {
   ArrowRight,
@@ -79,6 +79,7 @@ function clearOnboardingState() {
 export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState<Partial<ArrivalProfile>>({
     arrivalType: "international_student",
     arrivalStatus: "not_arrived",
@@ -88,15 +89,18 @@ export default function OnboardingPage() {
   const [showNotifBanner, setShowNotifBanner] = useState(false);
 
   useEffect(() => {
-    const user = getUser();
-    if (!user) router.push("/signup");
-
-    // Restore saved progress
-    const saved = loadOnboardingState();
-    if (saved) {
-      setStep(saved.step);
-      setProfile((p) => ({ ...p, ...saved.profile }));
+    async function loadSession() {
+      const res = await fetch("/api/user", { credentials: "include" });
+      if (!res.ok) { router.push("/signup"); return; }
+      const data = await res.json();
+      if (data.profile?.profile_completed) { router.push("/dashboard"); return; }
+      const saved = loadOnboardingState();
+      if (saved) {
+        setStep(saved.step);
+        setProfile((p) => ({ ...p, ...saved.profile }));
+      }
     }
+    loadSession();
   }, [router]);
 
   // Persist step + profile on every change
@@ -111,28 +115,35 @@ export default function OnboardingPage() {
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
   const handleFinish = async () => {
-    const full: ArrivalProfile = {
-      arrivalType: "international_student",
-      arrivalStatus: (profile.arrivalStatus as ArrivalProfile["arrivalStatus"]) || "not_arrived",
-      arrivalDate: profile.arrivalDate || "",
+    setLoading(true);
+    const full = {
+      arrival_type: "international_student",
+      arrival_status: (profile.arrivalStatus as ArrivalProfile["arrivalStatus"]) || "not_arrived",
+      arrival_date: profile.arrivalDate || "",
       city: profile.city || "",
       university: profile.university || "",
-      accommodationType: (profile.accommodationType as AccommodationType) || "not_secured",
+      accommodation: (profile.accommodationType as AccommodationType) || "not_secured",
       nationality: profile.nationality,
-      englishLevel: profile.englishLevel as EnglishLevel | undefined,
-      interestedInWork: profile.interestedInWork ?? false,
-      profileCompleted: true,
+      english_level: profile.englishLevel as EnglishLevel | undefined,
+      interested_in_work: profile.interestedInWork ?? false,
+      profile_completed: true,
     };
     clearOnboardingState();
-    setArrivalProfile(full);
+    try {
+      const res = await fetch("/api/user", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ profile: full }),
+      });
+      if (!res.ok) throw new Error("Save failed");
+    } catch { /* ignore */ }
     await new Promise((r) => setTimeout(r, 400));
-    // Show notification permission prompt only if not yet decided
     if (
       "Notification" in window &&
       Notification.permission === "default"
     ) {
       setShowNotifBanner(true);
-      // Don't navigate yet — banner controls the final redirect
     } else {
       router.push("/dashboard");
     }
@@ -418,6 +429,7 @@ export default function OnboardingPage() {
           {step < STEPS.length - 1 ? (
             <button
               onClick={next}
+              disabled={loading}
               disabled={
                 (step === 1 && !profile.arrivalStatus) ||
                 (step === 2 && (!profile.city || !profile.university))
@@ -429,9 +441,10 @@ export default function OnboardingPage() {
           ) : (
             <button
               onClick={handleFinish}
-              className="btn-primary flex-1 justify-center"
+              disabled={loading}
+              className="btn-primary flex-1 justify-center disabled:opacity-50"
             >
-              <CheckCircle className="w-4 h-4" /> Build my roadmap
+              {loading ? "Saving..." : <><CheckCircle className="w-4 h-4" /> Build my roadmap</>}
             </button>
           )}
         </div>

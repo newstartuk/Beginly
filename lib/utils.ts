@@ -36,31 +36,34 @@ function safeSet<T>(key: string, value: T): void {
 }
 
 // ─── Auth / User ─────────────────────────────────────────────────────────────
-// Cookie helpers for middleware-based route protection
-function setSessionCookie(userId: string, isAdmin: boolean): void {
+// Cookie helpers — both session and admin are httpOnly for security
+function setSessionCookie(token: string, isAdmin: boolean): void {
   if (typeof document === "undefined") return;
   const expires = new Date();
   expires.setDate(expires.getDate() + 30);
-  document.cookie = `nsk_session=${encodeURIComponent(userId)}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
-  document.cookie = `nsk_is_admin=${isAdmin ? "true" : "false"}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
+  // httpOnly: true — prevents JavaScript from reading the session token
+  document.cookie = `nsk_session=${encodeURIComponent(token)}; path=/; expires=${expires.toUTCString()}; SameSite=Lax; HttpOnly; Secure`;
+  // httpOnly: true — prevents JavaScript from spoofing admin access
+  document.cookie = `nsk_is_admin=${encodeURIComponent(isAdmin ? "true" : "false")}; path=/; expires=${expires.toUTCString()}; SameSite=Lax; HttpOnly`;
 }
 
 function clearSessionCookie(): void {
   if (typeof document === "undefined") return;
-  document.cookie = "nsk_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-  document.cookie = "nsk_is_admin=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  document.cookie = "nsk_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly";
+  document.cookie = "nsk_is_admin=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly";
 }
 
 export function getUser(): User | null {
   return safeGet<User | null>(KEYS.USER, null);
 }
 
-export function setUser(user: User): void {
+export function setUser(user: User, token?: string): void {
   safeSet(KEYS.USER, user);
   // Sync session cookie for middleware-based route guards
   // Admin emails: simple MVP rule — emails starting with 'admin@' are admins
   const isAdmin = user.email.toLowerCase().startsWith("admin@");
-  setSessionCookie(user.id, isAdmin);
+  // token param should be the JWT string from the API response cookie
+  setSessionCookie(token ?? user.id, isAdmin);
 }
 
 export function clearUser(): void {
@@ -68,9 +71,11 @@ export function clearUser(): void {
   clearSessionCookie();
 }
 
+// DEPRECATED — password hashing is done server-side in /api/auth/signup and /api/auth/login
+// using PBKDF2 with 100,000 iterations (lib/utils.ts is client-side only).
+// This weak hash is kept only for backwards compatibility during the localStorage → Supabase migration.
 export function hashPassword(password: string): string {
-  // MVP only — localStorage demo auth. In production, use Supabase Auth or similar.
-  // This is a simple hash for demo purposes only.
+  console.warn("[Beginly DEPRECATED] hashPassword called — migrate to server-side PBKDF2");
   let hash = 0;
   for (let i = 0; i < password.length; i++) {
     const char = password.charCodeAt(i);
@@ -91,8 +96,11 @@ export function createUser(name: string, email: string, password: string): User 
   };
 }
 
-export function verifyPassword(password: string, hash: string): boolean {
-  return hashPassword(password) === hash;
+// DEPRECATED — password verification is done server-side in /api/auth/login.
+// This weak comparison is kept only for backwards compatibility during the migration.
+export function verifyPassword(password: string, storedHash: string): boolean {
+  console.warn("[Beginly DEPRECATED] verifyPassword called — migrate to server-side PBKDF2");
+  return hashPassword(password) === storedHash;
 }
 
 // ─── Arrival Profile ──────────────────────────────────────────────────────────

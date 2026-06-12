@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import { useRouter } from "next/navigation";
-import { getUser, getArrivalProfile, getUserTasks } from "@/lib/utils";
+
 import { calculateReadinessScore } from "@/lib/readiness-score";
 import { calculateStage, getStageLabel } from "@/lib/stage-calculator";
 import { SEED_TASKS } from "@/lib/seed-data";
@@ -32,37 +32,42 @@ import Badge from "@/components/Badge";
 export default function DashboardPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [user, setUser] = useState<ReturnType<typeof getUser>>(null);
-  const [profile, setProfile] = useState<ReturnType<typeof getArrivalProfile>>(null);
-  const [userTasks, setUserTasks] = useState<UserTask[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<{ name: string; email: string; id: string; isAdmin?: boolean } | null>(null);
+  const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
+  const [tasks, setTasks] = useState<UserTask[]>([]);
   const [scamAlertIndex, setScamAlertIndex] = useState(0);
 
   useEffect(() => {
     setMounted(true);
-    const u = getUser();
-    const p = getArrivalProfile();
-    if (!u) { router.push("/signup"); return; }
-    setUser(u);
-    setProfile(p);
-    setUserTasks(getUserTasks());
+    async function loadSession() {
+      const res = await fetch("/api/user", { credentials: "include" });
+      if (!res.ok) { router.push("/signup"); return; }
+      const data = await res.json();
+      setUser(data.user);
+      setProfile(data.profile);
+      setTasks(data.tasks || []);
+      setLoading(false);
+    }
+    loadSession();
     const interval = setInterval(() => {
       setScamAlertIndex((i) => (i + 1) % getAllScamAlerts().length);
     }, 12000);
     return () => clearInterval(interval);
   }, [router]);
 
-  if (!mounted) return <DashboardSkeleton />;
+  if (!mounted || loading) return <DashboardSkeleton />;
   if (!user) return null;
 
   const stage = calculateStage(profile?.arrivalDate);
-  const score = calculateReadinessScore(SEED_TASKS, userTasks);
+  const score = calculateReadinessScore(SEED_TASKS, tasks);
   const highPriority = SEED_TASKS.filter(
     (t) =>
       t.priority === "Very High" &&
       t.active &&
-      !userTasks.find((ut) => ut.taskId === t.taskId && ut.status === "complete")
+      !tasks.find((ut) => ut.taskId === t.taskId && ut.status === "complete")
   ).slice(0, 3);
-  const completedCount = userTasks.filter((ut) => ut.status === "complete").length;
+  const completedCount = tasks.filter((ut) => ut.status === "complete").length;
   const totalTasks = SEED_TASKS.length;
   const scamAlerts = getAllScamAlerts();
   const currentAlert = scamAlerts[scamAlertIndex];
