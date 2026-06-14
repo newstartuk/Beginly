@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
@@ -20,22 +21,32 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.toLowerCase(),
+        password,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Login failed.");
+      if (authError) {
+        setError(authError.message);
         setLoading(false);
         return;
       }
 
-      // Login successful — redirect to dashboard or onboarding
-      router.push(data.user.profileCompleted ? "/dashboard" : "/onboarding");
+      if (!authData.user) {
+        setError("Something went wrong. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      // Check if profile exists in our users table
+      const { data: profileData } = await supabase
+        .from("users")
+        .select("profile_completed")
+        .eq("id", authData.user.id)
+        .single();
+
+      // Redirect: if profile complete → dashboard, else → onboarding
+      router.push(profileData?.profile_completed ? "/dashboard" : "/onboarding");
     } catch {
       setError("Network error. Please check your connection and try again.");
       setLoading(false);

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
+import { supabase } from "@/lib/supabase";
 import type { ArrivalProfile, AccommodationType, EnglishLevel } from "@/types";
 import {
   ArrowRight,
@@ -20,39 +20,38 @@ const CITIES = [
 ];
 
 const UNIVERSITIES = [
-  "University College London (UCL)", "Imperial College London", "King's College London",
-  "University of Manchester", "University of Birmingham", "University of Edinburgh",
-  "University of Glasgow", "University of Bristol", "University of Warwick",
-  "University of Leeds", "University of Sheffield", "University of Newcastle",
-  "University of Nottingham", "University of Liverpool", "Queen Mary University of London",
-  "London School of Economics (LSE)", "University of Southampton", "Cardiff University",
-  "Queen's University Belfast", "Durham University", "Other / Not listed",
+  "University of Oxford", "University of Cambridge", "University of Edinburgh",
+  "University of Manchester", "University of Glasgow", "University of Birmingham",
+  "King's College London", "University of Bristol", "University of Warwick",
+  "University of Sheffield", "University of Nottingham", "University of Southampton",
+  "University of Liverpool", "University of Leeds", "University of Newcastle",
+  "University of Cardiff", "Queen's University Belfast", "Durham University",
+  "Imperial College London", "London School of Economics",
+  "Other",
 ];
 
 const ACCOMMODATION_OPTIONS: { value: AccommodationType; label: string; desc: string }[] = [
-  { value: "university_accommodation", label: "University halls", desc: "On-campus student accommodation" },
-  { value: "private_rental", label: "Private rental", desc: "Rented flat, house, or studio" },
-  { value: "family_friend", label: "With family or friends", desc: "Staying with relatives or friends" },
-  { value: "temporary", label: "Temporary accommodation", desc: "Hotel, Airbnb, or short-let" },
-  { value: "not_secured", label: "Not yet secured", desc: "Still looking for accommodation" },
+  { value: "university_accommodation", label: "University halls of residence", desc: "On-campus student housing" },
+  { value: "private_rental", label: "Private rented flat/house", desc: "Renting from a landlord" },
+  { value: "homestay", label: "Homestay", desc: "Living with a host family — meals included" },
+  { value: "temporary", label: "Temporary (hotel/Airbnb/hostel)", desc: "Short-term while I find something permanent" },
+  { value: "family_friend", label: "Living with family or friends", desc: "Already have a place to stay" },
+  { value: "not_secured", label: "Not yet arranged", desc: "I still need to find accommodation" },
 ];
-
-const ACCOMMODATION_LABELS: Record<AccommodationType, string> = {
-  private_rental: "Private rental",
-  university_accommodation: "University halls",
-  family_friend: "With family or friends",
-  temporary: "Temporary accommodation",
-  not_secured: "Not yet secured",
-};
 
 const ENGLISH_OPTIONS: { value: EnglishLevel; label: string; desc: string }[] = [
-  { value: "beginner", label: "Beginner", desc: "I am still learning" },
-  { value: "intermediate", label: "Intermediate", desc: "I can communicate in most situations" },
-  { value: "advanced", label: "Advanced", desc: "I am confident but still learning" },
-  { value: "fluent", label: "Fluent", desc: "English is my first language or near-native" },
+  { value: "beginner", label: "Beginner", desc: "Learning the basics" },
+  { value: "intermediate", label: "Intermediate", desc: "I can have everyday conversations" },
+  { value: "advanced", label: "Advanced / Fluent", desc: "Confident in English" },
 ];
 
-const STEPS = ["Arrival type", "When are you arriving?", "City & university", "Accommodation", "Optional details"];
+const STEPS = [
+  { label: "Type", icon: User },
+  { label: "Status", icon: Calendar },
+  { label: "Location", icon: MapPin },
+  { label: "Accommodation", icon: Home },
+  { label: "Optional", icon: CheckCircle },
+];
 
 const ONSBOARDING_STORAGE_KEY = "nsk_onboarding_state";
 
@@ -80,6 +79,7 @@ export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const [profile, setProfile] = useState<Partial<ArrivalProfile>>({
     arrivalType: "international_student",
     arrivalStatus: "not_arrived",
@@ -88,25 +88,36 @@ export default function OnboardingPage() {
   });
   const [showNotifBanner, setShowNotifBanner] = useState(false);
 
+  // Auth check on mount
   useEffect(() => {
-    async function loadSession() {
-      const res = await fetch("/api/user", { credentials: "include" });
-      if (!res.ok) { router.push("/signup"); return; }
-      const data = await res.json();
-      if (data.profile?.profile_completed) { router.push("/dashboard"); return; }
+    async function checkAuth() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/signup"); return; }
+      setAuthChecked(true);
+
+      // Check if already completed
+      const { data: profileData } = await supabase
+        .from("arrival_profiles")
+        .select("arrival_type")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (profileData) { router.push("/dashboard"); return; }
+
+      // Restore saved step/progress
       const saved = loadOnboardingState();
       if (saved) {
         setStep(saved.step);
         setProfile((p) => ({ ...p, ...saved.profile }));
       }
     }
-    loadSession();
+    checkAuth();
   }, [router]);
 
   // Persist step + profile on every change
   useEffect(() => {
+    if (!authChecked) return;
     saveOnboardingState({ step, profile });
-  }, [step, profile]);
+  }, [step, profile, authChecked]);
 
   const update = (key: keyof ArrivalProfile, value: unknown) =>
     setProfile((p) => ({ ...p, [key]: value }));
@@ -116,30 +127,34 @@ export default function OnboardingPage() {
 
   const handleFinish = async () => {
     setLoading(true);
-    const full = {
-      arrival_type: "international_student",
-      arrival_status: (profile.arrivalStatus as ArrivalProfile["arrivalStatus"]) || "not_arrived",
-      arrival_date: profile.arrivalDate || "",
-      city: profile.city || "",
-      university: profile.university || "",
-      accommodation: (profile.accommodationType as AccommodationType) || "not_secured",
-      nationality: profile.nationality,
-      english_level: profile.englishLevel as EnglishLevel | undefined,
-      interested_in_work: profile.interestedInWork ?? false,
-      profile_completed: true,
-    };
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setLoading(false); return; }
+
     clearOnboardingState();
-    try {
-      const res = await fetch("/api/user", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ profile: full }),
-      });
-      if (!res.ok) throw new Error("Save failed");
-    } catch { /* ignore */ }
+
+    // Upsert arrival profile
+    await supabase.from("arrival_profiles").upsert({
+      user_id: user.id,
+      arrival_type: profile.arrivalType as string || "international_student",
+      status: profile.arrivalStatus as string || "not_arrived",
+      arrival_date: profile.arrivalDate || null,
+      city: profile.city || null,
+      university: profile.university || null,
+      accommodation: profile.accommodationType as string || "not_secured",
+      nationality: profile.nationality || null,
+      english_level: profile.englishLevel as string || null,
+      work_interest: profile.interestedInWork ?? false,
+    }, { onConflict: "user_id" });
+
+    // Mark user profile complete
+    await supabase
+      .from("users")
+      .update({ profile_completed: true })
+      .eq("id", user.id);
+
     await new Promise((r) => setTimeout(r, 400));
     if (
+      typeof window !== "undefined" &&
       "Notification" in window &&
       Notification.permission === "default"
     ) {
@@ -147,10 +162,11 @@ export default function OnboardingPage() {
     } else {
       router.push("/dashboard");
     }
+    setLoading(false);
   };
 
   const finishWithNotifs = async (permission: NotificationPermission) => {
-    try { localStorage.setItem("nsk_notification_permission", permission); } catch { /* ignore */ }
+    try { localStorage.setItem("beginly_notification_permission", permission); } catch { /* ignore */ }
     setShowNotifBanner(false);
     await new Promise((r) => setTimeout(r, 200));
     router.push("/dashboard");
@@ -161,6 +177,8 @@ export default function OnboardingPage() {
     const perm = await Notification.requestPermission();
     finishWithNotifs(perm);
   };
+
+  if (!authChecked) return null;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-10">
@@ -193,22 +211,15 @@ export default function OnboardingPage() {
               <div>
                 <label className="input-label">I am arriving as a...</label>
                 <div className="space-y-2 mt-1">
-                  {[
-                    { value: "international_student", label: "International student", desc: "Coming to study at a UK university" },
-                  ].map((opt) => (
-                    <div
-                      key={opt.value}
-                      className="flex items-center gap-3 p-4 border-2 border-primary bg-teal-50 rounded-xl"
-                    >
-                      <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary flex items-center justify-center shrink-0">
-                        <div className="w-2 h-2 rounded-full bg-white" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-navy">{opt.label}</p>
-                        <p className="text-xs text-muted">{opt.desc}</p>
-                      </div>
+                  <div className="flex items-center gap-3 p-4 border-2 border-primary bg-teal-50 rounded-xl">
+                    <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary flex items-center justify-center shrink-0">
+                      <div className="w-2 h-2 rounded-full bg-white" />
                     </div>
-                  ))}
+                    <div>
+                      <p className="text-sm font-semibold text-navy">International student</p>
+                      <p className="text-xs text-muted">Coming to study at a UK university</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -365,7 +376,6 @@ export default function OnboardingPage() {
                 </label>
               </div>
 
-              {/* Nia introduction — shown on the final step only */}
               <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-2">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center shrink-0">
@@ -384,7 +394,7 @@ export default function OnboardingPage() {
           )}
         </div>
 
-        {/* Notification permission banner (QA #8) */}
+        {/* Notification permission banner */}
         {showNotifBanner && (
           <div className="card bg-teal-50 border-primary/30 space-y-3">
             <div className="flex items-start gap-3">
@@ -430,7 +440,6 @@ export default function OnboardingPage() {
             <button
               onClick={next}
               disabled={
-                loading ||
                 (step === 1 && !profile.arrivalStatus) ||
                 (step === 2 && (!profile.city || !profile.university))
               }

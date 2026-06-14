@@ -1,22 +1,21 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
+import { supabase } from "@/lib/supabase";
 import type { ReminderPrefs } from "@/types";
-import { User, Bell, Trash2, CheckCircle, AlertCircle, BellRing } from "lucide-react";
+import { User, Bell, Trash2, CheckCircle, BellRing } from "lucide-react";
 import Disclaimer from "@/components/Disclaimer";
 import Navigation from "@/components/Navigation";
 import SettingsSkeleton from "@/components/SettingsSkeleton";
 
-// API-based user data (for Supabase auth)
-interface ApiUser {
+interface DisplayUser {
   id: string;
   name: string;
   email: string;
   profile_completed?: boolean;
 }
 
-interface ApiProfile {
+interface DisplayProfile {
   arrival_type?: string;
   status?: string;
   arrival_date?: string;
@@ -28,11 +27,10 @@ interface ApiProfile {
   work_interest?: string;
 }
 
-
 export default function SettingsPage() {
   const router = useRouter();
-  const [user, setUser] = useState<ApiUser | null>(null);
-  const [profile, setProfile] = useState<ApiProfile | null>(null);
+  const [user, setUser] = useState<DisplayUser | null>(null);
+  const [profile, setProfile] = useState<DisplayProfile | null>(null);
   const [reminders, setReminders] = useState<ReminderPrefs>({ emailReminders: false, frequency: "weekly" });
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -40,17 +38,47 @@ export default function SettingsPage() {
 
   useEffect(() => {
     async function loadSession() {
-      const res = await fetch("/api/user", { credentials: "include" });
-      if (!res.ok) { router.push("/login"); return; }
-      const data = await res.json();
-      setUser(data.user);
-      setProfile(data.profile);
-      if (data.reminders) {
-        setReminders({
-          emailReminders: data.reminders.email_reminders ?? false,
-          frequency: data.reminders.frequency || "weekly",
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) { router.push("/login"); return; }
+
+      setUser({
+        id: authUser.id,
+        name: (authUser.user_metadata?.name as string | undefined) ?? authUser.email?.split("@")[0] ?? "?",
+        email: authUser.email ?? "",
+        profile_completed: !!(authUser.user_metadata?.profile_completed),
+      });
+
+      const { data: profileData } = await supabase
+        .from("arrival_profiles")
+        .select("*")
+        .eq("user_id", authUser.id)
+        .maybeSingle();
+      if (profileData) {
+        setProfile({
+          arrival_type: profileData.arrival_type ?? undefined,
+          status: profileData.status ?? undefined,
+          arrival_date: profileData.arrival_date ?? undefined,
+          city: profileData.city ?? undefined,
+          university: profileData.university ?? undefined,
+          accommodation: profileData.accommodation ?? undefined,
+          nationality: profileData.nationality ?? undefined,
+          english_level: profileData.english_level ?? undefined,
+          work_interest: profileData.work_interest ?? undefined,
         });
       }
+
+      const { data: reminderData } = await supabase
+        .from("reminder_prefs")
+        .select("*")
+        .eq("user_id", authUser.id)
+        .maybeSingle();
+      if (reminderData) {
+        setReminders({
+          emailReminders: reminderData.email_reminders ?? false,
+          frequency: (reminderData.frequency as ReminderPrefs["frequency"]) ?? "weekly",
+        });
+      }
+
       if ("Notification" in window) {
         setNotifPerm(Notification.permission);
       }
@@ -59,18 +87,20 @@ export default function SettingsPage() {
   }, [router]);
 
   const handleReminderSave = async () => {
+    if (!user) return;
     setSaved(true);
-    await fetch("/api/user", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ reminders }),
-    }).catch(() => {});
+    await supabase.from("reminder_prefs").upsert({
+      user_id: user.id,
+      email_reminders: reminders.emailReminders,
+      frequency: reminders.frequency,
+    }, { onConflict: "user_id" });
     setTimeout(() => setSaved(false), 2000);
   };
 
   const handleDelete = async () => {
-    await fetch("/api/user", { method: "DELETE", credentials: "include" }).catch(() => {});
+    if (!user) return;
+    await supabase.from("users").delete().eq("id", user.id);
+    await supabase.auth.signOut();
     router.push("/login");
   };
 
@@ -100,11 +130,11 @@ export default function SettingsPage() {
               <div className="grid sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs text-muted mb-1">City</label>
-                  <p className="text-sm font-medium text-navy">{profile.city}</p>
+                  <p className="text-sm font-medium text-navy">{profile.city ?? "—"}</p>
                 </div>
                 <div>
                   <label className="block text-xs text-muted mb-1">University</label>
-                  <p className="text-sm font-medium text-navy">{profile.university}</p>
+                  <p className="text-sm font-medium text-navy">{profile.university ?? "—"}</p>
                 </div>
               </div>
             )}
@@ -114,7 +144,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Push notifications (QA #8) */}
+        {/* Push notifications */}
         <div className="card">
           <div className="flex items-center gap-3 mb-4">
             <BellRing className="w-5 h-5 text-primary" />
@@ -144,7 +174,7 @@ export default function SettingsPage() {
                   onClick={async () => {
                     const perm = await Notification.requestPermission();
                     setNotifPerm(perm);
-                    try { localStorage.setItem("nsk_notification_permission", perm); } catch { /* ignore */ }
+                    try { localStorage.setItem("beginly_notification_permission", perm); } catch { /* ignore */ }
                   }}
                   className="btn-primary text-sm"
                 >
@@ -155,15 +185,7 @@ export default function SettingsPage() {
               ) : (
                 <p className="text-xs text-amber-600">
                   Notifications are blocked.{" "}
-                  <a
-                    href="https://support.google.com/chrome/answer/3222708"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                  >
-                    Learn how to unblock them
-                  </a>
-                  .
+                  <a href="https://support.google.com/chrome/answer/3222708" target="_blank" rel="noopener noreferrer" className="underline">Learn how to unblock them</a>.
                 </p>
               )
             ) : (
@@ -213,9 +235,6 @@ export default function SettingsPage() {
             <button onClick={handleReminderSave} className="btn-primary">
               {saved ? <><CheckCircle className="w-4 h-4" /> Saved</> : "Save preferences"}
             </button>
-          </div>
-          <div className="mt-4">
-            <Disclaimer text="Settings and preferences are stored locally on this device. Email reminders are not currently active. Browser notifications are optional." type="general" />
           </div>
         </div>
 

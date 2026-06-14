@@ -2,11 +2,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import Disclaimer from "@/components/Disclaimer";
 import { AlertCircle } from "lucide-react";
-
-const DISCLAIMER =
-  "Beginly provides general settlement guidance, checklist support, document explanation, and signposting. We do not provide legal, immigration, financial, tax, medical, or housing advice.";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -29,21 +27,39 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), email: email.toLowerCase(), password }),
+      // Sign up with Supabase Auth directly
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: email.toLowerCase(),
+        password,
+        options: { data: { name: name.trim() } },
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Something went wrong.");
+      if (authError) {
+        setError(authError.message);
         setLoading(false);
         return;
       }
 
-      // Account created — redirect to onboarding
+      if (!authData.user) {
+        setError("Something went wrong. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      // Insert user profile into our users table
+      const { error: insertError } = await supabase.from("users").insert({
+        id: authData.user.id,
+        name: name.trim(),
+        email: email.toLowerCase(),
+        password_hash: "[REDACTED — managed by Supabase Auth]",
+      });
+
+      if (insertError) {
+        // If insert fails (e.g. RLS), still redirect — user exists in auth system
+        console.error("Profile insert failed:", insertError.message);
+      }
+
+      // Redirect to onboarding
       router.push("/onboarding");
     } catch {
       setError("Network error. Please check your connection and try again.");
@@ -54,7 +70,6 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-5">
-        {/* Logo */}
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">

@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
-import { useRouter } from "next/navigation";
-
+import { useAuth } from "@/hooks/useAuth";
 import { calculateReadinessScore } from "@/lib/readiness-score";
 import { calculateStage, getStageLabel } from "@/lib/stage-calculator";
 import { SEED_TASKS } from "@/lib/seed-data";
@@ -16,12 +15,10 @@ import {
   Clock,
   TrendingUp,
   BookOpen,
-  CheckSquare,
-  Star,
   Bot,
   Zap,
   Shield,
-  Users,
+  CheckSquare,
 } from "lucide-react";
 import DashboardSkeleton from "@/components/DashboardSkeleton";
 import ProgressRing from "@/components/ProgressRing";
@@ -30,42 +27,28 @@ import Alert from "@/components/Alert";
 import Badge from "@/components/Badge";
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<{ name: string; email: string; id: string; isAdmin?: boolean } | null>(null);
-  const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
-  const [tasks, setTasks] = useState<UserTask[]>([]);
+  const { user, profile, tasks, loading } = useAuth();
   const [scamAlertIndex, setScamAlertIndex] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    async function loadSession() {
-      const res = await fetch("/api/user", { credentials: "include" });
-      if (!res.ok) { router.push("/signup"); return; }
-      const data = await res.json();
-      setUser(data.user);
-      setProfile(data.profile);
-      setTasks(data.tasks || []);
-      setLoading(false);
-    }
-    loadSession();
     const interval = setInterval(() => {
-      setScamAlertIndex((i) => (i + 1) % getAllScamAlerts().length);
+      setScamAlertIndex((i: number) => (i + 1) % getAllScamAlerts().length);
     }, 12000);
     return () => clearInterval(interval);
-  }, [router]);
+  }, []);
 
   if (!mounted || loading) return <DashboardSkeleton />;
   if (!user) return null;
 
-  const stage = calculateStage(profile?.arrivalDate as string | undefined);
-  const score = calculateReadinessScore(SEED_TASKS, tasks);
+  const stage = calculateStage(profile?.arrival_date as string | undefined);
+  const score = calculateReadinessScore(SEED_TASKS, tasks as UserTask[]);
   const highPriority = SEED_TASKS.filter(
     (t) =>
       t.priority === "Very High" &&
       t.active &&
-      !tasks.find((ut) => ut.taskId === t.taskId && ut.status === "complete")
+      !tasks.find((ut) => ut.task_id === t.taskId && ut.status === "complete")
   ).slice(0, 3);
   const completedCount = tasks.filter((ut) => ut.status === "complete").length;
   const totalTasks = SEED_TASKS.length;
@@ -102,9 +85,9 @@ export default function DashboardPage() {
               {today}
             </p>
             <h1 className="text-2xl font-extrabold mt-0.5" style={{ color: "var(--color-navy)" }}>
-              Hello, {user.name.split(" ")[0]} 👋
+              Hello, {user.name?.split(" ")[0] ?? "?"} 👋
             </h1>
-            {!profile?.profileCompleted && (
+            {!profile && (
               <Link
                 href="/onboarding"
                 className="inline-flex items-center gap-1 text-xs mt-2 font-medium"
@@ -214,9 +197,9 @@ export default function DashboardPage() {
                   <p className="text-xs text-teal-200 mb-0.5">Current stage</p>
                   <p className="text-base font-bold text-white">{getStageLabel(stage)}</p>
                   <p className="text-xs text-teal-200 mt-0.5">
-                    {profile?.city ? `${profile.city}` : ""}
+                    {(profile?.city as string) ? `${profile?.city ?? ""}` : ""}
                     {profile?.city && profile?.university ? " · " : ""}
-                    {profile?.university ? `${(profile.university as string).split(" ")[0]} University` : "No university set"}
+                    {(profile?.university as string) ? `${(profile?.university as string)?.split(" ")[0]} University` : "No university set"}
                   </p>
                 </div>
               </div>

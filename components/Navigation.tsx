@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getUser, clearAllData } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 import {
   LayoutDashboard,
   CheckSquare,
@@ -21,98 +21,71 @@ import {
 } from "lucide-react";
 import MobileNav from "./MobileNav";
 
-/* ─── Admin role guard ──────────────────────────────────────────
-   P1/P2 priority: protect /admin behind a role check.
-   For MVP v1, admin access is set via localStorage flag.
-   In a later sprint this should be replaced by a proper
-   `role: "student" | "admin"` field on the User object
-   stored in localStorage (and eventually Supabase auth).
-────────────────────────────────────────────────────────────────── */
-function isAdminUser(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    // MVP pattern: set via browser console: localStorage.setItem('nsk_admin','true')
-    return localStorage.getItem("nsk_admin") === "true";
-  } catch {
-    return false;
-  }
-}
-
 const NAV_ITEMS = [
-  { href: "/dashboard",         label: "Dashboard",        icon: LayoutDashboard },
-  { href: "/checklist",         label: "My Checklist",    icon: CheckSquare },
-  { href: "/budget",             label: "Budget Planner",  icon: TrendingUp },
+  { href: "/dashboard",         label: "My Checklist",    icon: LayoutDashboard },
+  { href: "/checklist",         label: "Checklist",        icon: CheckSquare },
+  { href: "/budget",            label: "Budget Planner",   icon: TrendingUp },
   { href: "/guides",            label: "Guidance",        icon: BookOpen },
-  { href: "/document-helper",   label: "Document Helper", icon: Bot },
-  { href: "/nhs",               label: "NHS Guide",       icon: Shield },
-  { href: "/bank",              label: "Banking",         icon: Building2 },
-  { href: "/emergency",          label: "Emergency",       icon: Shield },
+  { href: "/document-helper",   label: "Doc Helper",      icon: Bot },
+  { href: "/nhs",              label: "NHS Guide",       icon: Shield },
+  { href: "/bank",             label: "Banking",         icon: Building2 },
+  { href: "/emergency",         label: "Emergency",       icon: Shield },
   { href: "/settings",          label: "Settings",        icon: Settings },
-  { href: "/support",           label: "Support",         icon: LifeBuoy },
-  { href: "#signout",          label: "Sign out",        icon: LogOut },
+  { href: "/support",          label: "Support",         icon: LifeBuoy },
+  { href: "#signout",          label: "Sign out",       icon: LogOut },
 ];
 
-const SIDEBAR_COLLAPSED_KEY = "nsk_sidebar_collapsed";
+const SIDEBAR_COLLAPSED_KEY = "beginly_sidebar_collapsed";
 
-function getCollapsed(defaultVal: boolean): boolean {
+function getCollapsedKey(defaultVal: boolean): boolean {
   if (typeof window === "undefined") return defaultVal;
   try {
     const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
     return stored !== null ? JSON.parse(stored) : defaultVal;
-  } catch {
-    return defaultVal;
-  }
+  } catch { return defaultVal; }
 }
 
-function setCollapsed(val: boolean): void {
+function setCollapsedKey(val: boolean): void {
   if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, JSON.stringify(val));
-  } catch {
-    // ignore
-  }
+  try { localStorage.setItem(SIDEBAR_COLLAPSED_KEY, JSON.stringify(val)); } catch { /* ignore */ }
 }
 
 export default function Navigation({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [user, setUser] = useState<ReturnType<typeof getUser>>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [session, setSession] = useState<{ user: { id: string; email?: string; user_metadata?: { name?: string } } | null }>({ user: null });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsedState] = useState(true);
 
   useEffect(() => {
-    setUser(getUser());
-    setIsAdmin(isAdminUser());
-    setCollapsedState(getCollapsed(true));
+    // Get initial session
+    supabase.auth.getUser().then(({ data }) => setSession({ user: data.user }));
 
-    // Listen for storage changes (e.g. admin flag toggled)
-    const onStorage = () => setIsAdmin(isAdminUser());
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    // Listen for auth changes (sign in / sign out)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession({ user: session?.user ?? null });
+    });
+
+    setCollapsedState(getCollapsedKey(true));
+    return () => subscription.unsubscribe();
   }, []);
 
   const toggleCollapse = () => {
     const next = !collapsed;
     setCollapsedState(next);
-    setCollapsed(next);
+    setCollapsedKey(next);
   };
 
   const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST" });
-    } catch { /* ignore */ }
-    // Clear local cache
-    if (typeof window !== "undefined") {
-      localStorage.clear();
-    }
+    await supabase.auth.signOut();
     window.location.href = "/login";
   };
 
+  const userName = session.user?.user_metadata?.name ?? session.user?.email?.split("@")[0] ?? "?";
+  const userEmail = session.user?.email ?? "";
+  const userInitial = userName.charAt(0).toUpperCase();
+
   const sidebarWidth = collapsed ? "w-16" : "w-64";
   const mainMargin  = collapsed ? "md:ml-16" : "md:ml-64";
-
-  // Build nav items, hiding /admin unless admin
-  const visibleItems = NAV_ITEMS;
 
   return (
     <div className="min-h-screen bg-mist flex">
@@ -127,7 +100,6 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
             collapsed ? "justify-center px-2" : "gap-2.5 px-4"
           }`}
         >
-          {/* Logo mark */}
           <div className="w-8 h-8 bg-teal rounded-xl flex items-center justify-center shrink-0 shadow-sm">
             <span className="text-white font-bold text-sm leading-none">B</span>
           </div>
@@ -153,8 +125,25 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
         {/* Nav items */}
         <nav className="flex-1 py-3 overflow-y-auto">
           <div className={collapsed ? "px-2 space-y-0.5" : "px-3 space-y-0.5"}>
-            {visibleItems.map(({ href, label, icon: Icon }) => {
+            {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
               const active = pathname === href || pathname.startsWith(href + "/");
+              if (href === "#signout") {
+                return (
+                  <button
+                    key={href}
+                    onClick={handleLogout}
+                    title={collapsed ? label : undefined}
+                    className={[
+                      "flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full",
+                      "text-civic-500 hover:bg-red-50 hover:text-red-500",
+                      collapsed ? "justify-center" : "",
+                    ].filter(Boolean).join(" ")}
+                  >
+                    <Icon className="w-4 h-4 shrink-0" />
+                    {!collapsed && <span>{label}</span>}
+                  </button>
+                );
+              }
               return (
                 <Link
                   key={href}
@@ -174,32 +163,6 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
               );
             })}
           </div>
-
-          {/* Admin section — only shown to admin users */}
-          {isAdmin && (
-            <>
-              <div className={`border-t border-border my-2 ${collapsed ? "mx-2" : "mx-3"}`} />
-              <div className={collapsed ? "px-2" : "px-3"}>
-                <p className={`text-xs font-semibold text-muted uppercase tracking-wider mb-1.5 px-3 ${collapsed ? "hidden" : ""}`}>
-                  Admin
-                </p>
-                <Link
-                  href="/admin"
-                  title={collapsed ? "Admin Dashboard" : undefined}
-                  className={[
-                    "flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
-                    pathname.startsWith("/admin")
-                      ? "bg-violet-light text-violet"
-                      : "text-civic-600 hover:bg-civic-50 hover:text-navy",
-                    collapsed ? "justify-center" : "",
-                  ].filter(Boolean).join(" ")}
-                >
-                  <Shield className="w-4 h-4 shrink-0" />
-                  {!collapsed && <span>Admin Dashboard</span>}
-                </Link>
-              </div>
-            </>
-          )}
         </nav>
 
         {/* User + Logout */}
@@ -211,14 +174,12 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
             ].filter(Boolean).join(" ")}
           >
             <div className="w-7 h-7 bg-civic-100 rounded-full flex items-center justify-center shrink-0">
-              <span className="text-xs font-bold text-navy">
-                {user?.name?.charAt(0)?.toUpperCase() ?? "?"}
-              </span>
+              <span className="text-xs font-bold text-navy">{userInitial}</span>
             </div>
             {!collapsed && (
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-navy truncate">{user?.name}</p>
-                <p className="text-xs text-muted truncate">{user?.email}</p>
+                <p className="text-xs font-semibold text-navy truncate">{userName}</p>
+                <p className="text-xs text-muted truncate">{userEmail}</p>
               </div>
             )}
           </div>
@@ -253,7 +214,6 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
           mobileOpen ? "translate-x-0" : "-translate-x-full",
         ].join(" ")}
       >
-        {/* Mobile header */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-border">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 bg-teal rounded-xl flex items-center justify-center">
@@ -266,27 +226,21 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
           </button>
         </div>
 
-        {/* Mobile nav */}
         <nav className="flex-1 py-3 px-3 space-y-0.5 overflow-y-auto">
-          {visibleItems.map(({ href, label, icon: Icon }) => {
+          {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
             const active = pathname === href || pathname.startsWith(href + "/");
-
-            // Sign out is an action, not a route
             if (href === "#signout") {
               return (
                 <button
                   key={href}
                   onClick={handleLogout}
-                  className={["flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
-                    "text-civic-500 hover:bg-red-50 hover:text-red-500 w-full"
-                  ].join(" ")}
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-civic-500 hover:bg-red-50 hover:text-red-500 w-full"
                 >
                   <Icon className="w-4 h-4 shrink-0" />
                   {label}
                 </button>
               );
             }
-
             return (
               <Link
                 key={href}
@@ -305,40 +259,16 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
               </Link>
             );
           })}
-
-          {/* Admin — mobile */}
-          {isAdmin && (
-            <>
-              <div className="border-t border-border my-2" />
-              <p className="text-xs font-semibold text-muted uppercase tracking-wider px-3 mb-1.5">Admin</p>
-              <Link
-                href="/admin"
-                onClick={() => setMobileOpen(false)}
-                className={[
-                  "flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
-                  pathname.startsWith("/admin")
-                    ? "bg-violet-light text-violet"
-                    : "text-civic-600 hover:bg-civic-50",
-                ].join(" ")}
-              >
-                <Shield className="w-4 h-4 shrink-0" />
-                Admin Dashboard
-              </Link>
-            </>
-          )}
         </nav>
 
-        {/* Mobile footer */}
         <div className="p-3 border-t border-border">
           <div className="flex items-center gap-2.5 px-3 py-2 mb-1">
             <div className="w-7 h-7 bg-civic-100 rounded-full flex items-center justify-center shrink-0">
-              <span className="text-xs font-bold text-navy">
-                {user?.name?.charAt(0)?.toUpperCase() ?? "?"}
-              </span>
+              <span className="text-xs font-bold text-navy">{userInitial}</span>
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold text-navy truncate">{user?.name}</p>
-              <p className="text-xs text-muted truncate">{user?.email}</p>
+              <p className="text-xs font-semibold text-navy truncate">{userName}</p>
+              <p className="text-xs text-muted truncate">{userEmail}</p>
             </div>
           </div>
           <button

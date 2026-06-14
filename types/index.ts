@@ -13,6 +13,7 @@ export type ArrivalStatus = "not_arrived" | "arriving_soon" | "arrived";
 export type AccommodationType =
   | "private_rental"
   | "university_accommodation"
+  | "homestay"
   | "family_friend"
   | "temporary"
   | "not_secured";
