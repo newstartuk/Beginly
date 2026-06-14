@@ -48,7 +48,7 @@ export default function DashboardPage() {
     (t) =>
       t.priority === "Very High" &&
       t.active &&
-      !tasks.find((ut) => ut.task_id === t.taskId && ut.status === "complete")
+      !tasks.find((ut) => ut.taskId === t.taskId && ut.status === "complete")
   ).slice(0, 3);
   const completedCount = tasks.filter((ut) => ut.status === "complete").length;
   const totalTasks = SEED_TASKS.length;
