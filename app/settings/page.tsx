@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { getSupabase, supabase } from "@/lib/supabase";
 import type { ReminderPrefs } from "@/types";
 import { User, Bell, Trash2, CheckCircle, BellRing } from "lucide-react";
 import Disclaimer from "@/components/Disclaimer";
@@ -38,6 +38,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     async function loadSession() {
+      const supabase = getSupabase();
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser) { router.push("/login"); return; }
 

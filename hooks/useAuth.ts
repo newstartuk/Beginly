@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import type { Database } from "@/types/database";
 import type { UserTask } from "@/types";
 
@@ -38,6 +38,7 @@ export function useAuth(requireAuth = true) {
     let mounted = true;
 
     async function load() {
+      const supabase = getSupabase();
       const { data: { user: sessionUser } } = await supabase.auth.getUser();
 
       if (!sessionUser) {
