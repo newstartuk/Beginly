@@ -1,0 +1,13 @@
+# Exclude webpack build cache from Cloudflare Pages upload
+.next/cache
+.next/BUILD_ID
+.next/export-marker.json
+.next/required-server-files.json
+.next/turbo*
+.next/server/*.dev.turbopack*
+.next/server/turbopack*
+.next/server/**/*.dev.js
+.next/server/**/*.hot*.js
+.next/server/**/*.json
+.next/static/**/webpack/*.js
+next-env.d.ts
