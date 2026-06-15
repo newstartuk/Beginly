@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { setUser } from "@/lib/utils";
 import Disclaimer from "@/components/Disclaimer";
 import { AlertCircle } from "lucide-react";
 
@@ -55,9 +56,19 @@ export default function SignupPage() {
       });
 
       if (insertError) {
-        // If insert fails (e.g. RLS), still redirect — user exists in auth system
         console.error("Profile insert failed:", insertError.message);
       }
+
+      // Sync session to localStorage + cookie so middleware recognizes user
+      const token = authData.session?.access_token;
+      setUser({
+        id: authData.user.id,
+        name: name.trim(),
+        email: email.toLowerCase(),
+        passwordHash: "",
+        createdAt: new Date().toISOString(),
+        profileCompleted: false,
+      }, token);
 
       // Redirect to onboarding
       router.push("/onboarding");

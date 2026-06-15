@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { clearUser } from "@/lib/utils";
 import {
   LayoutDashboard,
   CheckSquare,
@@ -77,6 +78,7 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    clearUser();
     window.location.href = "/login";
   };
 

@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { setUser } from "@/lib/utils";
 import { AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
@@ -37,6 +38,18 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
+
+      // Sync session to localStorage + cookie so middleware recognizes user
+      const token = authData.session?.access_token;
+      const name = (authData.user.user_metadata?.name as string) ?? authData.user.email?.split("@")[0] ?? "";
+      setUser({
+        id: authData.user.id,
+        name,
+        email: email.toLowerCase(),
+        passwordHash: "",
+        createdAt: new Date().toISOString(),
+        profileCompleted: false,
+      }, token);
 
       // Check if profile exists in our users table
       const { data: profileData } = await supabase

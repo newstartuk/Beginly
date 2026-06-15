@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabase, supabase } from "@/lib/supabase";
+import { clearUser } from "@/lib/utils";
 import type { ReminderPrefs } from "@/types";
 import { User, Bell, Trash2, CheckCircle, BellRing } from "lucide-react";
 import Disclaimer from "@/components/Disclaimer";
@@ -102,6 +103,7 @@ export default function SettingsPage() {
     if (!user) return;
     await supabase.from("users").delete().eq("id", user.id);
     await supabase.auth.signOut();
+    clearUser();
     router.push("/login");
   };
 
