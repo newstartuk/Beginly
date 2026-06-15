@@ -61,19 +61,25 @@ export default function SignupPage() {
 
       // Sync session to localStorage + cookie so middleware recognizes user
       const token = authData.session?.access_token;
-      setUser({
-        id: authData.user.id,
-        name: name.trim(),
-        email: email.toLowerCase(),
-        passwordHash: "",
-        createdAt: new Date().toISOString(),
-        profileCompleted: false,
-      }, token);
+      try {
+        setUser({
+          id: authData.user.id,
+          name: name.trim(),
+          email: email.toLowerCase(),
+          passwordHash: "",
+          createdAt: new Date().toISOString(),
+          profileCompleted: false,
+        }, token);
+      } catch (setErr) {
+        console.error("setUser failed:", setErr);
+      }
 
       // Redirect to onboarding
       router.push("/onboarding");
-    } catch {
-      setError("Network error. Please check your connection and try again.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Signup error:", msg);
+      setError(msg);
       setLoading(false);
     }
   };

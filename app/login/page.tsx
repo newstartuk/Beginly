@@ -42,14 +42,18 @@ export default function LoginPage() {
       // Sync session to localStorage + cookie so middleware recognizes user
       const token = authData.session?.access_token;
       const name = (authData.user.user_metadata?.name as string) ?? authData.user.email?.split("@")[0] ?? "";
-      setUser({
-        id: authData.user.id,
-        name,
-        email: email.toLowerCase(),
-        passwordHash: "",
-        createdAt: new Date().toISOString(),
-        profileCompleted: false,
-      }, token);
+      try {
+        setUser({
+          id: authData.user.id,
+          name,
+          email: email.toLowerCase(),
+          passwordHash: "",
+          createdAt: new Date().toISOString(),
+          profileCompleted: false,
+        }, token);
+      } catch (setErr) {
+        console.error("setUser failed:", setErr);
+      }
 
       // Check if profile exists in our users table
       const { data: profileData } = await supabase
@@ -60,8 +64,10 @@ export default function LoginPage() {
 
       // Redirect: if profile complete → dashboard, else → onboarding
       router.push(profileData?.profile_completed ? "/dashboard" : "/onboarding");
-    } catch {
-      setError("Network error. Please check your connection and try again.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Login error:", msg);
+      setError(msg);
       setLoading(false);
     }
   };
