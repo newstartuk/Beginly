@@ -5,6 +5,7 @@ import { SEED_TASKS } from "@/lib/seed-data";
 import type { Task } from "@/types";
 import { ChevronLeft, Shield, CheckCircle, XCircle, Pencil, X } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import AdminGuard from "@/components/AdminGuard";
 
 const PRIORITY_COLORS: Record<string, string> = {
   "Very High": "text-red-500 bg-red-50 border border-red-200",
@@ -38,6 +39,7 @@ export default function AdminTasksPage() {
   };
 
   return (
+    <AdminGuard>
     <Navigation>
       <div className="max-w-6xl mx-auto space-y-4 animate-fade-in">
         <div className="flex items-center gap-3">
@@ -181,5 +183,6 @@ export default function AdminTasksPage() {
         )}
       </div>
     </Navigation>
+    </AdminGuard>
   );
 }

@@ -8,11 +8,11 @@ import type {
 
 // ─── Key names ────────────────────────────────────────────────────────────────
 const KEYS = {
-  USER: "nsk_user",
-  PROFILE: "nsk_profile",
-  TASKS: "nsk_tasks",
-  REMINDERS: "nsk_reminders",
-  TICKETS: "nsk_tickets",
+  USER: "beginly_user",
+  PROFILE: "beginly_profile",
+  TASKS: "beginly_tasks",
+  REMINDERS: "beginly_reminders",
+  TICKETS: "beginly_tickets",
 } as const;
 
 // ─── Generic helpers ─────────────────────────────────────────────────────────
@@ -36,39 +36,20 @@ function safeSet<T>(key: string, value: T): void {
 }
 
 // ─── Auth / User ─────────────────────────────────────────────────────────────
-// Cookie helpers — both session and admin are httpOnly for security
-function setSessionCookie(token: string, isAdmin: boolean): void {
-  if (typeof document === "undefined") return;
-  const expires = new Date();
-  expires.setDate(expires.getDate() + 30);
-  // httpOnly: true — prevents JavaScript from reading the session token
-  document.cookie = `nsk_session=${encodeURIComponent(token)}; path=/; expires=${expires.toUTCString()}; SameSite=Lax; HttpOnly; Secure`;
-  // httpOnly: true — prevents JavaScript from spoofing admin access
-  document.cookie = `nsk_is_admin=${encodeURIComponent(isAdmin ? "true" : "false")}; path=/; expires=${expires.toUTCString()}; SameSite=Lax; HttpOnly`;
-}
-
-function clearSessionCookie(): void {
-  if (typeof document === "undefined") return;
-  document.cookie = "nsk_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly";
-  document.cookie = "nsk_is_admin=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly";
-}
+// Supabase Auth is the single source of truth. These helpers now cache only
+// non-sensitive display data for offline UI fallback; they do not create auth
+// cookies, admin cookies, or session authority.
 
 export function getUser(): User | null {
   return safeGet<User | null>(KEYS.USER, null);
 }
 
-export function setUser(user: User, token?: string): void {
+export function setUser(user: User): void {
   safeSet(KEYS.USER, user);
-  // Sync session cookie for middleware-based route guards
-  // Admin emails: simple MVP rule — emails starting with 'admin@' are admins
-  const isAdmin = user.email.toLowerCase().startsWith("admin@");
-  // token param should be the JWT string from the API response cookie
-  setSessionCookie(token ?? user.id, isAdmin);
 }
 
 export function clearUser(): void {
   if (typeof window !== "undefined") localStorage.removeItem(KEYS.USER);
-  clearSessionCookie();
 }
 
 // DEPRECATED — password hashing is done server-side in /api/auth/signup and /api/auth/login
@@ -167,7 +148,7 @@ export function addSupportTicket(ticket: SupportTicket): void {
 export function clearAllData(): void {
   if (typeof window === "undefined") return;
   Object.values(KEYS).forEach((k) => localStorage.removeItem(k));
-  clearSessionCookie();
+  
 }
 
 // ─── Utilities ────────────────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Continue'
-$log = "$env:USERPROFILE\Desktop\nsk_fix_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+$log = "$env:USERPROFILE\Desktop\beginly_fix_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
 $null = New-Item -Path $log -ItemType File -Force
 
 function Write-Log {

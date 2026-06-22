@@ -84,14 +84,14 @@ describe("utils — localStorage corruption handling", () => {
   afterEach(() => clearAllData());
 
   it("getUser returns null for corrupted localStorage", () => {
-    localStorage.setItem("nsk_user", "not valid json {{{");
+    localStorage.setItem("beginly_user", "not valid json {{{");
     expect(getUser()).toBe(null);
-    localStorage.removeItem("nsk_user");
+    localStorage.removeItem("beginly_user");
   });
 
   it("getArrivalProfile returns null for corrupted localStorage", () => {
-    localStorage.setItem("nsk_profile", "also not json ###");
+    localStorage.setItem("beginly_profile", "also not json ###");
     expect(getArrivalProfile()).toBe(null);
-    localStorage.removeItem("nsk_profile");
+    localStorage.removeItem("beginly_profile");
   });
 });

@@ -1,8 +1,8 @@
-# Beginly — Complete Design System & Brand Guide
+# NewStart UK — Complete Design System & Brand Guide
 
 > **Version:** 2.0 | **Date:** 30 May 2026  
 > **Status:** Design Specification (MVP v1 → Scale)  
-> **Based on:** NewStart UK Complete Master Pack v1.2 lineage + Beginly public brand/domain
+> **Based on:** NewStart UK Complete Master Pack v1.2 + 5 Brand Concept Boards
 
 ---
 
@@ -23,7 +23,7 @@
 
 ### 1.1 Brand Personality
 
-Beginly is **not** a government portal, a generic startup, or a student game. It occupies a unique position:
+NewStart UK is **not** a government portal, a generic startup, or a student game. It occupies a unique position:
 
 | Trait | Expression |
 |-------|-----------|
@@ -89,7 +89,7 @@ From the 5 concept boards provided, the recommended direction synthesises the st
 | Element | From Board | Rationale |
 |---------|-----------|-----------|
 | Compass/Navigation star | Board 1 | Directly encodes "guidance" and "navigation" — core product metaphor |
-| Clean wordmark "Beginly" | Board 1 | Professional, scalable, works at any size |
+| Clean wordmark "NewStart" + "UK" superscript | Board 1 | Professional, scalable, works at any size |
 | Tagline: "Guiding you forward. Building futures." | Board 1 | Aspirational but grounded |
 | Checkmark integration | Board 4 | Encodes "completion" and "done" — core interaction pattern |
 | AI-assisted positioning | Board 4 | Future-proof; signals intelligence without gimmickry |
@@ -103,8 +103,8 @@ From the 5 concept boards provided, the recommended direction synthesises the st
 **Logo Lockups:**
 ```
 ┌──────────────────────────────────┐  ┌──────────────────────────┐
-│  [★] Beginly                 │  │  [★]                      │
-│     Guiding you forward.         │  │  Beginly               │
+│  [★] NewStartᵁᴷ                 │  │  [★]                      │
+│     Guiding you forward.         │  │  NewStartᵁᴷ               │
 │                                  │  │                          │
 │  PRIMARY (Horizontal)            │  │  STACKED (Vertical)       │
 └──────────────────────────────────┘  └──────────────────────────┘
@@ -652,7 +652,7 @@ Showing 1–10 of 40 tasks          < 1 2 3 4 >
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│ [★] Beginly    Dashboard   Checklist   Guides   Support  [👤▼] │
+│ [★] NewStartᵁᴋ    Dashboard   Checklist   Guides   Support  [👤▼] │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -884,7 +884,7 @@ Empty State Variants:
 │                                                              │
 │  ℹ  General guidance notice                                 │
 │                                                              │
-│  Beginly provides general settlement guidance, checklist │
+│  NewStart UK provides general settlement guidance, checklist │
 │  support, document explanation, and signposting. We do not   │
 │  provide legal, immigration, financial, tax, medical, or     │
 │  housing advice. For official or regulated matters, please   │
@@ -936,7 +936,7 @@ Empty State Variants:
 ### 3.1 Site Map
 
 ```
-beginly.app/
+newstartuk.org/
 ├── /                           Landing Page (public)
 ├── /signup                     Registration
 ├── /login                      Authentication
@@ -1131,7 +1131,7 @@ GROW (Ongoing)
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                                                             │
-│  [★] Beginly          How it works    About    [Sign Up]│
+│  [★] NewStartᵁᴷ          How it works    About    [Sign Up]│
 │                                                             │
 │                                                             │
 │         Your guide to settling in the UK                    │
@@ -1149,7 +1149,7 @@ GROW (Ongoing)
 │  └──────────┘ └──────────┘ └──────────┘ └──────────┘      │
 │                                                             │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │  "Beginly made my first month in London so much    │   │
+│  │  "NewStart made my first month in London so much    │   │
 │  │   easier. I knew exactly what to do and when."       │   │
 │  │   — Amara O., Masters student, UCL                   │   │
 │  └─────────────────────────────────────────────────────┘   │
@@ -1162,7 +1162,7 @@ GROW (Ongoing)
 │  Still have questions? [Contact Us]                         │
 │                                                             │
 │  ── Footer ──────────────────────────────────────────────   │
-│  Beginly · Privacy · Terms · © 2026                     │
+│  NewStart UK · Privacy · Terms · © 2026                     │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -1184,7 +1184,7 @@ GROW (Ongoing)
 ```
 ┌────────────────────────────────────┐
 │                                    │
-│       [★] Beginly              │
+│       [★] NewStartᵁᴷ              │
 │                                    │
 │  Create your account               │
 │                                    │
@@ -1677,7 +1677,7 @@ Support page doubles as help centre. Key addition — **FAQ section:**
   ▸ Can I change my arrival date after signing up?
   ▸ Is my data secure?
   ▸ How do I delete my account?
-  ▸ Is Beginly affiliated with the government?
+  ▸ Is NewStart UK affiliated with the government?
   ▸ How is Nia different from a human advisor?
 ```
 
@@ -1992,7 +1992,7 @@ The design system is built to grow. Here's how each future phase maps to existin
   --brand-primary: #0B7285;
   --brand-primary-dark: #102A43;
   --brand-accent: #2F9E44;
-  --brand-name: "Beginly";
+  --brand-name: "NewStart UK";
   --brand-tagline: "Guiding you forward.";
 }
 
@@ -2001,7 +2001,7 @@ The design system is built to grow. Here's how each future phase maps to existin
   --brand-primary: #2B1159;    /* UoM purple */
   --brand-primary-dark: #1E0D3E;
   --brand-logo: url('/themes/uom/logo.svg');
-  --brand-name: "UoM Beginly";
+  --brand-name: "UoM NewStart";
 }
 ```
 
@@ -2132,10 +2132,10 @@ Toast notification        Community post              Live translation
 - **Illustration style:** Board 3's warm, welcoming vector style (arch/door/path metaphors)
 - **Nia/AI identity:** Board 5's persona definition + violet accent for AI features only
 - **Iconography:** Board 1's clean outlined icons + Board 2's pin-check metaphor
-- **Wordmark:** Board 1's clean navigation-led wordmark translated into Beginly (cleanest execution)
+- **Wordmark:** Board 1's "NewStart" + "UK" superscript (cleanest execution)
 
 ---
 
-*End of Beginly Design System v2.1*
+*End of NewStart UK Design System v2.0*
 *Generated: 30 May 2026*
 *Based on: Master Pack v1.2 + 5 Brand Concept Boards + Existing Codebase Audit*

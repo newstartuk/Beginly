@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_in_Chrome__list_connected_browsers",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__select_browser",
+      "mcp__Claude_in_Chrome__browser_batch",
+      "mcp__Claude_in_Chrome__javascript_tool",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "PowerShell(if \\(Test-Path \"$env:USERPROFILE\\\\.vercel\"\\) { Get-ChildItem \"$env:USERPROFILE\\\\.vercel\" } elseif \\(Test-Path \"$env:APPDATA\\\\Vercel\"\\) { Get-Content \"$env:APPDATA\\\\Vercel\\\\auth.json\" -ErrorAction SilentlyContinue } else { \"No Vercel config found\" })",
+      "PowerShell(vercel --version 2>&1)",
+      "PowerShell(cd \"C:\\\\Users\\\\tunde\\\\Desktop\\\\Beginly\"; Start-Job -ScriptBlock { vercel login --no-color 2>&1 } | Out-Null; Start-Sleep -Seconds 6; Get-Job | Receive-Job 2>&1)",
+      "mcp__Claude_Preview__preview_start",
+      "mcp__visualize__read_me",
+      "mcp__visualize__show_widget",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "PowerShell(cd \"C:\\\\Users\\\\tunde\\\\Desktop\\\\Beginly\"; $env:DEPLOY_TARGET=\"namecheap\"; npm run build 2>&1)",
+      "mcp__Claude_in_Chrome__read_console_messages",
+      "mcp__Claude_in_Chrome__read_network_requests",
+      "Bash(awk '{print $5/1048576 \" MB\"}')",
+      "Bash(awk '{print \"Created beginly-fix.tar.gz: \" $5/1048576 \" MB\"}')",
+      "Bash(tar -tzf beginly-fix.tar.gz)",
+      "Bash(echo \"--- sample paths \\(should use / not \\\\\\\\\\) ---\")",
+      "Bash(grep -E \"^\\\\./server.js$|^server.js$\")",
+      "Bash(cd \"/c/Users/tunde/Desktop/Beginly\" && rm middleware.ts && echo \"Deleted middleware.ts \\(it only returned NextResponse.next\\(\\) — pure per-request overhead\\)\")"
+    ]
+  }
+}

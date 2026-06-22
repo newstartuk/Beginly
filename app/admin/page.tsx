@@ -7,6 +7,7 @@ import { GUIDANCE_PAGES } from "@/lib/guidance-data";
 import { SCAM_ALERTS } from "@/lib/scam-alerts";
 import { Shield, CheckSquare, BookOpen, AlertTriangle, ArrowRight } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import AdminGuard from "@/components/AdminGuard";
 
 export default function AdminPage() {
   const [userTasks, setUserTasks] = useState<ReturnType<typeof getUserTasks>>([]);
@@ -25,6 +26,7 @@ export default function AdminPage() {
   const highPriority = SEED_TASKS.filter((t) => t.priority === "Very High" && t.active);
 
   return (
+    <AdminGuard>
     <Navigation>
       <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
         <div className="flex items-center gap-3">
@@ -98,5 +100,6 @@ export default function AdminPage() {
         </div>
       </div>
     </Navigation>
+    </AdminGuard>
   );
 }

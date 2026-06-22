@@ -2,7 +2,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import type { ArrivalProfile, AccommodationType, EnglishLevel } from "@/types";
+import { ensureBeginlyUser } from "@/lib/auth-client";
+import { generateTasksForProfile } from "@/lib/task-generator";
+import type { ArrivalProfile, AccommodationType, EnglishLevel, UserTask } from "@/types";
 import {
   ArrowRight,
   ArrowLeft,
@@ -53,7 +55,7 @@ const STEPS = [
   { label: "Optional", icon: CheckCircle },
 ];
 
-const ONSBOARDING_STORAGE_KEY = "nsk_onboarding_state";
+const ONSBOARDING_STORAGE_KEY = "beginly_onboarding_state";
 
 function saveOnboardingState(state: { step: number; profile: Partial<ArrivalProfile> }) {
   try {
@@ -128,36 +130,74 @@ export default function OnboardingPage() {
   const handleFinish = async () => {
     setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setLoading(false); return; }
+    if (!user) { setLoading(false); router.push("/login"); return; }
 
-    clearOnboardingState();
+    const completeProfile: ArrivalProfile = {
+      arrivalType: "international_student",
+      arrivalStatus: profile.arrivalStatus ?? "not_arrived",
+      arrivalDate: profile.arrivalDate ?? "",
+      city: profile.city ?? "",
+      university: profile.university ?? "",
+      accommodationType: profile.accommodationType ?? "not_secured",
+      nationality: profile.nationality,
+      englishLevel: profile.englishLevel,
+      interestedInWork: Boolean(profile.interestedInWork),
+      profileCompleted: true,
+    };
 
-    // Upsert arrival profile
-    await supabase.from("arrival_profiles").upsert({
+    await ensureBeginlyUser();
+
+    const { error: profileError } = await supabase.from("arrival_profiles").upsert({
       user_id: user.id,
-      arrival_type: profile.arrivalType as string || "international_student",
-      status: profile.arrivalStatus as string || "not_arrived",
-      arrival_date: profile.arrivalDate || null,
-      city: profile.city || null,
-      university: profile.university || null,
-      accommodation: profile.accommodationType as string || "not_secured",
-      nationality: profile.nationality || null,
-      english_level: profile.englishLevel as string || null,
-      work_interest: profile.interestedInWork ?? false,
+      arrival_type: completeProfile.arrivalType,
+      status: completeProfile.arrivalStatus,
+      arrival_date: completeProfile.arrivalDate || null,
+      city: completeProfile.city || null,
+      university: completeProfile.university || null,
+      accommodation: completeProfile.accommodationType,
+      nationality: completeProfile.nationality || null,
+      english_level: completeProfile.englishLevel || null,
+      work_interest: completeProfile.interestedInWork,
     }, { onConflict: "user_id" });
 
-    // Mark user profile complete
+    if (profileError) {
+      console.error("Arrival profile save failed:", profileError.message);
+      setLoading(false);
+      return;
+    }
+
+    const generatedTasks = generateTasksForProfile(completeProfile);
+    const { data: existingRows } = await supabase
+      .from("user_tasks")
+      .select("task_id,status,completed_at")
+      .eq("user_id", user.id);
+
+    const existing = new Set((existingRows ?? []).map((row) => row.task_id));
+    const rowsToInsert = generatedTasks
+      .filter((task: UserTask) => !existing.has(task.taskId))
+      .map((task: UserTask) => ({
+        user_id: user.id,
+        task_id: task.taskId,
+        status: task.status,
+        completed_at: null,
+      }));
+
+    if (rowsToInsert.length) {
+      const { error: taskError } = await supabase
+        .from("user_tasks")
+        .insert(rowsToInsert);
+      if (taskError) console.error("Generated task insert failed:", taskError.message);
+    }
+
     await supabase
       .from("users")
       .update({ profile_completed: true })
       .eq("id", user.id);
 
+    clearOnboardingState();
+
     await new Promise((r) => setTimeout(r, 400));
-    if (
-      typeof window !== "undefined" &&
-      "Notification" in window &&
-      Notification.permission === "default"
-    ) {
+    if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "default") {
       setShowNotifBanner(true);
     } else {
       router.push("/dashboard");
@@ -263,7 +303,8 @@ export default function OnboardingPage() {
                     value={profile.arrivalDate || ""}
                     onChange={(e) => update("arrivalDate", e.target.value)}
                     className="input-field"
-                    max={new Date().toISOString().split("T")[0]}
+                    min={profile.arrivalStatus === "arrived" ? undefined : new Date().toISOString().split("T")[0]}
+                    max={profile.arrivalStatus === "arrived" ? new Date().toISOString().split("T")[0] : undefined}
                   />
                 </div>
               )}

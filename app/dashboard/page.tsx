@@ -43,15 +43,17 @@ export default function DashboardPage() {
   if (!user) return null;
 
   const stage = calculateStage(profile?.arrival_date as string | undefined);
-  const score = calculateReadinessScore(SEED_TASKS, tasks as UserTask[]);
-  const highPriority = SEED_TASKS.filter(
+  const userTaskIds = new Set(tasks.map((task) => task.taskId));
+  const personalisedSeedTasks = SEED_TASKS.filter((task) => userTaskIds.has(task.taskId));
+  const score = calculateReadinessScore(personalisedSeedTasks, tasks as UserTask[]);
+  const highPriority = personalisedSeedTasks.filter(
     (t) =>
       t.priority === "Very High" &&
       t.active &&
       !tasks.find((ut) => ut.taskId === t.taskId && ut.status === "complete")
   ).slice(0, 3);
   const completedCount = tasks.filter((ut) => ut.status === "complete").length;
-  const totalTasks = SEED_TASKS.length;
+  const totalTasks = personalisedSeedTasks.length;
   const scamAlerts = getAllScamAlerts();
   const currentAlert = scamAlerts[scamAlertIndex];
 

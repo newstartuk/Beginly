@@ -58,8 +58,8 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
   const [collapsed, setCollapsedState] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getUser().then(({ data }) => setSession({ user: data.user }));
+    // Read the session from local storage (instant, no network round-trip).
+    supabase.auth.getSession().then(({ data }) => setSession({ user: data.session?.user ?? null }));
 
     // Listen for auth changes (sign in / sign out)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {

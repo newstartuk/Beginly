@@ -1,11 +1,13 @@
 "use client";
+
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { ensureBeginlyUser } from "@/lib/auth-client";
 import { setUser } from "@/lib/utils";
 import Disclaimer from "@/components/Disclaimer";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CheckCircle } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -14,25 +16,31 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
+  const [successEmail, setSuccessEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccessEmail("");
 
+    const normalisedEmail = email.trim().toLowerCase();
     if (!name.trim()) { setError("Please enter your name."); return; }
-    if (!email.includes("@")) { setError("Please enter a valid email address."); return; }
+    if (!normalisedEmail.includes("@")) { setError("Please enter a valid email address."); return; }
     if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
     if (password !== confirm) { setError("Passwords do not match."); return; }
 
     setLoading(true);
 
     try {
-      // Sign up with Supabase Auth directly
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: email.toLowerCase(),
+      const redirectTo = typeof window !== "undefined" ? `${window.location.origin}/login?confirmed=true` : undefined;
+      const { data, error: authError } = await supabase.auth.signUp({
+        email: normalisedEmail,
         password,
-        options: { data: { name: name.trim() } },
+        options: {
+          data: { name: name.trim() },
+          emailRedirectTo: redirectTo,
+        },
       });
 
       if (authError) {
@@ -41,40 +49,16 @@ export default function SignupPage() {
         return;
       }
 
-      if (!authData.user) {
-        setError("Something went wrong. Please try again.");
+      // With email confirmation ON, Supabase usually returns a user but no active session.
+      // In that case we must not fake an auth cookie or redirect into protected pages.
+      if (!data.session) {
+        setSuccessEmail(normalisedEmail);
         setLoading(false);
         return;
       }
 
-      // Insert user profile into our users table
-      const { error: insertError } = await supabase.from("users").insert({
-        id: authData.user.id,
-        name: name.trim(),
-        email: email.toLowerCase(),
-        password_hash: "[REDACTED — managed by Supabase Auth]",
-      });
-
-      if (insertError) {
-        console.error("Profile insert failed:", insertError.message);
-      }
-
-      // Sync session to localStorage + cookie so middleware recognizes user
-      const token = authData.session?.access_token;
-      try {
-        setUser({
-          id: authData.user.id,
-          name: name.trim(),
-          email: email.toLowerCase(),
-          passwordHash: "",
-          createdAt: new Date().toISOString(),
-          profileCompleted: false,
-        }, token);
-      } catch (setErr) {
-        console.error("setUser failed:", setErr);
-      }
-
-      // Redirect to onboarding
+      const beginlyUser = await ensureBeginlyUser(data.session.user);
+      if (beginlyUser) setUser(beginlyUser);
       router.push("/onboarding");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -101,83 +85,54 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <Disclaimer type="general" />
-
-        <form onSubmit={handleSubmit} className="card space-y-4">
-          {error && (
-            <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-lg p-3 text-sm">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              {error}
+        {successEmail ? (
+          <div className="card space-y-4 text-center">
+            <CheckCircle className="w-10 h-10 text-green mx-auto" />
+            <div>
+              <h2 className="text-lg font-bold text-navy">Check your email</h2>
+              <p className="text-sm text-muted mt-2">
+                We sent a confirmation link to <strong>{successEmail}</strong>. Confirm your email, then return to Beginly and sign in with the same credentials.
+              </p>
             </div>
-          )}
-
-          <div>
-            <label className="input-label">Your name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="input-field"
-              placeholder="e.g. Amara Osei"
-              autoComplete="name"
-              required
-            />
+            <Link href="/login" className="btn-primary w-full justify-center">Go to sign in</Link>
+            <p className="text-xs text-muted">If you do not see the email, check your spam/junk folder.</p>
           </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="card space-y-4">
+            {error && (
+              <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-lg p-3 text-sm">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                {error}
+              </div>
+            )}
 
-          <div>
-            <label className="input-label">Email address</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input-field"
-              placeholder="you@example.com"
-              autoComplete="email"
-              required
-            />
-          </div>
+            <div>
+              <label className="input-label">Full name</label>
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="input-field" placeholder="Your name" autoComplete="name" required />
+            </div>
 
-          <div>
-            <label className="input-label">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="input-field"
-              placeholder="At least 8 characters"
-              autoComplete="new-password"
-              required
-            />
-          </div>
+            <div>
+              <label className="input-label">Email address</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field" placeholder="you@example.com" autoComplete="email" required />
+            </div>
 
-          <div>
-            <label className="input-label">Confirm password</label>
-            <input
-              type="password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              className="input-field"
-              placeholder="Repeat your password"
-              autoComplete="new-password"
-              required
-            />
-          </div>
+            <div>
+              <label className="input-label">Password</label>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input-field" placeholder="At least 8 characters" autoComplete="new-password" required />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary w-full justify-center py-2.5"
-          >
-            {loading ? "Creating account..." : "Create account — it's free"}
-          </button>
-        </form>
+            <div>
+              <label className="input-label">Confirm password</label>
+              <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className="input-field" placeholder="Repeat password" autoComplete="new-password" required />
+            </div>
 
-        <p className="text-center text-xs text-muted">
-          By creating an account, you agree to our{" "}
-          <Link href="/support" className="text-primary hover:underline">terms of use</Link>{" "}
-          and acknowledge our{" "}
-          <Link href="/guides" className="text-primary hover:underline">privacy approach</Link>.
-        </p>
+            <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-2.5">
+              {loading ? "Creating account..." : "Create account"}
+            </button>
+
+            <Disclaimer text="Beginly provides general settlement guidance and checklist support. We do not provide legal, immigration, financial, tax, medical, or housing advice." type="general" />
+          </form>
+        )}
       </div>
     </div>
   );

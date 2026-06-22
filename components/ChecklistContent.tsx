@@ -1,8 +1,10 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { SEED_TASKS } from "@/lib/seed-data";
+import { dbProfileToArrivalProfile, generateTasksForProfile } from "@/lib/task-generator";
 import type { UserTask } from "@/types";
 import ChecklistSkeleton from "./ChecklistSkeleton";
 import Badge from "./Badge";
@@ -31,10 +33,42 @@ export default function ChecklistContent() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push("/login"); return; }
 
-      const { data: taskData } = await supabase
+      let { data: taskData } = await supabase
         .from("user_tasks")
-        .select("*")
+        .select("task_id,status,completed_at")
         .eq("user_id", user.id);
+
+      // Repair path: if onboarding/profile exists but no task rows were generated,
+      // generate the user's roadmap now instead of showing an empty checklist.
+      if (!taskData?.length) {
+        const { data: profileRow } = await supabase
+          .from("arrival_profiles")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (profileRow) {
+          const generated = generateTasksForProfile(dbProfileToArrivalProfile(profileRow));
+          if (generated.length) {
+            await supabase.from("user_tasks").insert(
+              generated.map((task) => ({
+                user_id: user.id,
+                task_id: task.taskId,
+                status: task.status,
+                completed_at: null,
+              }))
+            );
+            const refreshed = await supabase
+              .from("user_tasks")
+              .select("task_id,status,completed_at")
+              .eq("user_id", user.id);
+            taskData = refreshed.data ?? [];
+          }
+        } else {
+          router.push("/onboarding");
+          return;
+        }
+      }
 
       setTasks(
         (taskData ?? []).map((t): UserTask => ({
@@ -51,44 +85,33 @@ export default function ChecklistContent() {
   const toggle = async (taskId: string) => {
     const existing = tasks.find((t) => t.taskId === taskId);
     const isComplete = existing?.status === "complete";
+    const nextStatus: UserTask["status"] = isComplete ? "not_started" : "complete";
+    const completedAt = isComplete ? undefined : new Date().toISOString();
 
-    // Optimistic update
     setTasks((prev) =>
       prev.map((t): UserTask =>
-        t.taskId === taskId
-          ? {
-              ...t,
-              status: (isComplete ? "not_started" : "complete") as UserTask["status"],
-              completedAt: isComplete ? undefined : new Date().toISOString(),
-            }
-          : t
+        t.taskId === taskId ? { ...t, status: nextStatus, completedAt } : t
       )
     );
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    if (isComplete) {
-      await supabase
-        .from("user_tasks")
-        .update({ status: "not_started", completed_at: null })
-        .eq("user_id", user.id)
-        .eq("task_id", taskId);
-    } else {
-      await supabase
-        .from("user_tasks")
-        .upsert({
-          user_id: user.id,
-          task_id: taskId,
-          status: "complete",
-          completed_at: new Date().toISOString(),
-        }, { onConflict: "user_id,task_id" });
-    }
+    await supabase
+      .from("user_tasks")
+      .upsert({
+        user_id: user.id,
+        task_id: taskId,
+        status: nextStatus,
+        completed_at: completedAt ?? null,
+      }, { onConflict: "user_id,task_id" });
   };
 
   if (loading) return <ChecklistSkeleton />;
 
-  const filteredTasks = tasks.filter((t) => {
+  const validTaskIds = new Set(SEED_TASKS.map((task) => task.taskId));
+  const visibleTasks = tasks.filter((task) => validTaskIds.has(task.taskId));
+  const filteredTasks = visibleTasks.filter((t) => {
     if (filter === "pending") return t.status !== "complete";
     if (filter === "complete") return t.status === "complete";
     return true;
@@ -98,9 +121,9 @@ export default function ChecklistContent() {
     STAGE_ORDER.map((s) => [s, filteredTasks.filter((t) => SEED_TASKS.find((st) => st.taskId === t.taskId && st.stage === s))])
   );
 
-  const completedCount = tasks.filter((t) => t.status === "complete").length;
-  const totalCount = SEED_TASKS.length;
-  const allDone = completedCount === totalCount;
+  const completedCount = visibleTasks.filter((t) => t.status === "complete").length;
+  const totalCount = visibleTasks.length;
+  const allDone = totalCount > 0 && completedCount === totalCount;
 
   const toggleStage = (stage: string) => {
     setExpandedStages((prev) => {
@@ -113,8 +136,6 @@ export default function ChecklistContent() {
 
   return (
     <div className="space-y-5">
-
-      {/* ── Summary bar ─────────────────────────────────── */}
       <div className="card flex items-center justify-between gap-4 flex-wrap">
         <div>
           <p className="text-sm font-semibold text-navy">
@@ -123,7 +144,7 @@ export default function ChecklistContent() {
           <div className="mt-2 w-48 h-2 bg-civic-100 rounded-full overflow-hidden">
             <div
               className="h-full bg-primary transition-all"
-              style={{ width: `${Math.round((completedCount / totalCount) * 100)}%` }}
+              style={{ width: `${totalCount ? Math.round((completedCount / totalCount) * 100) : 0}%` }}
             />
           </div>
         </div>
@@ -146,11 +167,10 @@ export default function ChecklistContent() {
         <div className="card bg-green-50 border-green-200 text-center py-8 space-y-3">
           <CheckCircle className="w-10 h-10 text-green mx-auto" />
           <p className="text-lg font-bold text-green">All tasks complete!</p>
-          <p className="text-sm text-civic-600">You&apos;ve finished your 90-day settlement roadmap. Well done!</p>
+          <p className="text-sm text-civic-600">You&apos;ve finished your personalised settlement roadmap. Well done!</p>
         </div>
       )}
 
-      {/* ── Task list by stage ────────────────────────────── */}
       {STAGE_ORDER.map((stage) => {
         const stageTasks = tasksByStage[stage];
         if (!stageTasks.length) return null;
@@ -159,10 +179,7 @@ export default function ChecklistContent() {
 
         return (
           <div key={stage} className="card">
-            <button
-              onClick={() => toggleStage(stage)}
-              className="w-full flex items-center justify-between py-2"
-            >
+            <button onClick={() => toggleStage(stage)} className="w-full flex items-center justify-between py-2">
               <div className="flex items-center gap-3">
                 <Badge label={stage} variant="stage" />
                 <span className="text-sm font-semibold text-navy">{STAGE_LABELS[stage]}</span>
@@ -183,9 +200,7 @@ export default function ChecklistContent() {
                       key={ut.taskId}
                       onClick={() => toggle(ut.taskId)}
                       className={`w-full flex items-start gap-3 p-4 rounded-xl border text-left transition-all ${
-                        done
-                          ? "bg-green-50 border-green-200"
-                          : "bg-white border-border hover:border-primary/30"
+                        done ? "bg-green-50 border-green-200" : "bg-white border-border hover:border-primary/30"
                       }`}
                     >
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
@@ -194,14 +209,11 @@ export default function ChecklistContent() {
                         {done && <CheckCircle className="w-3.5 h-3.5 text-white" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-medium ${done ? "text-green line-through opacity-70" : "text-navy"}`}>
-                          {seed.title}
-                        </p>
-                        {seed.category && (
-                          <div className="mt-1">
-                            <Badge label={seed.category} variant="category" />
-                          </div>
-                        )}
+                        <p className={`text-sm font-medium ${done ? "text-green line-through opacity-70" : "text-navy"}`}>{seed.title}</p>
+                        <div className="mt-1 flex gap-1.5 flex-wrap">
+                          <Badge label={seed.category} variant="category" />
+                          {seed.conditional && <span className="text-[10px] text-muted bg-civic-50 rounded-full px-2 py-0.5">{seed.conditional}</span>}
+                        </div>
                       </div>
                       <Badge label={seed.priority} variant="priority" />
                     </button>
@@ -214,11 +226,7 @@ export default function ChecklistContent() {
       })}
 
       {filteredTasks.length === 0 && !allDone && (
-        <EmptyState
-          icon={Filter}
-          message="No tasks here"
-          description="Try a different filter to see your tasks."
-        />
+        <EmptyState icon={Filter} message="No tasks here" description="Try a different filter to see your tasks." />
       )}
     </div>
   );

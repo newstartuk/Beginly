@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronLeft, Shield } from "lucide-react";
 import { GUIDANCE_PAGES } from "@/lib/guidance-data";
 import Navigation from "@/components/Navigation";
+import AdminGuard from "@/components/AdminGuard";
 import Disclaimer from "@/components/Disclaimer";
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -18,6 +19,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export default function AdminGuidesPage() {
   return (
+    <AdminGuard>
     <Navigation>
       <div className="max-w-5xl mx-auto space-y-4 animate-fade-in">
         <div className="flex items-center gap-3">
@@ -64,5 +66,6 @@ export default function AdminGuidesPage() {
         <Disclaimer text="Full guide editor (create, edit, publish) will be implemented in Sprint 5. Currently, guides are managed by editing lib/guidance-data.ts directly. Set up Supabase and integrate it in Sprint 5." type="general" />
       </div>
     </Navigation>
+    </AdminGuard>
   );
 }

@@ -1,7 +1,10 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabase } from "@/lib/supabase";
+import { ensureBeginlyUser } from "@/lib/auth-client";
+import { dbProfileToArrivalProfile, generateTasksForProfile } from "@/lib/task-generator";
 import type { Database } from "@/types/database";
 import type { UserTask } from "@/types";
 
@@ -21,40 +24,30 @@ export interface AuthState {
   loading: boolean;
 }
 
-/**
- * Shared auth hook — replaces all `/api/user` fetches.
- * Handles: session check, redirect to /login, data loading.
- */
 export function useAuth(requireAuth = true) {
   const router = useRouter();
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    profile: null,
-    tasks: [],
-    loading: true,
-  });
+  const [state, setState] = useState<AuthState>({ user: null, profile: null, tasks: [], loading: true });
 
   useEffect(() => {
     let mounted = true;
 
     async function load() {
+      const t0 = performance.now();
       const supabase = getSupabase();
-      const { data: { user: sessionUser } } = await supabase.auth.getUser();
+      // getSession reads local storage (instant). RLS is the real security boundary
+      // for the queries below, so we don't need a blocking getUser network call here.
+      const { data: { session } } = await supabase.auth.getSession();
+      const sessionUser = session?.user ?? null;
 
       if (!sessionUser) {
         if (requireAuth) { router.push("/login"); return; }
-        if (mounted) setState(s => ({ ...s, loading: false }));
+        if (mounted) setState((s) => ({ ...s, loading: false }));
         return;
       }
 
-      const user: AuthUser = {
-        id: sessionUser.id,
-        email: sessionUser.email,
-        name: sessionUser.user_metadata?.name as string | undefined,
-        isAdmin: !!(sessionUser.user_metadata?.is_admin),
-      };
-
-      const [profileRes, tasksRes] = await Promise.all([
+      // Fire the three independent reads in parallel instead of one after another.
+      const [appUser, profileRes, firstTasksRes] = await Promise.all([
+        ensureBeginlyUser(sessionUser),
         supabase
           .from("arrival_profiles")
           .select("*")
@@ -62,9 +55,37 @@ export function useAuth(requireAuth = true) {
           .maybeSingle(),
         supabase
           .from("user_tasks")
-          .select("*")
+          .select("task_id,status,completed_at")
           .eq("user_id", sessionUser.id),
       ]);
+
+      const isAdmin = Boolean(sessionUser.user_metadata?.is_admin);
+      const user: AuthUser = {
+        id: sessionUser.id,
+        email: sessionUser.email,
+        name: appUser?.name ?? (sessionUser.user_metadata?.name as string | undefined),
+        isAdmin,
+      };
+
+      let tasksRes = firstTasksRes;
+
+      if ((!tasksRes.data || tasksRes.data.length === 0) && profileRes.data) {
+        const generated = generateTasksForProfile(dbProfileToArrivalProfile(profileRes.data));
+        if (generated.length) {
+          await supabase.from("user_tasks").insert(
+            generated.map((task) => ({
+              user_id: sessionUser.id,
+              task_id: task.taskId,
+              status: task.status,
+              completed_at: null,
+            }))
+          );
+          tasksRes = await supabase
+            .from("user_tasks")
+            .select("task_id,status,completed_at")
+            .eq("user_id", sessionUser.id);
+        }
+      }
 
       if (!mounted) return;
 
@@ -74,12 +95,8 @@ export function useAuth(requireAuth = true) {
         completedAt: t.completed_at ?? undefined,
       }));
 
-      setState({
-        user,
-        profile: profileRes.data ?? null,
-        tasks,
-        loading: false,
-      });
+      console.log(`⏱️ [Beginly] auth + data loaded in ${Math.round(performance.now() - t0)}ms`);
+      setState({ user, profile: profileRes.data ?? null, tasks, loading: false });
     }
 
     load();

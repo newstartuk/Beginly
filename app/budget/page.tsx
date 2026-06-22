@@ -11,7 +11,7 @@ import {
 import { TrendingUp, Trash2, Plus, AlertTriangle, Printer } from "lucide-react";
 import BudgetSkeleton from "@/components/BudgetSkeleton";
 
-const STORAGE_KEY = "nsk_budget";
+const STORAGE_KEY = "beginly_budget";
 
 function loadBudget(): BudgetItem[] {
   if (typeof window === "undefined") return getDefaults();

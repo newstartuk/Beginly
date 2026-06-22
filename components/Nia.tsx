@@ -56,46 +56,43 @@ function isInScope(topic: string): boolean {
 function generateNiaReply(userMessage: string): string {
   const msg = userMessage.toLowerCase().trim();
 
-  // Greetings
-  if (/^(hi|hello|hey|nia's?|start|help)/.test(msg)) {
-    return `Welcome! I'm here to help you work through your Beginly checklist. Here's a quick overview of what you can ask me:\n\n**Your checklist** — I can explain what any task means and why it matters.\n**Official sources** — I can point you to GOV.UK, NHS, or university pages.\n**UK life** — Questions about how things work — banking, transport, student discounts.\n\nWhat's on your mind today?`;
+  if (/^(hi|hello|hey|nia'?s?|start|help)/.test(msg)) {
+    return `Welcome. I can help you understand Beginly checklist tasks, find relevant guidance pages, and point you toward official sources. I give general settlement guidance only — not legal, immigration, medical, financial, tax, or housing advice.`;
   }
 
-  // Task explanations
-  if (/gp registration|nhs|doctor|health/.test(msg)) {
-    return `GP registration is one of the most important tasks on your checklist. Here's why:\n\nAs an international student, you've paid the **Immigration Health Surcharge** as part of your visa fee — so you're entitled to full NHS care, including GP services.\n\n**Steps:**\n1. Find a GP near you at [nhs.uk/service-search/find-a-gp](https://www.nhs.uk/service-search/find-a-gp)\n2. Check they're accepting new patients\n3. Fill in a **GMS1 registration form** (available at the surgery)\n4. You don't need proof of ID — just your UK address\n\nRegistering early means you're covered when you need medical help. Don't wait until you're ill!`;
+  if (/evisa|ukvi|brp|visa|work hours|right to work|immigration/.test(msg)) {
+    return `This is a sensitive immigration/work-rights topic, so I cannot decide or interpret your personal legal position. Please check your UKVI online account, your eVisa/visa conditions, GOV.UK, and your university international student support team. I can help you find the right checklist task or explain general terms, but not make the decision for you.`;
   }
 
-  if (/bank|account|money/.test(msg)) {
-    return `Opening a UK bank account is an important step. Here's what you need to know:\n\n**What you'll typically need:**\n• Your passport\n• Your UK address (tenancy agreement or accommodation letter works)\n• Proof of student status (your university ID or a student status letter)\n\n**Top student accounts right now:** Santander, NatWest, and HSBC all offer interest-free overdrafts. Compare them at [moneysavingexpert.com](https://www.moneysavingexpert.com) before deciding.\n\nNote: some banks require a branch visit — check this before travelling to the UK!`;
+  if (/bank|account|overdraft|loan|credit|money transfer|insurance/.test(msg)) {
+    return `I can explain general preparation steps, but Beginly does not recommend or rank financial products.\n\nFor a UK bank account, you may be asked for ID, proof of address, and proof of student status. Compare official provider terms, fees, eligibility, app/branch access, and any overdraft conditions yourself. Never pay anyone who claims they can guarantee a bank account.`;
   }
 
-  if (/evisa|ukvi|brp|visa|work hours/.test(msg)) {
-    return `Great question — but this is exactly the kind of topic where I'd recommend speaking to a qualified adviser.\n\nFor anything to do with your **visa conditions, eVisa, or work-hour limits**, please check:\n• Your **UKVI online account** at [gov.uk/prove-immigration-status](https://www.gov.uk/prove-immigration-status)\n• Your **university's international student support team** — they deal with these questions daily\n• The official **GOV.UK student visa page** at [gov.uk/student-visa](https://www.gov.uk/student-visa)\n\nThese sources have the most accurate, up-to-date information for your specific situation.`;
+  if (/budget|expense|saving/.test(msg)) {
+    return `Budgeting early is sensible. This is general organisation guidance, not financial advice.\n\nUseful categories to track are rent, bills, food, transport, phone/SIM, course materials, and an emergency buffer. If you are considering overdrafts, credit, insurance, or money-transfer products, compare official terms and speak to a qualified adviser if unsure.`;
   }
 
-  if (/budget|money|expense|saving/.test(msg)) {
-    return `Managing your money as a student is a skill — and you're already taking the right step by thinking about it early!\n\n**Quick tips:**\n• **Fixed costs first** — rent, utilities, phone. Set these as non-negotiables in your budget.\n• **Student overdrafts** — many UK student accounts offer an interest-free overdraft. Use it carefully as a safety net, not extra income.\n• **Student discounts** — always ask! Most retailers, restaurants, and shops offer a student discount (usually 10–20%). Get a **Totum** card to access these easily.\n• **Free help** — your university will have a free money advice service. Use it!\n\nCheck out the Budget Planner at [moneysavingexpert.com](https://www.moneysavingexpert.com) to build your first budget.`;
+  if (/gp registration|nhs|doctor|health|dental|prescription|optician/.test(msg)) {
+    return `GP/NHS setup is an important settlement step. I can give general guidance, but I cannot confirm your personal entitlement or provide medical advice.\n\nStart by finding a GP near your term-time address, checking whether they accept new patients, and following their registration process. For eligibility, charges, symptoms, medication, or urgent concerns, check NHS guidance or contact NHS 111/999 as appropriate.`;
   }
 
-  if (/accommodation|housing|flat|rent|landlord/.test(msg)) {
-    return `Getting your accommodation sorted is one of the first big things to do. A few things worth knowing:\n\n**Before you sign:**\n• Never transfer money without seeing a written tenancy agreement first\n• Check the landlord is registered with a deposit protection scheme (TDS, DPS, or MyDeposits) — it's legally required\n• Use Shelter's checklist: [shelterengland.org](https://www.shelterengland.org)\n\n**Deposits:**\nYour deposit must be protected within 30 days. Check it at the DPS portal: [depositprotection.com](https://www.depositprotection.com)\n\n**Council tax:**\nFull-time students are exempt — but you need to claim it! Contact your local council to confirm.`;
+  if (/accommodation|housing|flat|rent|landlord|deposit|council tax/.test(msg)) {
+    return `Accommodation and council-tax issues can be situation-specific. I can provide general safety guidance, not legal or housing advice.\n\nBefore paying or signing, keep written evidence, avoid pressure payments, check provider details, and read official guidance. For tenancy disputes, formal letters, eviction threats, unclear contract terms, or council-tax liability questions, contact your university housing team, Citizens Advice, Shelter, your council, or a qualified adviser.`;
   }
 
-  if (/national insurance|ni number|work permit/.test(msg)) {
-    return `If you're planning to work in the UK, you'll need a **National Insurance (NI) number**. Here's the short version:\n\n• It's your unique tax reference number — employers use it to deduct the right tax\n• **How to apply:** Call the DWP on **0300 200 3500** and they'll schedule an evidence interview\n• You'll need your passport and UKVI online account / eVisa for the interview\n• Your NI number will be posted to you within 3–4 weeks\n\nNote: some employers can hire you *before* you have an NI number — but you must apply quickly once you start.`;
-  }
-
-  if (/nhs|doctor|gp|dental|prescription|optician/.test(msg)) {
-    return `The NHS is the UK's public health service. As an international student, you've paid the **Immigration Health Surcharge** — you're entitled to full NHS care.\n\n**Key services:**\n• **GP** — free, your first point of contact for most health issues. Register on day one.\n• **A&E / 999** — for emergencies only\n• **111** — non-emergency medical help, 24/7\n• **Prescriptions** — currently £9.90 per item (check if you qualify for HC2 for free prescriptions)\n• **Dentist** — NHS places are limited. Register early!\n• **Eye tests** — free NHS eye test for students, plus a voucher toward glasses\n\n**Download the NHS App** — it lets you order prescriptions and book appointments.`;
+  if (/national insurance|ni number|work permit|job/.test(msg)) {
+    return `For work-related setup, first check your own visa/eVisa conditions and university guidance. I cannot decide what work you are legally permitted to do.\n\nFor National Insurance number information, use the current GOV.UK process. Keep your NI number private and avoid sharing it through unofficial forms or messages.`;
   }
 
   if (/safe|scam|warning|fraud/.test(msg)) {
-    return `Protecting yourself from scams is really important — international students are sometimes targeted.\n\n**Red flags to watch for:**\n• Anyone asking for money upfront to "guarantee" a job\n• Landlords who won't show the property but ask for a deposit\n• Calls or texts claiming to be from the Home Office or HMRC asking for payment\n• Offers that sound too good to be true\n\n**Official sources:**\n• Action Fraud (UK fraud reporting): [actionfraud.police.uk](https://www.actionfraud.police.uk)\n• UK Finance (banking scams): [ukfinance.org.uk](https://www.ukfinance.org.uk)\n\nIf something feels wrong, trust your instincts and ask your university's student support team.`;
+    return `Scam awareness is one of Beginly's safest and most useful areas. Watch for upfront payments to guarantee jobs, landlords who refuse verification, fake official calls asking for payment, document phishing, and requests for bank login details or one-time codes.\n\nIf something feels wrong, pause, keep evidence, and check with your university support team or the relevant official reporting route.`;
   }
 
-  // Fallback — in scope
-  return `That's a good question! Here's a general answer:\n\nFrom what you've described, the best next step would be to check the official guidance on GOV.UK or speak to your university's support team — they're experienced in helping students with exactly these kinds of questions.\n\nWould you like me to point you to a specific official source, or shall we talk through your checklist and find the relevant task?`;
+  if (/checklist|task|roadmap|next/.test(msg)) {
+    return `Your Beginly roadmap is generated from your arrival status, accommodation type, work interest, and settlement stage. Start with high-priority tasks, then complete tasks that unlock later steps such as banking, GP registration, and local-admin setup.`;
+  }
+
+  return `I can help with general settlement guidance and checklist navigation. For official, regulated, medical, legal, immigration, financial, tax, or housing decisions, please use official sources or a qualified professional. Tell me the checklist task or general topic you want to understand, and I’ll keep it practical and safe.`;
 }
 
 export default function Nia({ autoOpen = false }: { autoOpen?: boolean }) {
