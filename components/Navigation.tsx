@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
-import { clearAuthCache } from "@/hooks/useAuth";
+import { supabase } from "@/lib/supabase";
+import { clearUser } from "@/lib/utils";
 import {
   LayoutDashboard,
   CheckSquare,
@@ -53,12 +53,21 @@ function setCollapsedKey(val: boolean): void {
 
 export default function Navigation({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user: authUser } = useAuth();
+  const [session, setSession] = useState<{ user: { id: string; email?: string; user_metadata?: { name?: string } } | null }>({ user: null });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsedState] = useState(true);
 
   useEffect(() => {
+    // Read the session from local storage (instant, no network round-trip).
+    supabase.auth.getSession().then(({ data }) => setSession({ user: data.session?.user ?? null }));
+
+    // Listen for auth changes (sign in / sign out)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession({ user: session?.user ?? null });
+    });
+
     setCollapsedState(getCollapsedKey(true));
+    return () => subscription.unsubscribe();
   }, []);
 
   const toggleCollapse = () => {
@@ -68,15 +77,13 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
   };
 
   const handleLogout = async () => {
-    clearAuthCache();
-    localStorage.removeItem("custom_auth_token");
-    const token = localStorage.getItem("custom_auth_token");
-    await fetch("/api/auth/logout", { method: "POST", headers: { Authorization: `Bearer ${token ?? ""}` } }).catch(() => {});
+    await supabase.auth.signOut();
+    clearUser();
     window.location.href = "/login";
   };
 
-  const userName = authUser?.name ?? authUser?.email?.split("@")[0] ?? "?";
-  const userEmail = authUser?.email ?? "";
+  const userName = session.user?.user_metadata?.name ?? session.user?.email?.split("@")[0] ?? "?";
+  const userEmail = session.user?.email ?? "";
   const userInitial = userName.charAt(0).toUpperCase();
 
   const sidebarWidth = collapsed ? "w-16" : "w-64";
@@ -152,6 +159,8 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
                     collapsed ? "justify-center" : "",
                   ].filter(Boolean).join(" ")}
                 >
+                  <Icon className="w-4 h-4 shrink-0" />
+                  {!collapsed && <span className="truncate">{label}</span>}
                   {/* Active dot — Direction A nav indicator */}
                   {active && (
                     <span
@@ -166,8 +175,6 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
                       aria-hidden="true"
                     />
                   )}
-                  <Icon className="w-4 h-4 shrink-0" />
-                  {!collapsed && <span className="truncate">{label}</span>}
                 </Link>
               );
             })}
