@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Disclaimer from "@/components/Disclaimer";
+import { supabase } from "@/lib/supabase";
+import { withTimeout } from "@/lib/utils";
 import type { BudgetItem } from "@/types";
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip,
@@ -11,19 +13,39 @@ import {
 import { TrendingUp, Trash2, Plus, AlertTriangle, Printer } from "lucide-react";
 import BudgetSkeleton from "@/components/BudgetSkeleton";
 
+function getDefaults(city?: string | null): Omit<BudgetItem, "id">[] {
+  const isInLondon = city === "London";
+  return [
+    { category: "Accommodation", label: "Rent", amount: isInLondon ? 900 : 550, type: "expense", color: "#0B7285" },
+    { category: "Food", label: "Groceries", amount: isInLondon ? 200 : 150, type: "expense", color: "#0D9488" },
+    { category: "University", label: "Tuition fees", amount: 0, type: "expense", color: "#6366F1" },
+    { category: "Transport", label: "Transport (bus/train)", amount: isInLondon ? 150 : 80, type: "expense", color: "#F59E0B" },
+    { category: "Accommodation", label: "Bills (electric, gas, internet)", amount: isInLondon ? 120 : 80, type: "expense", color: "#8B5CF6" },
+    { category: "Utilities", label: "Phone/SIM", amount: 15, type: "expense", color: "#EC4899" },
+    { category: "Social", label: "Social & leisure", amount: 80, type: "expense", color: "#F97316" },
+    { category: "University", label: "Books & materials", amount: 50, type: "expense", color: "#14B8A6" },
+    { category: "Savings", label: "Savings target", amount: 200, type: "savings", color: "#22C55E" },
+    { category: "Funding", label: "Student loan / stipend", amount: isInLondon ? 1200 : 900, type: "income", color: "#10B981" },
+  ];
+}
+
 const CATEGORIES = ["Accommodation", "Food", "Transport", "University", "Social", "Utilities", "Health", "Savings", "Funding", "Other"];
+const TYPES = ["expense", "income", "savings"] as const;
 const PIE_COLORS = ["#0B7285", "#0D9488", "#F59E0B", "#6366F1", "#EC4899", "#F97316", "#14B8A6", "#22C55E", "#8B5CF6", "#EF4444"];
 
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 
-// Budget data now lives in Supabase (public.budget_items), same as your
-// checklist. Reads/writes go through /api/budget rather than straight from
-// the browser to Supabase, because this app's custom auth token isn't a
-// Supabase Auth session — so the row-level security on budget_items (which
-// checks auth.uid()) would silently reject a direct browser call.
-function authHeaders(): HeadersInit {
-  const token = typeof window !== "undefined" ? localStorage.getItem("custom_auth_token") : null;
-  return token ? { Authorization: `Bearer ${token}` } : {};
+type BudgetRow = { id: string; label: string; amount: number | string; category: string; type: BudgetItem["type"]; color: string | null };
+
+function rowToItem(row: BudgetRow): BudgetItem {
+  return {
+    id: row.id,
+    label: row.label,
+    amount: Number(row.amount),
+    category: row.category,
+    type: row.type,
+    color: row.color ?? undefined,
+  };
 }
 
 export default function BudgetPage() {
@@ -39,33 +61,49 @@ export default function BudgetPage() {
     let mounted = true;
 
     async function load() {
-      // Don't gate on localStorage having a token — the session is also
-      // carried by an httpOnly cookie the browser sends automatically, and
-      // that cookie is the more reliable of the two. Just make the request
-      // and let a 401 response (not a missing localStorage key) decide
-      // whether to redirect to /login.
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
-
       try {
-        const res = await fetch("/api/budget", { headers: authHeaders(), signal: controller.signal });
-        if (res.status === 401) { router.push("/login"); return; }
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to load budget.");
+        const { data: { user } } = await withTimeout(supabase.auth.getUser());
+        if (!user) { router.push("/login"); return; }
 
-        if (!mounted) return;
-        setItems((data.items ?? []) as BudgetItem[]);
+        const { data: existingRows, error } = await withTimeout(
+          supabase
+            .from("budget_items")
+            .select("id,label,amount,category,type,color")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: true })
+        );
+        if (error) throw new Error(error.message);
+
+        if (existingRows && existingRows.length > 0) {
+          if (!mounted) return;
+          setItems((existingRows as BudgetRow[]).map(rowToItem));
+        } else {
+          // First time this user has opened the budget planner — seed sensible
+          // defaults (once) so it's not just a blank page.
+          const { data: profileRow } = await withTimeout(
+            supabase.from("arrival_profiles").select("city").eq("user_id", user.id).maybeSingle()
+          );
+          const defaults = getDefaults(profileRow?.city as string | null | undefined);
+          const { data: inserted, error: insertError } = await withTimeout(
+            supabase
+              .from("budget_items")
+              .insert(defaults.map((d) => ({ ...d, user_id: user.id })))
+              .select("id,label,amount,category,type,color")
+          );
+          if (insertError) throw new Error(insertError.message);
+          if (!mounted) return;
+          setItems(((inserted ?? []) as BudgetRow[]).map(rowToItem));
+        }
       } catch (err: unknown) {
         if (!mounted) return;
-        const isAbort = err instanceof Error && err.name === "AbortError";
-        console.error("Budget load failed:", err instanceof Error ? err.message : String(err));
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error("Budget load failed:", msg);
         setLoadError(
-          isAbort
-            ? "This is taking longer than expected. Please try again."
+          msg === "This is taking longer than expected. Please try again."
+            ? msg
             : "We couldn't load your budget. Please try again."
         );
       } finally {
-        clearTimeout(timeoutId);
         if (mounted) setLoading(false);
       }
     }
@@ -101,20 +139,24 @@ export default function BudgetPage() {
     };
 
     try {
-      const res = await fetch("/api/budget", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
-        body: JSON.stringify(newItemData),
-      });
-      if (res.status === 401) { router.push("/login"); return; }
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to save item.");
+      const { data: { user } } = await withTimeout(supabase.auth.getUser());
+      if (!user) { router.push("/login"); return; }
 
-      setItems((prev) => [...prev, data.item as BudgetItem]);
+      const { data, error } = await withTimeout(
+        supabase
+          .from("budget_items")
+          .insert({ ...newItemData, user_id: user.id })
+          .select("id,label,amount,category,type,color")
+          .single()
+      );
+      if (error) throw new Error(error.message);
+
+      setItems((prev) => [...prev, rowToItem(data as BudgetRow)]);
       setForm({ label: "", amount: "", category: "Other", type: "expense" });
       setShowForm(false);
     } catch (err: unknown) {
-      console.error("Budget item save failed:", err instanceof Error ? err.message : String(err));
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Budget item save failed:", msg);
       setActionError("We couldn't save that item. Please try again.");
     }
   };
@@ -125,15 +167,11 @@ export default function BudgetPage() {
     setItems((prev) => prev.filter((i) => i.id !== id));
 
     try {
-      const res = await fetch(`/api/budget?id=${encodeURIComponent(id)}`, {
-        method: "DELETE",
-        headers: authHeaders(),
-      });
-      if (res.status === 401) { router.push("/login"); return; }
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to delete item.");
+      const { error } = await withTimeout(supabase.from("budget_items").delete().eq("id", id));
+      if (error) throw new Error(error.message);
     } catch (err: unknown) {
-      console.error("Budget item delete failed:", err instanceof Error ? err.message : String(err));
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Budget item delete failed:", msg);
       setItems(previous);
       setActionError("We couldn't remove that item. Please try again.");
     }

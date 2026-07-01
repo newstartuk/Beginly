@@ -1,7 +1,9 @@
 "use client";
+export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { SEED_TASKS } from "@/lib/seed-data";
 import type { TaskStatus } from "@/types";
 import {
@@ -10,23 +12,15 @@ import {
   Circle,
   Clock,
   AlertTriangle,
+  ExternalLink,
   ArrowRight,
 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Disclaimer from "@/components/Disclaimer";
 
-// Task progress lives in Supabase (public.user_tasks), read/written through
-// /api/tasks — same as the main checklist page — rather than the old
-// localStorage-only getUserTask/upsertUserTask helpers, which never synced
-// this page's progress anywhere beyond the current browser.
-function authHeaders(): HeadersInit {
-  const token = typeof window !== "undefined" ? localStorage.getItem("custom_auth_token") : null;
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 export default function TaskDetailPage() {
-  const router = useRouter();
   const params = useParams();
+  const router = useRouter();
   const taskId = params.id as string;
   const task = SEED_TASKS.find((t) => t.taskId === taskId);
   const [status, setStatus] = useState<TaskStatus>("not_started");
@@ -34,33 +28,20 @@ export default function TaskDetailPage() {
   const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
-    let active = true;
-
-    async function load() {
-      // Don't gate on localStorage having a token — the session is also
-      // carried by an httpOnly cookie the browser sends automatically, and
-      // that cookie is the more reliable of the two. Just make the request
-      // and let a 401 response (not a missing localStorage key) decide
-      // whether to redirect to /login.
-      if (!task) { if (active) setMounted(true); return; }
-
-      try {
-        const res = await fetch("/api/tasks", { headers: authHeaders() });
-        if (res.status === 401) { router.push("/login"); return; }
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to load task.");
-        if (!active) return;
-
-        const match = (data.tasks ?? []).find((t: { taskId: string; status: TaskStatus }) => t.taskId === task.taskId);
-        if (match) setStatus(match.status);
-      } catch (err: unknown) {
-        console.error("Task load failed:", err instanceof Error ? err.message : String(err));
-      } finally {
-        if (active) setMounted(true);
-      }
+    async function loadStatus() {
+      setMounted(true);
+      if (!task) return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/login"); return; }
+      const { data } = await supabase
+        .from("user_tasks")
+        .select("status")
+        .eq("user_id", user.id)
+        .eq("task_id", task.taskId)
+        .maybeSingle();
+      if (data?.status) setStatus(data.status as TaskStatus);
     }
-    load();
-    return () => { active = false; };
+    loadStatus();
   }, [task, router]);
 
   if (!mounted) return null;
@@ -77,22 +58,39 @@ export default function TaskDetailPage() {
   }
 
   const update = async (newStatus: TaskStatus) => {
-    const previous = status;
+    const previousStatus = status;
+    setStatus(newStatus); // optimistic — reverted below if the save fails
     setSaveError("");
-    setStatus(newStatus);
-
     try {
-      const res = await fetch("/api/tasks", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
-        body: JSON.stringify({ taskId: task.taskId, status: newStatus }),
-      });
-      if (res.status === 401) { setStatus(previous); router.push("/login"); return; }
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Save failed.");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/login"); return; }
+
+      // Avoid `.upsert(..., { onConflict: "user_id,task_id" })` — same class
+      // of bug found in onboarding's arrival_profiles save: if user_tasks
+      // has no matching unique/exclusion constraint, Postgres rejects the
+      // ON CONFLICT clause outright. Select-then-insert-or-update works
+      // regardless of what constraints actually exist on the table.
+      const { data: existing } = await supabase
+        .from("user_tasks")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .eq("task_id", task.taskId)
+        .maybeSingle();
+
+      const row = {
+        status: newStatus,
+        completed_at: newStatus === "complete" ? new Date().toISOString() : null,
+      };
+
+      const { error } = existing
+        ? await supabase.from("user_tasks").update(row).eq("user_id", user.id).eq("task_id", task.taskId)
+        : await supabase.from("user_tasks").insert({ user_id: user.id, task_id: task.taskId, ...row });
+
+      if (error) throw new Error(error.message);
     } catch (err: unknown) {
-      console.error("Task update failed:", err instanceof Error ? err.message : String(err));
-      setStatus(previous);
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Task status save failed:", msg);
+      setStatus(previousStatus);
       setSaveError("We couldn't save that — please try again.");
     }
   };
@@ -107,10 +105,6 @@ export default function TaskDetailPage() {
   return (
     <Navigation>
       <div className="space-y-5 animate-fade-in max-w-3xl">
-        {saveError && (
-          <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5">{saveError}</div>
-        )}
-
         {/* Back */}
         <Link href="/checklist" className="inline-flex items-center gap-1 text-sm text-muted hover:text-primary transition-colors">
           <ChevronLeft className="w-4 h-4" /> Back to checklist
@@ -152,6 +146,9 @@ export default function TaskDetailPage() {
               </button>
             ))}
           </div>
+          {saveError && (
+            <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2 mt-3">{saveError}</p>
+          )}
         </div>
 
         {/* Why it matters */}

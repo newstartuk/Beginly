@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { SEED_TASKS } from "@/lib/seed-data";
+import { dbProfileToArrivalProfile, generateTasksForProfile } from "@/lib/task-generator";
 import type { UserTask } from "@/types";
 import ChecklistSkeleton from "./ChecklistSkeleton";
 import Badge from "./Badge";
@@ -19,62 +21,66 @@ const STAGE_LABELS: Record<string, string> = {
   GROW: "Growth",
 };
 
-// Task progress lives in Supabase (public.user_tasks), read/written through
-// /api/tasks rather than directly from the browser. This app's custom auth
-// token isn't a Supabase Auth session, so the row-level security on
-// user_tasks (which checks auth.uid()) would silently reject a direct
-// browser call to supabase.from("user_tasks").
-function authHeaders(): HeadersInit {
-  const token = typeof window !== "undefined" ? localStorage.getItem("custom_auth_token") : null;
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 export default function ChecklistContent() {
   const router = useRouter();
   const [tasks, setTasks] = useState<UserTask[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState("");
   const [filter, setFilter] = useState<"all" | "pending" | "complete">("all");
   const [expandedStages, setExpandedStages] = useState<Set<string>>(new Set(["PRE", "D1"]));
   const [toggleError, setToggleError] = useState("");
 
   useEffect(() => {
-    let active = true;
-
     async function load() {
-      // Don't gate on localStorage having a token — the session is also
-      // carried by an httpOnly cookie the browser sends automatically, and
-      // that cookie is the more reliable of the two. Just make the request
-      // and let a 401 response (not a missing localStorage key) decide
-      // whether to redirect to /login.
-      try {
-        const res = await fetch("/api/tasks", { headers: authHeaders() });
-        if (res.status === 401) { router.push("/login"); return; }
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to load checklist.");
-        if (!active) return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/login"); return; }
 
-        if (!data.hasProfile) { router.push("/onboarding"); return; }
+      let { data: taskData } = await supabase
+        .from("user_tasks")
+        .select("task_id,status,completed_at")
+        .eq("user_id", user.id);
 
-        setTasks(
-          (data.tasks ?? []).map(
-            (t: { taskId: string; status: UserTask["status"]; completedAt?: string }): UserTask => ({
-              taskId: t.taskId,
-              status: t.status,
-              completedAt: t.completedAt,
-            })
-          )
-        );
-      } catch (err: unknown) {
-        if (!active) return;
-        console.error("Checklist load failed:", err instanceof Error ? err.message : String(err));
-        setLoadError("We couldn't load your checklist. Please try again.");
-      } finally {
-        if (active) setLoading(false);
+      // Repair path: if onboarding/profile exists but no task rows were generated,
+      // generate the user's roadmap now instead of showing an empty checklist.
+      if (!taskData?.length) {
+        const { data: profileRow } = await supabase
+          .from("arrival_profiles")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (profileRow) {
+          const generated = generateTasksForProfile(dbProfileToArrivalProfile(profileRow));
+          if (generated.length) {
+            await supabase.from("user_tasks").insert(
+              generated.map((task) => ({
+                user_id: user.id,
+                task_id: task.taskId,
+                status: task.status,
+                completed_at: null,
+              }))
+            );
+            const refreshed = await supabase
+              .from("user_tasks")
+              .select("task_id,status,completed_at")
+              .eq("user_id", user.id);
+            taskData = refreshed.data ?? [];
+          }
+        } else {
+          router.push("/onboarding");
+          return;
+        }
       }
+
+      setTasks(
+        (taskData ?? []).map((t): UserTask => ({
+          taskId: t.task_id,
+          status: t.status as UserTask["status"],
+          completedAt: t.completed_at ?? undefined,
+        }))
+      );
+      setLoading(false);
     }
     load();
-    return () => { active = false; };
   }, [router]);
 
   const toggle = async (taskId: string) => {
@@ -99,31 +105,31 @@ export default function ChecklistContent() {
     );
 
     try {
-      const res = await fetch("/api/tasks", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
-        body: JSON.stringify({ taskId, status: nextStatus }),
-      });
-      if (res.status === 401) { revert(); router.push("/login"); return; }
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Save failed.");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { revert(); router.push("/login"); return; }
+
+      const { data: existingRow } = await supabase
+        .from("user_tasks")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .eq("task_id", taskId)
+        .maybeSingle();
+
+      const row = { status: nextStatus, completed_at: completedAt ?? null };
+      const { error } = existingRow
+        ? await supabase.from("user_tasks").update(row).eq("user_id", user.id).eq("task_id", taskId)
+        : await supabase.from("user_tasks").insert({ user_id: user.id, task_id: taskId, ...row });
+
+      if (error) throw new Error(error.message);
     } catch (err: unknown) {
-      console.error("Task toggle save failed:", err instanceof Error ? err.message : String(err));
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Task toggle save failed:", msg);
       revert();
       setToggleError("We couldn't save that — please try again.");
     }
   };
 
   if (loading) return <ChecklistSkeleton />;
-
-  if (loadError) {
-    return (
-      <div className="max-w-md mx-auto mt-16 text-center space-y-3">
-        <p className="text-sm font-semibold text-navy">{loadError}</p>
-        <button onClick={() => window.location.reload()} className="btn-primary text-sm">Try again</button>
-      </div>
-    );
-  }
 
   const validTaskIds = new Set(SEED_TASKS.map((task) => task.taskId));
   const visibleTasks = tasks.filter((task) => validTaskIds.has(task.taskId));
