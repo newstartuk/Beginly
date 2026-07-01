@@ -39,6 +39,7 @@ export default function SettingsPage() {
   const [loadError, setLoadError] = useState("");
   const [deleteError, setDeleteError] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [reminderError, setReminderError] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -104,17 +105,29 @@ export default function SettingsPage() {
 
   const handleReminderSave = async () => {
     if (!user) return;
+    setReminderError("");
     try {
-      await withTimeout(supabase.from("reminder_prefs").upsert({
-        user_id: user.id,
-        email_reminders: reminders.emailReminders,
-        frequency: reminders.frequency,
-      }, { onConflict: "user_id" }));
+      // Avoid `.upsert(..., { onConflict: "user_id" })` — same class of bug
+      // found in onboarding's arrival_profiles save: if reminder_prefs has
+      // no unique/exclusion constraint on user_id, Postgres rejects the
+      // ON CONFLICT clause outright. Select-then-insert-or-update works
+      // regardless of what constraints actually exist on the table.
+      const { data: existing } = await withTimeout(
+        supabase.from("reminder_prefs").select("user_id").eq("user_id", user.id).maybeSingle()
+      );
+      const reminderRow = { email_reminders: reminders.emailReminders, frequency: reminders.frequency };
+      const { error } = existing
+        ? await withTimeout(supabase.from("reminder_prefs").update(reminderRow).eq("user_id", user.id))
+        : await withTimeout(supabase.from("reminder_prefs").insert({ user_id: user.id, ...reminderRow }));
+
+      if (error) throw new Error(error.message);
+
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error("Reminder save failed:", msg);
+      setReminderError("We couldn't save your reminder preferences. Please try again.");
     }
   };
 
@@ -280,6 +293,9 @@ export default function SettingsPage() {
                   <option value="monthly">Monthly roundup</option>
                 </select>
               </div>
+            )}
+            {reminderError && (
+              <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2">{reminderError}</p>
             )}
             <button onClick={handleReminderSave} className="btn-primary">
               {saved ? <><CheckCircle className="w-4 h-4" /> Saved</> : "Save preferences"}

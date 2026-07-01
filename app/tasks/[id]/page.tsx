@@ -1,8 +1,9 @@
 "use client";
+export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { getUser, upsertUserTask, getUserTask } from "@/lib/utils";
+import { useParams, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { SEED_TASKS } from "@/lib/seed-data";
 import type { TaskStatus } from "@/types";
 import {
@@ -19,18 +20,29 @@ import Disclaimer from "@/components/Disclaimer";
 
 export default function TaskDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const taskId = params.id as string;
   const task = SEED_TASKS.find((t) => t.taskId === taskId);
   const [status, setStatus] = useState<TaskStatus>("not_started");
   const [mounted, setMounted] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
-    setMounted(true);
-    if (task) {
-      const ut = getUserTask(task.taskId);
-      if (ut) setStatus(ut.status);
+    async function loadStatus() {
+      setMounted(true);
+      if (!task) return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/login"); return; }
+      const { data } = await supabase
+        .from("user_tasks")
+        .select("status")
+        .eq("user_id", user.id)
+        .eq("task_id", task.taskId)
+        .maybeSingle();
+      if (data?.status) setStatus(data.status as TaskStatus);
     }
-  }, [task]);
+    loadStatus();
+  }, [task, router]);
 
   if (!mounted) return null;
 
@@ -45,9 +57,42 @@ export default function TaskDetailPage() {
     );
   }
 
-  const update = (newStatus: TaskStatus) => {
-    setStatus(newStatus);
-    upsertUserTask(task.taskId, newStatus);
+  const update = async (newStatus: TaskStatus) => {
+    const previousStatus = status;
+    setStatus(newStatus); // optimistic — reverted below if the save fails
+    setSaveError("");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/login"); return; }
+
+      // Avoid `.upsert(..., { onConflict: "user_id,task_id" })` — same class
+      // of bug found in onboarding's arrival_profiles save: if user_tasks
+      // has no matching unique/exclusion constraint, Postgres rejects the
+      // ON CONFLICT clause outright. Select-then-insert-or-update works
+      // regardless of what constraints actually exist on the table.
+      const { data: existing } = await supabase
+        .from("user_tasks")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .eq("task_id", task.taskId)
+        .maybeSingle();
+
+      const row = {
+        status: newStatus,
+        completed_at: newStatus === "complete" ? new Date().toISOString() : null,
+      };
+
+      const { error } = existing
+        ? await supabase.from("user_tasks").update(row).eq("user_id", user.id).eq("task_id", task.taskId)
+        : await supabase.from("user_tasks").insert({ user_id: user.id, task_id: task.taskId, ...row });
+
+      if (error) throw new Error(error.message);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Task status save failed:", msg);
+      setStatus(previousStatus);
+      setSaveError("We couldn't save that — please try again.");
+    }
   };
 
   const PRIORITY_COLORS: Record<string, string> = {
@@ -101,6 +146,9 @@ export default function TaskDetailPage() {
               </button>
             ))}
           </div>
+          {saveError && (
+            <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2 mt-3">{saveError}</p>
+          )}
         </div>
 
         {/* Why it matters */}

@@ -156,8 +156,7 @@ export default function OnboardingPage() {
       // second auth round-trip entirely.
       await withTimeout(ensureBeginlyUser(user));
 
-      const { error: profileError } = await withTimeout(supabase.from("arrival_profiles").upsert({
-        user_id: user.id,
+      const profileRow = {
         arrival_type: completeProfile.arrivalType,
         status: completeProfile.arrivalStatus,
         arrival_date: completeProfile.arrivalDate || null,
@@ -167,7 +166,21 @@ export default function OnboardingPage() {
         nationality: completeProfile.nationality || null,
         english_level: completeProfile.englishLevel || null,
         work_interest: completeProfile.interestedInWork,
-      }, { onConflict: "user_id" }));
+      };
+
+      // Avoid `.upsert(..., { onConflict: "user_id" })` — the arrival_profiles
+      // table has no unique/exclusion constraint on user_id, so Postgres
+      // rejects the ON CONFLICT clause outright with "there is no unique or
+      // exclusion constraint matching the ON CONFLICT specification" (a real
+      // 400 from PostgREST, confirmed live). Select-then-insert-or-update
+      // works regardless of what constraints exist on the table.
+      const { data: existingProfileRow } = await withTimeout(
+        supabase.from("arrival_profiles").select("id").eq("user_id", user.id).maybeSingle()
+      );
+
+      const { error: profileError } = existingProfileRow
+        ? await withTimeout(supabase.from("arrival_profiles").update(profileRow).eq("user_id", user.id))
+        : await withTimeout(supabase.from("arrival_profiles").insert({ user_id: user.id, ...profileRow }));
 
       if (profileError) {
         console.error("Arrival profile save failed:", profileError.message);
