@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { withTimeout } from "@/lib/utils";
 import { SEED_TASKS } from "@/lib/seed-data";
 import type { TaskStatus } from "@/types";
 import {
@@ -26,20 +27,31 @@ export default function TaskDetailPage() {
   const [status, setStatus] = useState<TaskStatus>("not_started");
   const [mounted, setMounted] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
     async function loadStatus() {
       setMounted(true);
       if (!task) return;
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push("/login"); return; }
-      const { data } = await supabase
-        .from("user_tasks")
-        .select("status")
-        .eq("user_id", user.id)
-        .eq("task_id", task.taskId)
-        .maybeSingle();
-      if (data?.status) setStatus(data.status as TaskStatus);
+      try {
+        // Same withTimeout guard as Checklist/Budget/Settings — without it, an
+        // occasional Supabase client stall here silently leaves the status
+        // toggle showing "Not started" even when the real saved status is
+        // something else, with no error and no way to tell.
+        const { data: { user } } = await withTimeout(supabase.auth.getUser());
+        if (!user) { router.push("/login"); return; }
+        const { data } = await withTimeout(supabase
+          .from("user_tasks")
+          .select("status")
+          .eq("user_id", user.id)
+          .eq("task_id", task.taskId)
+          .maybeSingle());
+        if (data?.status) setStatus(data.status as TaskStatus);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error("Task status load failed:", msg);
+        setLoadError("We couldn't load your saved progress for this task — it may not reflect your latest status.");
+      }
     }
     loadStatus();
   }, [task, router]);
@@ -125,6 +137,9 @@ export default function TaskDetailPage() {
 
         {/* Status toggle */}
         <div className="card">
+          {loadError && (
+            <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-2 mb-3">{loadError}</p>
+          )}
           <p className="text-xs text-muted mb-3 uppercase tracking-wide font-semibold">Mark your progress</p>
           <div className="grid grid-cols-3 gap-2">
             {[

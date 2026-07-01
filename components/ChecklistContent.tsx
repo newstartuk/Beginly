@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { withTimeout } from "@/lib/utils";
 import { SEED_TASKS } from "@/lib/seed-data";
 import { dbProfileToArrivalProfile, generateTasksForProfile } from "@/lib/task-generator";
 import type { UserTask } from "@/types";
@@ -28,60 +29,84 @@ export default function ChecklistContent() {
   const [filter, setFilter] = useState<"all" | "pending" | "complete">("all");
   const [expandedStages, setExpandedStages] = useState<Set<string>>(new Set(["PRE", "D1"]));
   const [toggleError, setToggleError] = useState("");
+  const [loadError, setLoadError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push("/login"); return; }
+      setLoadError("");
+      try {
+        // Guard against the Supabase client occasionally stalling on
+        // getUser()/getSession() with no error and no network activity —
+        // same class of bug documented in lib/utils.ts's withTimeout, and
+        // the same fix already applied on the Budget Planner, Settings, and
+        // onboarding pages. Without this, a stalled call left this page
+        // stuck on the skeleton forever with no feedback and no way out.
+        const { data: { user } } = await withTimeout(supabase.auth.getUser());
+        if (cancelled) return;
+        if (!user) { router.push("/login"); return; }
 
-      let { data: taskData } = await supabase
-        .from("user_tasks")
-        .select("task_id,status,completed_at")
-        .eq("user_id", user.id);
+        let { data: taskData } = await withTimeout(supabase
+          .from("user_tasks")
+          .select("task_id,status,completed_at")
+          .eq("user_id", user.id));
 
-      // Repair path: if onboarding/profile exists but no task rows were generated,
-      // generate the user's roadmap now instead of showing an empty checklist.
-      if (!taskData?.length) {
-        const { data: profileRow } = await supabase
-          .from("arrival_profiles")
-          .select("*")
-          .eq("user_id", user.id)
-          .maybeSingle();
+        // Repair path: if onboarding/profile exists but no task rows were generated,
+        // generate the user's roadmap now instead of showing an empty checklist.
+        if (!taskData?.length) {
+          const { data: profileRow } = await withTimeout(supabase
+            .from("arrival_profiles")
+            .select("*")
+            .eq("user_id", user.id)
+            .maybeSingle());
 
-        if (profileRow) {
-          const generated = generateTasksForProfile(dbProfileToArrivalProfile(profileRow));
-          if (generated.length) {
-            await supabase.from("user_tasks").insert(
-              generated.map((task) => ({
-                user_id: user.id,
-                task_id: task.taskId,
-                status: task.status,
-                completed_at: null,
-              }))
-            );
-            const refreshed = await supabase
-              .from("user_tasks")
-              .select("task_id,status,completed_at")
-              .eq("user_id", user.id);
-            taskData = refreshed.data ?? [];
+          if (cancelled) return;
+
+          if (profileRow) {
+            const generated = generateTasksForProfile(dbProfileToArrivalProfile(profileRow));
+            if (generated.length) {
+              await withTimeout(supabase.from("user_tasks").insert(
+                generated.map((task) => ({
+                  user_id: user.id,
+                  task_id: task.taskId,
+                  status: task.status,
+                  completed_at: null,
+                }))
+              ));
+              const refreshed = await withTimeout(supabase
+                .from("user_tasks")
+                .select("task_id,status,completed_at")
+                .eq("user_id", user.id));
+              taskData = refreshed.data ?? [];
+            }
+          } else {
+            router.push("/onboarding");
+            return;
           }
-        } else {
-          router.push("/onboarding");
-          return;
         }
-      }
 
-      setTasks(
-        (taskData ?? []).map((t): UserTask => ({
-          taskId: t.task_id,
-          status: t.status as UserTask["status"],
-          completedAt: t.completed_at ?? undefined,
-        }))
-      );
-      setLoading(false);
+        if (cancelled) return;
+        setTasks(
+          (taskData ?? []).map((t): UserTask => ({
+            taskId: t.task_id,
+            status: t.status as UserTask["status"],
+            completedAt: t.completed_at ?? undefined,
+          }))
+        );
+        setLoading(false);
+      } catch (err: unknown) {
+        if (cancelled) return;
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error("Checklist load failed:", msg);
+        setLoadError("We couldn't load your checklist. Please try again.");
+        setLoading(false);
+      }
     }
     load();
-  }, [router]);
+    return () => { cancelled = true; };
+  }, [router, reloadKey]);
 
   const toggle = async (taskId: string) => {
     const existing = tasks.find((t) => t.taskId === taskId);
@@ -128,6 +153,18 @@ export default function ChecklistContent() {
       setToggleError("We couldn't save that — please try again.");
     }
   };
+
+  if (loadError) {
+    return (
+      <div className="max-w-md mx-auto mt-16 text-center space-y-3">
+        <p className="text-sm font-semibold text-navy">We couldn&apos;t load your checklist</p>
+        <p className="text-xs text-muted">{loadError}</p>
+        <button onClick={() => { setLoading(true); setReloadKey((k) => k + 1); }} className="btn-primary text-sm">
+          Try again
+        </button>
+      </div>
+    );
+  }
 
   if (loading) return <ChecklistSkeleton />;
 
