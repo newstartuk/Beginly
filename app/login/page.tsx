@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { ensureBeginlyUser } from "@/lib/auth-client";
-import { setUser } from "@/lib/utils";
+import { setUser, withTimeout } from "@/lib/utils";
 import { AlertCircle, CheckCircle } from "lucide-react";
 
 export default function LoginPage() {
@@ -32,36 +32,34 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
+      const { data, error: authError } = await withTimeout(supabase.auth.signInWithPassword({
         email: normalisedEmail,
         password,
-      });
+      }));
 
       if (authError) {
         const message = authError.message.toLowerCase().includes("email not confirmed")
           ? "Please confirm your email address first. Check your inbox/spam folder, then try again."
           : authError.message;
         setError(message);
-        setLoading(false);
         return;
       }
 
       if (!data.user) {
         setError("Something went wrong. Please try again.");
-        setLoading(false);
         return;
       }
 
       // Run the profile-row check and the arrival-profile lookup in parallel,
       // passing the user we already have to avoid an extra auth round-trip.
-      const [beginlyUser, profileRes] = await Promise.all([
+      const [beginlyUser, profileRes] = await withTimeout(Promise.all([
         ensureBeginlyUser(data.user),
         supabase
           .from("arrival_profiles")
           .select("id")
           .eq("user_id", data.user.id)
           .maybeSingle(),
-      ]);
+      ]));
       if (beginlyUser) setUser(beginlyUser);
 
       router.push(profileRes.data ? "/dashboard" : "/onboarding");
@@ -69,6 +67,7 @@ export default function LoginPage() {
       const msg = err instanceof Error ? err.message : String(err);
       console.error("Login error:", msg);
       setError(msg);
+    } finally {
       setLoading(false);
     }
   };

@@ -15,6 +15,31 @@ const KEYS = {
   TICKETS: "beginly_tickets",
 } as const;
 
+// ─── Async safety net ────────────────────────────────────────────────────────
+// Wraps a promise so it can never hang a UI forever. If `promise` hasn't
+// settled within `ms`, this rejects with a TimeoutError instead of leaving
+// the caller's `await` pending indefinitely. Used to guard Supabase auth/data
+// calls that have been observed to occasionally stall (e.g. concurrent
+// getSession()/getUser() calls contending for the client's internal auth
+// lock) with no error and no network activity — previously this left
+// "Saving…"/"Loading…" buttons and skeletons stuck forever with no way out.
+export class TimeoutError extends Error {
+  constructor(message = "This is taking longer than expected. Please try again.") {
+    super(message);
+    this.name = "TimeoutError";
+  }
+}
+
+export function withTimeout<T>(promise: Promise<T>, ms = 15000): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new TimeoutError()), ms);
+    promise.then(
+      (value) => { clearTimeout(timer); resolve(value); },
+      (err) => { clearTimeout(timer); reject(err); }
+    );
+  });
+}
+
 // ─── Generic helpers ─────────────────────────────────────────────────────────
 function safeGet<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;

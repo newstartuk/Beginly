@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabase, supabase } from "@/lib/supabase";
-import { clearUser } from "@/lib/utils";
+import { clearUser, withTimeout } from "@/lib/utils";
 import type { ReminderPrefs } from "@/types";
 import { User, Bell, Trash2, CheckCircle, BellRing } from "lucide-react";
 import Disclaimer from "@/components/Disclaimer";
@@ -36,81 +36,123 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [notifPerm, setNotifPerm] = useState<NotificationPermission>("default");
+  const [loadError, setLoadError] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+
     async function loadSession() {
-      const supabase = getSupabase();
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (!authUser) { router.push("/login"); return; }
+      try {
+        const supabase = getSupabase();
+        const { data: { user: authUser } } = await withTimeout(supabase.auth.getUser());
+        if (!authUser) { router.push("/login"); return; }
 
-      setUser({
-        id: authUser.id,
-        name: (authUser.user_metadata?.name as string | undefined) ?? authUser.email?.split("@")[0] ?? "?",
-        email: authUser.email ?? "",
-        profile_completed: !!(authUser.user_metadata?.profile_completed),
-      });
-
-      const { data: profileData } = await supabase
-        .from("arrival_profiles")
-        .select("*")
-        .eq("user_id", authUser.id)
-        .maybeSingle();
-      if (profileData) {
-        setProfile({
-          arrival_type: profileData.arrival_type ?? undefined,
-          status: profileData.status ?? undefined,
-          arrival_date: profileData.arrival_date ?? undefined,
-          city: profileData.city ?? undefined,
-          university: profileData.university ?? undefined,
-          accommodation: profileData.accommodation ?? undefined,
-          nationality: profileData.nationality ?? undefined,
-          english_level: profileData.english_level ?? undefined,
-          work_interest: profileData.work_interest ?? undefined,
+        if (!mounted) return;
+        setUser({
+          id: authUser.id,
+          name: (authUser.user_metadata?.name as string | undefined) ?? authUser.email?.split("@")[0] ?? "?",
+          email: authUser.email ?? "",
+          profile_completed: !!(authUser.user_metadata?.profile_completed),
         });
-      }
 
-      const { data: reminderData } = await supabase
-        .from("reminder_prefs")
-        .select("*")
-        .eq("user_id", authUser.id)
-        .maybeSingle();
-      if (reminderData) {
-        setReminders({
-          emailReminders: reminderData.email_reminders ?? false,
-          frequency: (reminderData.frequency as ReminderPrefs["frequency"]) ?? "weekly",
-        });
-      }
+        const { data: profileData } = await withTimeout(supabase
+          .from("arrival_profiles")
+          .select("*")
+          .eq("user_id", authUser.id)
+          .maybeSingle());
+        if (profileData && mounted) {
+          setProfile({
+            arrival_type: profileData.arrival_type ?? undefined,
+            status: profileData.status ?? undefined,
+            arrival_date: profileData.arrival_date ?? undefined,
+            city: profileData.city ?? undefined,
+            university: profileData.university ?? undefined,
+            accommodation: profileData.accommodation ?? undefined,
+            nationality: profileData.nationality ?? undefined,
+            english_level: profileData.english_level ?? undefined,
+            work_interest: profileData.work_interest ?? undefined,
+          });
+        }
 
-      if ("Notification" in window) {
-        setNotifPerm(Notification.permission);
+        const { data: reminderData } = await withTimeout(supabase
+          .from("reminder_prefs")
+          .select("*")
+          .eq("user_id", authUser.id)
+          .maybeSingle());
+        if (reminderData && mounted) {
+          setReminders({
+            emailReminders: reminderData.email_reminders ?? false,
+            frequency: (reminderData.frequency as ReminderPrefs["frequency"]) ?? "weekly",
+          });
+        }
+
+        if ("Notification" in window) {
+          setNotifPerm(Notification.permission);
+        }
+      } catch (err: unknown) {
+        if (!mounted) return;
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error("Settings load failed:", msg);
+        setLoadError(msg);
       }
     }
     loadSession();
+    return () => { mounted = false; };
   }, [router]);
 
   const handleReminderSave = async () => {
     if (!user) return;
-    setSaved(true);
-    await supabase.from("reminder_prefs").upsert({
-      user_id: user.id,
-      email_reminders: reminders.emailReminders,
-      frequency: reminders.frequency,
-    }, { onConflict: "user_id" });
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await withTimeout(supabase.from("reminder_prefs").upsert({
+        user_id: user.id,
+        email_reminders: reminders.emailReminders,
+        frequency: reminders.frequency,
+      }, { onConflict: "user_id" }));
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Reminder save failed:", msg);
+    }
   };
 
   const handleDelete = async () => {
     if (!user) return;
-    await supabase.from("support_tickets").delete().eq("user_id", user.id);
-    await supabase.from("reminder_prefs").delete().eq("user_id", user.id);
-    await supabase.from("user_tasks").delete().eq("user_id", user.id);
-    await supabase.from("arrival_profiles").delete().eq("user_id", user.id);
-    await supabase.from("users").delete().eq("id", user.id);
-    await supabase.auth.signOut();
-    clearUser();
-    router.push("/login");
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      await withTimeout(supabase.from("support_tickets").delete().eq("user_id", user.id));
+      await withTimeout(supabase.from("reminder_prefs").delete().eq("user_id", user.id));
+      await withTimeout(supabase.from("user_tasks").delete().eq("user_id", user.id));
+      await withTimeout(supabase.from("arrival_profiles").delete().eq("user_id", user.id));
+      await withTimeout(supabase.from("users").delete().eq("id", user.id));
+      await withTimeout(supabase.auth.signOut());
+      clearUser();
+      router.push("/login");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Account delete failed:", msg);
+      setDeleteError("We couldn't complete the deletion. Some of your data may already be removed — please try again or contact support.");
+    } finally {
+      setDeleting(false);
+    }
   };
 
+  if (loadError) {
+    return (
+      <Navigation>
+        <div className="max-w-md mx-auto mt-16 text-center space-y-3">
+          <p className="text-sm font-semibold text-navy">We couldn&apos;t load your settings</p>
+          <p className="text-xs text-muted">{loadError}</p>
+          <button onClick={() => window.location.reload()} className="btn-primary text-sm">
+            Try again
+          </button>
+        </div>
+      </Navigation>
+    );
+  }
   if (!user) return <SettingsSkeleton />;
 
   return (
@@ -261,11 +303,12 @@ export default function SettingsPage() {
           ) : (
             <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-3">
               <p className="text-sm text-red-700 font-medium">Are you sure? This removes your app data and signs you out.</p>
+              {deleteError && <p className="text-sm text-red-600">{deleteError}</p>}
               <div className="flex gap-2">
-                <button onClick={handleDelete} className="bg-red-500 hover:bg-red-600 text-white font-semibold text-sm px-4 py-2 rounded-xl">
-                  Yes, delete everything
+                <button onClick={handleDelete} disabled={deleting} className="bg-red-500 hover:bg-red-600 text-white font-semibold text-sm px-4 py-2 rounded-xl disabled:opacity-50">
+                  {deleting ? "Deleting..." : "Yes, delete everything"}
                 </button>
-                <button onClick={() => setConfirmDelete(false)} className="btn-ghost text-sm">Cancel</button>
+                <button onClick={() => setConfirmDelete(false)} disabled={deleting} className="btn-ghost text-sm">Cancel</button>
               </div>
             </div>
           )}

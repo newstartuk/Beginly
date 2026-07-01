@@ -178,7 +178,7 @@ export default function Nia({ autoOpen = false }: { autoOpen?: boolean }) {
         <button
           onClick={() => setOpen(true)}
           aria-label="Open Nia — The Beginly Navigator"
-          className="fixed bottom-22 right-4 z-50 w-14 h-14 rounded-full bg-primary shadow-lg hover:scale-105 transition-transform flex items-center justify-center"
+          className="fixed bottom-22 right-4 z-50 w-14 h-14 rounded-full bg-violet shadow-lg hover:scale-105 transition-transform flex items-center justify-center"
           style={{ bottom: "6rem" }}
         >
           <Bot className="w-7 h-7 text-white" />
@@ -199,7 +199,7 @@ export default function Nia({ autoOpen = false }: { autoOpen?: boolean }) {
           {minimized ? (
             <button
               onClick={() => setMinimized(false)}
-              className="w-full h-full bg-primary rounded-2xl flex items-center justify-center"
+              className="w-full h-full bg-violet rounded-2xl flex items-center justify-center"
               aria-label="Expand Nia chat"
             >
               <Bot className="w-7 h-7 text-white" />
@@ -207,7 +207,7 @@ export default function Nia({ autoOpen = false }: { autoOpen?: boolean }) {
           ) : (
             <>
               {/* Header */}
-              <div className="bg-primary px-4 py-3 flex items-center justify-between shrink-0">
+              <div className="bg-violet px-4 py-3 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2">
                   <Bot className="w-5 h-5 text-white" />
                   <span className="text-white font-semibold text-sm">Nia — The Beginly Navigator</span>
@@ -256,7 +256,7 @@ export default function Nia({ autoOpen = false }: { autoOpen?: boolean }) {
                       className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed ${
                         msg.role === "nia"
                           ? "bg-civic-100 text-navy rounded-tl-sm"
-                          : "bg-primary text-white rounded-tr-sm"
+                          : "bg-violet text-white rounded-tr-sm"
                       }`}
                     >
                       <div className="whitespace-pre-wrap">{msg.text}</div>
@@ -275,13 +275,13 @@ export default function Nia({ autoOpen = false }: { autoOpen?: boolean }) {
                   placeholder="Ask Nia anything…"
                   rows={1}
                   aria-label="Message Nia"
-                  className="flex-1 resize-none border border-civic-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 placeholder:text-civic-400"
+                  className="flex-1 resize-none border border-civic-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet/40 placeholder:text-civic-400"
                 />
                 <button
                   onClick={handleSend}
                   aria-label="Send message"
                   disabled={!input.trim()}
-                  className="w-9 h-9 rounded-xl bg-primary hover:bg-primary/90 disabled:opacity-40 text-white flex items-center justify-center shrink-0 transition-colors"
+                  className="w-9 h-9 rounded-xl bg-violet hover:bg-violet/90 disabled:opacity-40 text-white flex items-center justify-center shrink-0 transition-colors"
                 >
                   <Send className="w-4 h-4" />
                 </button>

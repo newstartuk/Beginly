@@ -27,7 +27,7 @@ import Alert from "@/components/Alert";
 import Badge from "@/components/Badge";
 
 export default function DashboardPage() {
-  const { user, profile, tasks, loading } = useAuth();
+  const { user, profile, tasks, loading, error } = useAuth();
   const [scamAlertIndex, setScamAlertIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
 
@@ -39,7 +39,22 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, []);
 
+  const t0 = performance.now();
   if (!mounted || loading) return <DashboardSkeleton />;
+  console.log("[Dashboard] auth loaded → render start", Math.round(performance.now() - t0), "ms");
+  if (error) {
+    return (
+      <Navigation>
+        <div className="max-w-md mx-auto mt-16 text-center space-y-3">
+          <p className="text-sm font-semibold text-navy">We couldn&apos;t load your dashboard</p>
+          <p className="text-xs text-muted">{error}</p>
+          <button onClick={() => window.location.reload()} className="btn-primary text-sm">
+            Try again
+          </button>
+        </div>
+      </Navigation>
+    );
+  }
   if (!user) return null;
 
   const stage = calculateStage(profile?.arrival_date as string | undefined);
@@ -57,11 +72,22 @@ export default function DashboardPage() {
   const scamAlerts = getAllScamAlerts();
   const currentAlert = scamAlerts[scamAlertIndex];
 
-  const today = new Date().toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
+  const now = new Date();
+  const today = now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const firstName = user.name?.split(" ")[0] ?? "?";
+
+  // Warm stage-specific headline
+  const stageMessages: Record<string, { headline: string; sub: string }> = {
+    PRE:  { headline: "Your UK journey starts here.",    sub: "You have everything ahead of you — let's get you ready." },
+    D1:   { headline: "Welcome to the UK! 🏴󠁧󠁢󠁥󠁮󠁧󠁿",    sub: "Day 1. This is going to be brilliant." },
+    D7:   { headline: "You're finding your feet. 💪",   sub: "First week done. Keep the momentum going." },
+    D30:  { headline: "One month in. You're doing it. 🌟", sub: "A lot done. A lot more to come." },
+    D90:  { headline: "Nearly there. You're ready. ✨",  sub: "Last stretch — finish strong." },
+    GROW: { headline: "You're officially settled. 🎉",    sub: "What a journey. Welcome to your new life." },
+  };
+  const { headline, sub } = stageMessages[stage] ?? stageMessages.PRE;
 
   // Score colour
   const scoreColor = score.totalScore >= 80
@@ -81,19 +107,28 @@ export default function DashboardPage() {
       <div className="space-y-6 animate-fade-up">
 
         {/* ── Welcome hero ─────────────────────────────────── */}
-        <div className="flex items-start justify-between gap-4 flex-wrap">
+        {/* Direction A: warm amber-tinted hero strip */}
+        <div
+          className="rounded-2xl px-5 py-4 flex items-start justify-between gap-4 flex-wrap"
+          style={{
+            background: "linear-gradient(135deg, #FFF8ED 0%, #FFFDF5 60%, #F0FAFC 100%)",
+            border: "1px solid #FDE68A",
+            boxShadow: "0 2px 12px rgba(217,119,6,0.08)",
+          }}
+        >
           <div>
-            <p className="text-xs font-medium" style={{ color: "var(--color-muted)" }}>
-              {today}
+            <p className="text-xs font-medium" style={{ color: "var(--color-amber)" }}>
+              {greeting} · {today}
             </p>
             <h1 className="text-2xl font-extrabold mt-0.5" style={{ color: "var(--color-navy)" }}>
-              Hello, {user.name?.split(" ")[0] ?? "?"} 👋
+              {firstName} {headline}
             </h1>
+            <p className="text-sm mt-1" style={{ color: "var(--color-muted)" }}>{sub}</p>
             {!profile && (
               <Link
                 href="/onboarding"
-                className="inline-flex items-center gap-1 text-xs mt-2 font-medium"
-                style={{ color: "var(--color-teal)" }}
+                className="inline-flex items-center gap-1 text-xs mt-2 font-semibold"
+                style={{ color: "var(--color-amber)" }}
               >
                 <Zap className="w-3.5 h-3.5" />
                 Complete your profile → get your personalised roadmap

@@ -33,6 +33,8 @@ const VARIANT_STYLES: Record<string, string> = {
   danger:     "text-[#991B1B] bg-[#FEF2F2] border-[#FECACA]",
   info:       "text-[#1E40AF] bg-[#EFF6FF] border-[#BFDBFE]",
   nia:        "text-[#5B21B6] bg-[#F5F3FF] border-[#DDD6FE]",
+  amber:      "text-[#92400E] bg-[#FEF3C7] border-[#FDE68A]",   /* Direction A warm variant */
+  teal:       "text-[#0B7285] bg-[#F0FAFC] border-[#99F6E4]",   /* Beginly primary teal */
 };
 
 const STAGE_STYLES: Record<string, string> = {
@@ -47,7 +49,7 @@ const STAGE_STYLES: Record<string, string> = {
 interface BadgeProps {
   label: string;
   /** 'category' = task category, 'priority' = task priority, 'stage' = journey stage */
-  variant?: "category" | "priority" | "stage" | "success" | "warning" | "danger" | "info" | "nia";
+  variant?: "category" | "priority" | "stage" | "success" | "warning" | "danger" | "info" | "nia" | "amber" | "teal";
   className?: string;
 }
 
@@ -66,6 +68,8 @@ export default function Badge({
     case "danger":    style = VARIANT_STYLES.danger;    break;
     case "info":      style = VARIANT_STYLES.info;      break;
     case "nia":       style = VARIANT_STYLES.nia;       break;
+    case "amber":     style = VARIANT_STYLES.amber;     break;
+    case "teal":      style = VARIANT_STYLES.teal;      break;
     default:          style = CATEGORY_STYLES[label]   ?? "text-muted bg-civic-50 border-border";
   }
 

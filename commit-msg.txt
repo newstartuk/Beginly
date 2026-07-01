@@ -1,0 +1,8 @@
+Sync from Vercel production (Jun 18 2026)
+
+All source files synced from live Vercel deployment to GitHub:
+- New: AdminGuard.tsx, lib/auth-client.ts, lib/task-generator.ts
+- New: Resources/ (PDFs, design docs, source packs)
+- New: .claude/ VS Code settings
+- Updated: all app pages, components, lib, configs
+- Updated: tailwind.config.ts, next.config.ts, supabase/schema.sql

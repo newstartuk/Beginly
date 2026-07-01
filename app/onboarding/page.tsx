@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { ensureBeginlyUser } from "@/lib/auth-client";
 import { generateTasksForProfile } from "@/lib/task-generator";
+import { withTimeout } from "@/lib/utils";
 import type { ArrivalProfile, AccommodationType, EnglishLevel, UserTask } from "@/types";
 import {
   ArrowRight,
@@ -89,6 +90,7 @@ export default function OnboardingPage() {
     profileCompleted: false,
   });
   const [showNotifBanner, setShowNotifBanner] = useState(false);
+  const [finishError, setFinishError] = useState("");
 
   // Auth check on mount
   useEffect(() => {
@@ -129,80 +131,97 @@ export default function OnboardingPage() {
 
   const handleFinish = async () => {
     setLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setLoading(false); router.push("/login"); return; }
+    setFinishError("");
+    try {
+      const { data: { user } } = await withTimeout(supabase.auth.getUser());
+      if (!user) { router.push("/login"); return; }
 
-    const completeProfile: ArrivalProfile = {
-      arrivalType: "international_student",
-      arrivalStatus: profile.arrivalStatus ?? "not_arrived",
-      arrivalDate: profile.arrivalDate ?? "",
-      city: profile.city ?? "",
-      university: profile.university ?? "",
-      accommodationType: profile.accommodationType ?? "not_secured",
-      nationality: profile.nationality,
-      englishLevel: profile.englishLevel,
-      interestedInWork: Boolean(profile.interestedInWork),
-      profileCompleted: true,
-    };
+      const completeProfile: ArrivalProfile = {
+        arrivalType: "international_student",
+        arrivalStatus: profile.arrivalStatus ?? "not_arrived",
+        arrivalDate: profile.arrivalDate ?? "",
+        city: profile.city ?? "",
+        university: profile.university ?? "",
+        accommodationType: profile.accommodationType ?? "not_secured",
+        nationality: profile.nationality,
+        englishLevel: profile.englishLevel,
+        interestedInWork: Boolean(profile.interestedInWork),
+        profileCompleted: true,
+      };
 
-    await ensureBeginlyUser();
+      // Pass the user we already have — calling ensureBeginlyUser() with no
+      // argument makes it fetch its own session right after the getUser()
+      // call above, which can contend for the Supabase client's internal
+      // auth lock and stall indefinitely. Passing the known user skips that
+      // second auth round-trip entirely.
+      await withTimeout(ensureBeginlyUser(user));
 
-    const { error: profileError } = await supabase.from("arrival_profiles").upsert({
-      user_id: user.id,
-      arrival_type: completeProfile.arrivalType,
-      status: completeProfile.arrivalStatus,
-      arrival_date: completeProfile.arrivalDate || null,
-      city: completeProfile.city || null,
-      university: completeProfile.university || null,
-      accommodation: completeProfile.accommodationType,
-      nationality: completeProfile.nationality || null,
-      english_level: completeProfile.englishLevel || null,
-      work_interest: completeProfile.interestedInWork,
-    }, { onConflict: "user_id" });
-
-    if (profileError) {
-      console.error("Arrival profile save failed:", profileError.message);
-      setLoading(false);
-      return;
-    }
-
-    const generatedTasks = generateTasksForProfile(completeProfile);
-    const { data: existingRows } = await supabase
-      .from("user_tasks")
-      .select("task_id,status,completed_at")
-      .eq("user_id", user.id);
-
-    const existing = new Set((existingRows ?? []).map((row) => row.task_id));
-    const rowsToInsert = generatedTasks
-      .filter((task: UserTask) => !existing.has(task.taskId))
-      .map((task: UserTask) => ({
+      const { error: profileError } = await withTimeout(supabase.from("arrival_profiles").upsert({
         user_id: user.id,
-        task_id: task.taskId,
-        status: task.status,
-        completed_at: null,
-      }));
+        arrival_type: completeProfile.arrivalType,
+        status: completeProfile.arrivalStatus,
+        arrival_date: completeProfile.arrivalDate || null,
+        city: completeProfile.city || null,
+        university: completeProfile.university || null,
+        accommodation: completeProfile.accommodationType,
+        nationality: completeProfile.nationality || null,
+        english_level: completeProfile.englishLevel || null,
+        work_interest: completeProfile.interestedInWork,
+      }, { onConflict: "user_id" }));
 
-    if (rowsToInsert.length) {
-      const { error: taskError } = await supabase
+      if (profileError) {
+        console.error("Arrival profile save failed:", profileError.message);
+        setFinishError("We could not save your profile. Please try again.");
+        return;
+      }
+
+      const generatedTasks = generateTasksForProfile(completeProfile);
+      const { data: existingRows } = await withTimeout(supabase
         .from("user_tasks")
-        .insert(rowsToInsert);
-      if (taskError) console.error("Generated task insert failed:", taskError.message);
+        .select("task_id,status,completed_at")
+        .eq("user_id", user.id));
+
+      const existing = new Set((existingRows ?? []).map((row) => row.task_id));
+      const rowsToInsert = generatedTasks
+        .filter((task: UserTask) => !existing.has(task.taskId))
+        .map((task: UserTask) => ({
+          user_id: user.id,
+          task_id: task.taskId,
+          status: task.status,
+          completed_at: null,
+        }));
+
+      if (rowsToInsert.length) {
+        const { error: taskError } = await withTimeout(supabase
+          .from("user_tasks")
+          .insert(rowsToInsert));
+        if (taskError) console.error("Generated task insert failed:", taskError.message);
+      }
+
+      await withTimeout(supabase
+        .from("users")
+        .update({ profile_completed: true })
+        .eq("id", user.id));
+
+      clearOnboardingState();
+
+      await new Promise((r) => setTimeout(r, 400));
+      if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "default") {
+        setShowNotifBanner(true);
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Build roadmap failed:", msg);
+      setFinishError(
+        msg === "This is taking longer than expected. Please try again."
+          ? msg
+          : "Something went wrong while building your roadmap. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
-
-    await supabase
-      .from("users")
-      .update({ profile_completed: true })
-      .eq("id", user.id);
-
-    clearOnboardingState();
-
-    await new Promise((r) => setTimeout(r, 400));
-    if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "default") {
-      setShowNotifBanner(true);
-    } else {
-      router.push("/dashboard");
-    }
-    setLoading(false);
   };
 
   const finishWithNotifs = async (permission: NotificationPermission) => {
@@ -463,6 +482,12 @@ export default function OnboardingPage() {
                 Not now
               </button>
             </div>
+          </div>
+        )}
+
+        {finishError && (
+          <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-xl p-3 text-sm">
+            {finishError}
           </div>
         )}
 

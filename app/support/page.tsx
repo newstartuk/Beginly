@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { withTimeout } from "@/lib/utils";
 import type { SupportCategory } from "@/types";
 import { MessageSquare, Send, CheckCircle, AlertTriangle } from "lucide-react";
 import Navigation from "@/components/Navigation";
@@ -42,26 +43,32 @@ export default function SupportPage() {
     setLoading(true);
     setError("");
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push("/login"); return; }
+    try {
+      const { data: { user } } = await withTimeout(supabase.auth.getUser());
+      if (!user) { router.push("/login"); return; }
 
-    const { error: insertError } = await supabase.from("support_tickets").insert({
-      user_id: user.id,
-      category,
-      description,
-      email,
-      status: "open",
-    });
+      const { error: insertError } = await withTimeout(supabase.from("support_tickets").insert({
+        user_id: user.id,
+        category,
+        description,
+        email,
+        status: "open",
+      }));
 
-    if (insertError) {
-      console.error("Support ticket insert failed:", insertError.message);
+      if (insertError) {
+        console.error("Support ticket insert failed:", insertError.message);
+        setError("We could not submit your message. Please try again, or contact your university support service for urgent issues.");
+        return;
+      }
+
+      setSubmitted(true);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Support submit failed:", msg);
       setError("We could not submit your message. Please try again, or contact your university support service for urgent issues.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setSubmitted(true);
-    setLoading(false);
   };
 
   return (

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { ensureBeginlyUser } from "@/lib/auth-client";
-import { setUser } from "@/lib/utils";
+import { setUser, withTimeout } from "@/lib/utils";
 import Disclaimer from "@/components/Disclaimer";
 import { AlertCircle, CheckCircle } from "lucide-react";
 
@@ -34,18 +34,17 @@ export default function SignupPage() {
 
     try {
       const redirectTo = typeof window !== "undefined" ? `${window.location.origin}/login?confirmed=true` : undefined;
-      const { data, error: authError } = await supabase.auth.signUp({
+      const { data, error: authError } = await withTimeout(supabase.auth.signUp({
         email: normalisedEmail,
         password,
         options: {
           data: { name: name.trim() },
           emailRedirectTo: redirectTo,
         },
-      });
+      }));
 
       if (authError) {
         setError(authError.message);
-        setLoading(false);
         return;
       }
 
@@ -53,17 +52,17 @@ export default function SignupPage() {
       // In that case we must not fake an auth cookie or redirect into protected pages.
       if (!data.session) {
         setSuccessEmail(normalisedEmail);
-        setLoading(false);
         return;
       }
 
-      const beginlyUser = await ensureBeginlyUser(data.session.user);
+      const beginlyUser = await withTimeout(ensureBeginlyUser(data.session.user));
       if (beginlyUser) setUser(beginlyUser);
       router.push("/onboarding");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error("Signup error:", msg);
       setError(msg);
+    } finally {
       setLoading(false);
     }
   };

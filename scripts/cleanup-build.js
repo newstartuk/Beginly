@@ -12,8 +12,12 @@ const WEBPACK_CACHE = path.join(__dirname, "..", ".webpack-cache");
 
 function rmrf(dir) {
   if (fs.existsSync(dir)) {
-    fs.rmSync(dir, { recursive: true, force: true });
-    console.log(`✓ Removed: ${path.relative(__dirname + "/..", dir)}`);
+    try {
+      fs.rmSync(dir, { recursive: true, force: true });
+      console.log(`✓ Removed: ${path.relative(__dirname + "/..", dir)}`);
+    } catch (err) {
+      console.warn(`⚠ Could not remove ${dir}: ${err.message}`);
+    }
   }
 }
 

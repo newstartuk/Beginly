@@ -87,6 +87,13 @@ export default function GuidesPage() {
           ))}
         </div>
 
+        {/* Footer */}
+        <div className="flex flex-wrap gap-4 justify-center text-xs text-muted pt-6 border-t border-border mt-8">
+          <Link href="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+          <Link href="/terms-of-service" className="hover:text-primary transition-colors">Terms of Service</Link>
+          <Link href="/support" className="hover:text-primary transition-colors">Get Support</Link>
+        </div>
+
         {/* Results */}
         {filtered.length === 0 ? (
           <div className="card text-center py-12">
