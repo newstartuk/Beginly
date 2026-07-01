@@ -26,6 +26,21 @@ export interface AuthState {
   error: string | null;
 }
 
+// ─── Compatibility no-ops ───────────────────────────────────────────────────
+// This hook is the Supabase-session-backed version of useAuth (it always
+// fetches fresh via supabase.auth.getSession()/getUser() rather than an
+// in-memory cache). preloadAuth/clearAuthCache are kept as harmless no-ops
+// purely so a handful of other files — leftovers from a separate, unfinished
+// custom-token auth migration — still compile if they import these names.
+// They do not affect this hook's own behaviour.
+export function preloadAuth(_preloaded: { user: AuthUser; profile: Profile | null; tasks: UserTask[] }) {
+  // intentionally empty
+}
+
+export function clearAuthCache() {
+  // intentionally empty
+}
+
 export function useAuth(requireAuth = true) {
   const router = useRouter();
   const [state, setState] = useState<AuthState>({ user: null, profile: null, tasks: [], loading: true, error: null });
