@@ -138,6 +138,7 @@ export default function SettingsPage() {
     try {
       await withTimeout(supabase.from("support_tickets").delete().eq("user_id", user.id));
       await withTimeout(supabase.from("reminder_prefs").delete().eq("user_id", user.id));
+      await withTimeout(supabase.from("budget_items").delete().eq("user_id", user.id));
       await withTimeout(supabase.from("user_tasks").delete().eq("user_id", user.id));
       await withTimeout(supabase.from("arrival_profiles").delete().eq("user_id", user.id));
       await withTimeout(supabase.from("users").delete().eq("id", user.id));
