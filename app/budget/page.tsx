@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Disclaimer from "@/components/Disclaimer";
-import { getArrivalProfile } from "@/lib/utils";
 import type { BudgetItem } from "@/types";
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip,
@@ -11,55 +11,66 @@ import {
 import { TrendingUp, Trash2, Plus, AlertTriangle, Printer } from "lucide-react";
 import BudgetSkeleton from "@/components/BudgetSkeleton";
 
-const STORAGE_KEY = "beginly_budget";
-
-function loadBudget(): BudgetItem[] {
-  if (typeof window === "undefined") return getDefaults();
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw) as BudgetItem[];
-  } catch { /* ignore */ }
-  return getDefaults();
-}
-
-function saveBudget(items: BudgetItem[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-}
-
-function getDefaults(): BudgetItem[] {
-  const profile = getArrivalProfile();
-  const isInLondon = profile?.city === "London";
-  return [
-    { id: "rent", category: "Accommodation", label: "Rent", amount: isInLondon ? 900 : 550, type: "expense", color: "#0B7285" },
-    { id: "groceries", category: "Food", label: "Groceries", amount: isInLondon ? 200 : 150, type: "expense", color: "#0D9488" },
-    { id: "uni", category: "University", label: "Tuition fees", amount: 0, type: "expense", color: "#6366F1" },
-    { id: "transport", category: "Transport", label: "Transport (bus/train)", amount: isInLondon ? 150 : 80, type: "expense", color: "#F59E0B" },
-    { id: "utilities", category: "Accommodation", label: "Bills (electric, gas, internet)", amount: isInLondon ? 120 : 80, type: "expense", color: "#8B5CF6" },
-    { id: "phone", category: "Utilities", label: "Phone/SIM", amount: 15, type: "expense", color: "#EC4899" },
-    { id: "social", category: "Social", label: "Social & leisure", amount: 80, type: "expense", color: "#F97316" },
-    { id: "books", category: "University", label: "Books & materials", amount: 50, type: "expense", color: "#14B8A6" },
-    { id: "savings", category: "Savings", label: "Savings target", amount: 200, type: "savings", color: "#22C55E" },
-    { id: "loan", category: "Funding", label: "Student loan / stipend", amount: isInLondon ? 1200 : 900, type: "income", color: "#10B981" },
-  ];
-}
-
 const CATEGORIES = ["Accommodation", "Food", "Transport", "University", "Social", "Utilities", "Health", "Savings", "Funding", "Other"];
-const TYPES = ["expense", "income", "savings"] as const;
 const PIE_COLORS = ["#0B7285", "#0D9488", "#F59E0B", "#6366F1", "#EC4899", "#F97316", "#14B8A6", "#22C55E", "#8B5CF6", "#EF4444"];
 
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 
+// Budget data now lives in Supabase (public.budget_items), same as your
+// checklist. Reads/writes go through /api/budget rather than straight from
+// the browser to Supabase, because this app's custom auth token isn't a
+// Supabase Auth session — so the row-level security on budget_items (which
+// checks auth.uid()) would silently reject a direct browser call.
+function authHeaders(): HeadersInit {
+  const token = typeof window !== "undefined" ? localStorage.getItem("custom_auth_token") : null;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export default function BudgetPage() {
+  const router = useRouter();
   const [items, setItems] = useState<BudgetItem[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [actionError, setActionError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ label: "", amount: "", category: "Other", type: "expense" as BudgetItem["type"] });
 
   useEffect(() => {
-    setItems(loadBudget());
-    setMounted(true);
-  }, []);
+    let mounted = true;
+
+    async function load() {
+      const token = localStorage.getItem("custom_auth_token");
+      if (!token) { router.push("/login"); return; }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      try {
+        const res = await fetch("/api/budget", { headers: authHeaders(), signal: controller.signal });
+        if (res.status === 401) { router.push("/login"); return; }
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to load budget.");
+
+        if (!mounted) return;
+        setItems((data.items ?? []) as BudgetItem[]);
+      } catch (err: unknown) {
+        if (!mounted) return;
+        const isAbort = err instanceof Error && err.name === "AbortError";
+        console.error("Budget load failed:", err instanceof Error ? err.message : String(err));
+        setLoadError(
+          isAbort
+            ? "This is taking longer than expected. Please try again."
+            : "We couldn't load your budget. Please try again."
+        );
+      } finally {
+        clearTimeout(timeoutId);
+        if (mounted) setLoading(false);
+      }
+    }
+
+    load();
+    return () => { mounted = false; };
+  }, [router]);
 
   const totalIncome = items.filter((i) => i.type === "income").reduce((s, i) => s + i.amount, 0);
   const totalExpenses = items.filter((i) => i.type === "expense").reduce((s, i) => s + i.amount, 0);
@@ -74,31 +85,71 @@ export default function BudgetPage() {
     { name: "Savings", amount: totalSavings, fill: "#22C55E" },
   ];
 
-  const addItem = () => {
+  const addItem = async () => {
     const parsedAmount = parseFloat(form.amount);
     if (!form.label.trim() || form.amount === "" || isNaN(parsedAmount) || parsedAmount < 0) return;
-    const newItem: BudgetItem = {
-      id: `item_${Date.now()}`,
+
+    setActionError("");
+    const newItemData = {
       label: form.label.trim(),
-      amount: parseFloat(form.amount),
+      amount: parsedAmount,
       category: form.category,
       type: form.type,
       color: PIE_COLORS[CATEGORIES.indexOf(form.category) % PIE_COLORS.length],
     };
-    const updated = [...items, newItem];
-    setItems(updated);
-    saveBudget(updated);
-    setForm({ label: "", amount: "", category: "Other", type: "expense" });
-    setShowForm(false);
+
+    try {
+      const res = await fetch("/api/budget", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify(newItemData),
+      });
+      if (res.status === 401) { router.push("/login"); return; }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save item.");
+
+      setItems((prev) => [...prev, data.item as BudgetItem]);
+      setForm({ label: "", amount: "", category: "Other", type: "expense" });
+      setShowForm(false);
+    } catch (err: unknown) {
+      console.error("Budget item save failed:", err instanceof Error ? err.message : String(err));
+      setActionError("We couldn't save that item. Please try again.");
+    }
   };
 
-  const removeItem = (id: string) => {
-    const updated = items.filter((i) => i.id !== id);
-    setItems(updated);
-    saveBudget(updated);
+  const removeItem = async (id: string) => {
+    const previous = items;
+    setActionError("");
+    setItems((prev) => prev.filter((i) => i.id !== id));
+
+    try {
+      const res = await fetch(`/api/budget?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+      if (res.status === 401) { router.push("/login"); return; }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to delete item.");
+    } catch (err: unknown) {
+      console.error("Budget item delete failed:", err instanceof Error ? err.message : String(err));
+      setItems(previous);
+      setActionError("We couldn't remove that item. Please try again.");
+    }
   };
 
-  if (!mounted) return <BudgetSkeleton />;
+  if (loading) return <BudgetSkeleton />;
+
+  if (loadError) {
+    return (
+      <Navigation>
+        <div className="max-w-md mx-auto mt-16 text-center space-y-3">
+          <p className="text-sm font-semibold text-navy">We couldn&apos;t load your budget</p>
+          <p className="text-xs text-muted">{loadError}</p>
+          <button onClick={() => window.location.reload()} className="btn-primary text-sm">Try again</button>
+        </div>
+      </Navigation>
+    );
+  }
 
   return (
     <Navigation>
@@ -132,6 +183,12 @@ export default function BudgetPage() {
             </button>
           </div>
         </div>
+
+        {actionError && (
+          <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-xl p-3 text-sm no-print">
+            {actionError}
+          </div>
+        )}
 
         {/* Summary cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

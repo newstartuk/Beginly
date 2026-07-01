@@ -146,6 +146,41 @@ export interface Database {
           updated_at?: string;
         }
       >;
+      budget_items: TableDef<
+        {
+          id: string;
+          user_id: string;
+          label: string;
+          amount: number;
+          category: string;
+          type: string;
+          color: string | null;
+          created_at: string;
+          updated_at: string;
+        },
+        {
+          id?: string;
+          user_id: string;
+          label: string;
+          amount?: number;
+          category?: string;
+          type?: string;
+          color?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        },
+        {
+          id?: string;
+          user_id?: string;
+          label?: string;
+          amount?: number;
+          category?: string;
+          type?: string;
+          color?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        }
+      >;
       support_tickets: TableDef<
         {
           id: string;
