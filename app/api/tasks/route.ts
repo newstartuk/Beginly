@@ -7,7 +7,17 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 function getUserId(req: NextRequest): string | null {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "") ?? "";
+  // Accept either the Authorization header (what the client sends when it has
+  // the token in localStorage) or the httpOnly "custom_auth_token" cookie
+  // that /api/auth/signin also sets on every sign-in — same fallback order
+  // /api/profile already uses. The cookie is the more reliable of the two:
+  // it's set by the browser automatically and survives page reloads even
+  // when, for whatever reason, the client-side localStorage write doesn't
+  // stick.
+  const token =
+    req.headers.get("authorization")?.replace("Bearer ", "") ||
+    req.cookies.get("custom_auth_token")?.value ||
+    "";
   if (!token) return null;
   const payload = verifySessionToken(token);
   return payload?.userId ?? null;

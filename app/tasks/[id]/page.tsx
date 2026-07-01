@@ -37,8 +37,11 @@ export default function TaskDetailPage() {
     let active = true;
 
     async function load() {
-      const token = localStorage.getItem("custom_auth_token");
-      if (!token) { router.push("/login"); return; }
+      // Don't gate on localStorage having a token — the session is also
+      // carried by an httpOnly cookie the browser sends automatically, and
+      // that cookie is the more reliable of the two. Just make the request
+      // and let a 401 response (not a missing localStorage key) decide
+      // whether to redirect to /login.
       if (!task) { if (active) setMounted(true); return; }
 
       try {
@@ -79,9 +82,6 @@ export default function TaskDetailPage() {
     setStatus(newStatus);
 
     try {
-      const token = localStorage.getItem("custom_auth_token");
-      if (!token) { setStatus(previous); router.push("/login"); return; }
-
       const res = await fetch("/api/tasks", {
         method: "PATCH",
         headers: { "Content-Type": "application/json", ...authHeaders() },

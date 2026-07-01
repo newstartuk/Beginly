@@ -39,9 +39,11 @@ export default function BudgetPage() {
     let mounted = true;
 
     async function load() {
-      const token = localStorage.getItem("custom_auth_token");
-      if (!token) { router.push("/login"); return; }
-
+      // Don't gate on localStorage having a token — the session is also
+      // carried by an httpOnly cookie the browser sends automatically, and
+      // that cookie is the more reliable of the two. Just make the request
+      // and let a 401 response (not a missing localStorage key) decide
+      // whether to redirect to /login.
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
 

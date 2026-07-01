@@ -8,7 +8,15 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 type BudgetItemType = "income" | "expense" | "savings";
 
 function getUserId(req: NextRequest): string | null {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "") ?? "";
+  // Accept either the Authorization header or the httpOnly "custom_auth_token"
+  // cookie that /api/auth/signin also sets — same fallback order /api/profile
+  // uses, and the more reliable of the two since it's set by the browser
+  // automatically and survives reloads even when the localStorage write
+  // doesn't stick.
+  const token =
+    req.headers.get("authorization")?.replace("Bearer ", "") ||
+    req.cookies.get("custom_auth_token")?.value ||
+    "";
   if (!token) return null;
   const payload = verifySessionToken(token);
   return payload?.userId ?? null;
