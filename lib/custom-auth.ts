@@ -11,7 +11,14 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const JWT_SECRET = process.env.CUSTOM_AUTH_SECRET!;
 
-if (!JWT_SECRET) throw new Error("CUSTOM_AUTH_SECRET env var is not set");
+// NOTE: deliberately not throwing here if CUSTOM_AUTH_SECRET is unset.
+// This module is imported (for static analysis) during every Next.js build,
+// including "collect page data" — a module-level throw here crashes the
+// entire production build even though nothing on the live site currently
+// calls these functions (the app runs on Supabase Auth directly; see
+// SPRINT_AUTHSECURITY_2026-07-01.md). If CUSTOM_AUTH_SECRET is genuinely
+// missing, sign()/verify() below will throw at call time instead, which
+// every caller already wraps in try/catch.
 
 // Supabase client with service-role (bypasses RLS) — only used server-side
 function getServiceClient() {
