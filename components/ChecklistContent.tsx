@@ -27,6 +27,7 @@ export default function ChecklistContent() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "pending" | "complete">("all");
   const [expandedStages, setExpandedStages] = useState<Set<string>>(new Set(["PRE", "D1"]));
+  const [toggleError, setToggleError] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -88,23 +89,44 @@ export default function ChecklistContent() {
     const nextStatus: UserTask["status"] = isComplete ? "not_started" : "complete";
     const completedAt = isComplete ? undefined : new Date().toISOString();
 
+    setToggleError("");
     setTasks((prev) =>
       prev.map((t): UserTask =>
         t.taskId === taskId ? { ...t, status: nextStatus, completedAt } : t
       )
     );
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    // Revert the optimistic update above if the save actually fails — this
+    // used to fail silently with no feedback and no revert, which is the
+    // same "looks done but never saved" bug found (and fixed) on the task
+    // detail page and in onboarding's arrival_profiles save.
+    const revert = () => setTasks((prev) =>
+      prev.map((t): UserTask => (t.taskId === taskId ? (existing ?? t) : t))
+    );
 
-    await supabase
-      .from("user_tasks")
-      .upsert({
-        user_id: user.id,
-        task_id: taskId,
-        status: nextStatus,
-        completed_at: completedAt ?? null,
-      }, { onConflict: "user_id,task_id" });
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { revert(); router.push("/login"); return; }
+
+      const { data: existingRow } = await supabase
+        .from("user_tasks")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .eq("task_id", taskId)
+        .maybeSingle();
+
+      const row = { status: nextStatus, completed_at: completedAt ?? null };
+      const { error } = existingRow
+        ? await supabase.from("user_tasks").update(row).eq("user_id", user.id).eq("task_id", taskId)
+        : await supabase.from("user_tasks").insert({ user_id: user.id, task_id: taskId, ...row });
+
+      if (error) throw new Error(error.message);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Task toggle save failed:", msg);
+      revert();
+      setToggleError("We couldn't save that — please try again.");
+    }
   };
 
   if (loading) return <ChecklistSkeleton />;
@@ -136,6 +158,9 @@ export default function ChecklistContent() {
 
   return (
     <div className="space-y-5">
+      {toggleError && (
+        <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5">{toggleError}</div>
+      )}
       <div className="card flex items-center justify-between gap-4 flex-wrap">
         <div>
           <p className="text-sm font-semibold text-navy">
