@@ -129,7 +129,8 @@ export type DocType =
   | "council_tax_letter"
   | "student_status_letter"
   | "bank_letter"
-  | "nhs_registration_form";
+  | "nhs_registration_form"
+  | "other";
 
 export interface DocHelperResponse {
   plainEnglish: string;

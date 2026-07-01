@@ -1,21 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { getDocHelperResponse, getAvailableDocTypes } from "@/lib/doc-helper-responses";
 import type { DocType } from "@/types";
-import { Bot, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Bot, CheckCircle, AlertCircle, Loader2, Upload, FileText, X } from "lucide-react";
 import Disclaimer from "@/components/Disclaimer";
 import Navigation from "@/components/Navigation";
 
 const NIA_INTRO =
-  "Hi, I'm Nia. For this MVP, Document Helper is paste-text-only. Paste a short non-sensitive extract and I’ll explain the general meaning in plain English. Do not paste passport numbers, bank details, passwords, full tenancy contracts, or sensitive personal documents.";
+  "Hi, I'm Nia. Paste a short non-sensitive extract, or upload a document, and I’ll explain the general meaning in plain English. Do not paste or upload passport numbers, bank details, passwords, or full sensitive personal documents.";
+
+const ACCEPTED_EXTENSIONS = ".txt,.pdf,.docx";
 
 export default function DocumentHelperPage() {
   const [selectedType, setSelectedType] = useState<DocType | "">("");
   const [userText, setUserText] = useState("");
   const [response, setResponse] = useState<ReturnType<typeof getDocHelperResponse> | null>(null);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [uploadedFileName, setUploadedFileName] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const docTypes = getAvailableDocTypes();
+
+  const handleFileSelect = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file later
+    if (!file) return;
+
+    setUploadError("");
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/document-helper/extract", { method: "POST", body: formData });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data.error || "We couldn't read that file. Please try again or paste the text instead.");
+      }
+
+      setUserText((data.text as string).slice(0, 5000));
+      setUploadedFileName(file.name);
+      setResponse(null);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setUploadError(msg);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const clearUpload = () => {
+    setUploadedFileName("");
+    setUserText("");
+    setUploadError("");
+  };
 
   const handleExplain = async () => {
     if (!selectedType) return;
@@ -41,7 +81,7 @@ export default function DocumentHelperPage() {
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold text-navy">Document Helper</h1>
-              <span className="text-[10px] font-mono bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded">MVP paste-text only</span>
+              <span className="text-[10px] font-mono bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded">MVP</span>
             </div>
             <p className="text-xs text-muted">Powered by Nia — your Beginly guide</p>
           </div>
@@ -80,16 +120,69 @@ export default function DocumentHelperPage() {
 
           <div className="mt-4 pt-4 border-t border-border">
             <label className="block text-xs font-medium text-navy mb-1.5">
-              Paste a short non-sensitive extract only
+              Upload a document or paste a short non-sensitive extract
             </label>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={ACCEPTED_EXTENSIONS}
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+
+            {!uploadedFileName ? (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="w-full flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-civic-200 bg-civic-50/50 py-5 text-center hover:border-primary/40 transition-all disabled:opacity-60"
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                    <span className="text-xs font-medium text-civic-600">Reading your file…</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-5 h-5 text-primary" />
+                    <span className="text-xs font-medium text-navy">Click to upload a document</span>
+                    <span className="text-[11px] text-muted">.txt, .pdf, or .docx — up to 8MB</span>
+                  </>
+                )}
+              </button>
+            ) : (
+              <div className="flex items-center justify-between gap-2 rounded-xl border border-primary/30 bg-teal-50/60 px-3 py-2.5">
+                <div className="flex items-center gap-2 min-w-0">
+                  <FileText className="w-4 h-4 text-primary shrink-0" />
+                  <span className="text-xs font-medium text-navy truncate">{uploadedFileName}</span>
+                </div>
+                <button type="button" onClick={clearUpload} className="text-muted hover:text-red-600 shrink-0" aria-label="Remove uploaded file">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            {uploadError && (
+              <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2 mt-2">{uploadError}</p>
+            )}
+
+            <div className="flex items-center gap-3 my-3">
+              <div className="flex-1 h-px bg-civic-100" />
+              <span className="text-[11px] text-muted uppercase tracking-wide">or paste text</span>
+              <div className="flex-1 h-px bg-civic-100" />
+            </div>
+
             <textarea
               value={userText}
-              onChange={(e) => setUserText(e.target.value.slice(0, 5000))}
+              onChange={(e) => { setUserText(e.target.value.slice(0, 5000)); if (uploadedFileName) setUploadedFileName(""); }}
               className="input-field resize-none"
               rows={6}
-              placeholder="Paste a short extract here. Do not paste passport numbers, bank details, passwords, full contracts, or private/sensitive documents."
+              placeholder="Paste a short extract here, or use the upload button above. Do not paste or upload passport numbers, bank details, passwords, or private/sensitive documents."
             />
-            <p className="text-xs text-muted mt-1">Maximum 5,000 characters. File upload/OCR will be added only after stronger privacy and extraction controls are implemented.</p>
+            <p className="text-xs text-muted mt-1">
+              Maximum 5,000 characters. Uploaded files are read only to extract the text and are not stored — review and edit the text below before continuing.
+            </p>
           </div>
 
           <button onClick={handleExplain} disabled={loading || !selectedType} className="btn-primary w-full justify-center mt-4 disabled:opacity-50 disabled:cursor-not-allowed">

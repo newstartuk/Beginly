@@ -132,6 +132,18 @@ const RESPONSES: Record<DocType, DocHelperResponse> = {
       "Download the NHS App to manage appointments and prescriptions online.",
     ],
   },
+  other: {
+    plainEnglish:
+      "This doesn't match one of our pre-written document types, but the same general approach applies: work out who issued it, what it's asking you to do, and by when. Read it in full before signing or relying on it, and keep a copy for your records.",
+    missingFields: [],
+    keyTerms: [],
+    safeNextSteps: [
+      "Read the document in full before signing or acting on it.",
+      "Confirm who issued it and that it's genuinely addressed to you.",
+      "If it involves money, a deadline, or your legal rights, don't act under pressure — take time to check it properly.",
+      "If it's a legal, immigration, financial, tax, medical, or housing document, verify with an official source or a qualified professional before acting.",
+    ],
+  },
 };
 
 export function getDocHelperResponse(docType: string): DocHelperResponse {
@@ -177,6 +189,11 @@ export function getAvailableDocTypes(): { type: DocType; label: string; desc: st
       type: "nhs_registration_form",
       label: "NHS GP Registration Form",
       desc: "Registering with a UK family doctor",
+    },
+    {
+      type: "other",
+      label: "Other",
+      desc: "Any other document not listed above",
     },
   ];
 }

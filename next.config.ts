@@ -1,20 +1,26 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactStrictMode: true,
-  outputFileTracingRoot: __dirname,
-  trailingSlash: false,
-  eslint: {
-    // `next lint` has been deprecated/removed in recent Next versions.
-    // Static type checking is run separately with `tsc --noEmit` in QA.
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    // CI should run `tsc --noEmit` separately. This avoids Next build hanging
-    // in sandbox/Vercel-like environments during duplicated type validation.
-    ignoreBuildErrors: true,
-  },
-  output: process.env.DEPLOY_TARGET === "namecheap" ? "standalone" : undefined,
+reactStrictMode: true,
+outputFileTracingRoot: __dirname,
+trailingSlash: false,
+eslint: {
+// `next lint` has been deprecated/removed in recent Next versions.
+// Static type checking is run separately with `tsc --noEmit` in QA.
+ignoreDuringBuilds: true,
+},
+typescript: {
+// CI should run `tsc --noEmit` separately. This avoids Next build hanging
+// in sandbox/Vercel-like environments during duplicated type validation.
+ignoreBuildErrors: true,
+},
+// mammoth and pdf-parse are only ever used inside the
+// /api/document-helper/extract route (server-only, Node runtime). Keeping
+// them external stops Next's server bundler from trying to statically
+// bundle their Node-specific requires, which is the usual cause of build
+// failures for libraries like these in Next.js API routes.
+serverExternalPackages: ["mammoth", "pdf-parse"],
+output: process.env.DEPLOY_TARGET === "namecheap" ? "standalone" : undefined,
 };
 
 export default nextConfig;
