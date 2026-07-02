@@ -22,9 +22,6 @@ import {
   ShieldAlert,
   Map,
   Users,
-  ShieldAlert,
-  Map,
-  Users,
 } from "lucide-react";
 import MobileNav from "./MobileNav";
 
