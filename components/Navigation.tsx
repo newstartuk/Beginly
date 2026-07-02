@@ -19,19 +19,28 @@ import {
   ChevronLeft,
   Building2,
   TrendingUp,
+  ShieldAlert,
+  Map,
+  Users,
+  ShieldAlert,
+  Map,
+  Users,
 } from "lucide-react";
 import MobileNav from "./MobileNav";
 
 const NAV_ITEMS = [
   { href: "/dashboard",         label: "My Checklist",    icon: LayoutDashboard },
-  { href: "/checklist",         label: "Checklist",        icon: CheckSquare },
+  { href: "/journey", label: "Journey", icon: Map },
+    { href: "/checklist",         label: "Checklist",        icon: CheckSquare },
   { href: "/budget",            label: "Budget Planner",   icon: TrendingUp },
   { href: "/guides",            label: "Guidance",        icon: BookOpen },
   { href: "/document-helper",   label: "Doc Helper",      icon: Bot },
   { href: "/nhs",              label: "NHS Guide",       icon: Shield },
   { href: "/bank",             label: "Banking",         icon: Building2 },
   { href: "/emergency",         label: "Emergency",       icon: Shield },
-  { href: "/settings",          label: "Settings",        icon: Settings },
+  { href: "/intelligence/scam-radar", label: "Scam Radar", icon: ShieldAlert },
+    { href: "/community", label: "Community", icon: Users },
+    { href: "/settings",          label: "Settings",        icon: Settings },
   { href: "/support",          label: "Support",         icon: LifeBuoy },
   { href: "#signout",          label: "Sign out",       icon: LogOut },
 ];
