@@ -1,0 +1,202 @@
+<title>Beginly — Mobile Architecture Reference</title>
+<style>
+  :root {
+    --bg: #F7FAFB; --surface: #FFFFFF; --surface-2: #EFF4F7;
+    --border: #E2E8F0; --border-strong: #CBD5E1;
+    --text-primary: #0D2036; --text-secondary: #4B5D71; --text-muted: #8092A3;
+    --teal: #0E7A78; --teal-bg: #E8F4F3;
+    --aqua: #1F8FB0; --aqua-bg: #E7F5FA;
+    --gold: #B97700; --gold-bg: #FBF1DD;
+    --coral: #C43F3A; --coral-bg: #FBEAEA;
+    --violet: #6B4FD6; --violet-bg: #F1EDFB;
+    --slate: #64748B; --slate-bg: #F1F5F9;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(13,32,54,.04), 0 8px 24px -12px rgba(13,32,54,.10);
+    --mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+  :root[data-theme="dark"] {
+    --bg: #07182E; --surface: #0D2036; --surface-2: #10233F;
+    --border: rgba(255,255,255,.10); --border-strong: rgba(255,255,255,.18);
+    --text-primary: #F4F8FA; --text-secondary: #B8CAD8; --text-muted: #7E93A5;
+    --teal: #4DD4CE; --teal-bg: rgba(77,212,206,.12);
+    --aqua: #6FCBEA; --aqua-bg: rgba(111,203,234,.12);
+    --gold: #E8B95D; --gold-bg: rgba(232,185,93,.14);
+    --coral: #E8817C; --coral-bg: rgba(232,129,124,.14);
+    --violet: #B7A6F2; --violet-bg: rgba(183,166,242,.14);
+    --slate: #9AACBC; --slate-bg: rgba(154,172,188,.12);
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #07182E; --surface: #0D2036; --surface-2: #10233F;
+      --border: rgba(255,255,255,.10); --border-strong: rgba(255,255,255,.18);
+      --text-primary: #F4F8FA; --text-secondary: #B8CAD8; --text-muted: #7E93A5;
+      --teal: #4DD4CE; --teal-bg: rgba(77,212,206,.12);
+      --aqua: #6FCBEA; --aqua-bg: rgba(111,203,234,.12);
+      --gold: #E8B95D; --gold-bg: rgba(232,185,93,.14);
+      --coral: #E8817C; --coral-bg: rgba(232,129,124,.14);
+      --violet: #B7A6F2; --violet-bg: rgba(183,166,242,.14);
+      --slate: #9AACBC; --slate-bg: rgba(154,172,188,.12);
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text-primary);
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+  .eyebrow { display: inline-flex; align-items: center; gap: .5rem; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--violet); margin-bottom: .9rem; }
+  .eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--violet); }
+  h1 { font-size: clamp(26px,4vw,34px); font-weight: 800; letter-spacing: -.02em; line-height: 1.15; margin: 0 0 .6rem; text-wrap: balance; }
+  .lede { font-size: 16px; color: var(--text-secondary); max-width: 66ch; margin: 0 0 2.5rem; }
+  h2.section { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  h2.section:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+  h3 { font-size: 15px; font-weight: 750; margin: 0 0 .5rem; letter-spacing: -.01em; }
+  p { color: var(--text-secondary); margin: 0 0 .8rem; }
+  code { background: var(--surface-2); padding: 1px 6px; border-radius: 5px; font-size: 12.5px; font-family: var(--mono); color: var(--text-primary); }
+
+  .status-banner { display: flex; gap: .8rem; padding: 1rem 1.2rem; border-radius: var(--radius); background: var(--coral-bg); border: 1px solid color-mix(in srgb, var(--coral) 35%, var(--border)); margin-bottom: 2rem; font-size: 13.5px; }
+  .status-banner b { color: var(--text-primary); }
+
+  .stack-row { display: grid; grid-template-columns: repeat(3,1fr); gap: .8rem; margin-bottom: 1rem; }
+  .stack-item { border: 1px solid var(--border); border-radius: 12px; padding: .9rem 1.1rem; background: var(--surface); }
+  .stack-item .n { font-size: 12.5px; font-weight: 750; }
+  .stack-item .v { font-size: 11px; color: var(--text-muted); font-family: var(--mono); margin-top: 2px; }
+
+  .flow { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; font-size: 12.5px; margin: 1rem 0; }
+  .flow .node { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; font-weight: 600; color: var(--text-primary); }
+  .flow .arrow { color: var(--text-muted); font-size: 14px; }
+
+  .layer-stack { display: flex; flex-direction: column; gap: 2px; margin: 1rem 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+  .layer { background: var(--surface); padding: .8rem 1.1rem; display: flex; align-items: center; gap: .8rem; }
+  .layer .idx { font-size: 10px; font-weight: 800; color: var(--text-muted); width: 16px; }
+  .layer .name { font-size: 13px; font-weight: 700; min-width: 150px; }
+  .layer .desc { font-size: 12px; color: var(--text-secondary); }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+  .card h3 { display: flex; align-items: center; gap: .5rem; }
+  .card ul { margin: .3rem 0 0; padding-left: 1.1rem; font-size: 12.5px; color: var(--text-secondary); }
+  .card li { margin-bottom: .3rem; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); padding: 8px 10px; border-bottom: 1px solid var(--border-strong); }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+
+  .status-pill { display: inline-flex; align-items: center; gap: .3rem; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .status-pill.canon { background: var(--teal-bg); color: var(--teal); }
+  .status-pill.legacy { background: var(--slate-bg); color: var(--slate); }
+  .status-pill.risk { background: var(--coral-bg); color: var(--coral); }
+
+  .finding { display: flex; gap: .75rem; padding: .85rem 1rem; border-radius: 10px; background: var(--surface-2); border-left: 3px solid var(--gold); margin-bottom: .7rem; font-size: 13px; }
+  .finding b { color: var(--text-primary); }
+
+  footer { margin-top: 3rem; font-size: 11.5px; color: var(--text-muted); text-align: center; }
+</style>
+
+<div class="wrap">
+
+  <div class="eyebrow">Mobile architecture reference</div>
+  <h1>Beginly Mobile — architecture reference</h1>
+  <p class="lede">The Expo/React Native companion app, mapped from source. It's more architecturally sophisticated than its "never installed" status suggests — an offline-first client with its own security and release-gating layers.</p>
+
+  <div class="status-banner">
+    <span>⚠</span>
+    <span><b>Never installed or run.</b> The app's own <code>README.md</code> states plainly: "this environment did not install the Expo dependency tree or produce signed Android/iOS binaries." Everything below is a source-level map, not a verified-working map. That's Roadmap Phase 4.</span>
+  </div>
+
+  <h2 class="section">Stack</h2>
+  <div class="stack-row">
+    <div class="stack-item"><div class="n">Expo</div><div class="v">~57.0.4</div></div>
+    <div class="stack-item"><div class="n">React Native</div><div class="v">0.86.0</div></div>
+    <div class="stack-item"><div class="n">React</div><div class="v">19.2.6</div></div>
+    <div class="stack-item"><div class="n">Routing</div><div class="v">expo-router ~57.0.4</div></div>
+    <div class="stack-item"><div class="n">Reanimated</div><div class="v">4.5.0</div></div>
+    <div class="stack-item"><div class="n">Auth storage</div><div class="v">expo-secure-store</div></div>
+  </div>
+  <p style="font-size:12.5px;">Entirely separate dependency tree from the web app — own <code>package.json</code>, own <code>tsconfig.json</code>, correctly excluded from the root project's TypeScript checking.</p>
+
+  <h2 class="section">How it talks to the backend</h2>
+  <p>Not a separate API — the mobile app is a client of the <em>same</em> Next.js routes merged into the web project in Phase 0. Default target during development is literally the web dev server:</p>
+  <div class="flow">
+    <div class="node">mobile/lib/api.ts</div><div class="arrow">→</div>
+    <div class="node">EXPO_PUBLIC_BEGINLY_API_URL</div><div class="arrow">→</div>
+    <div class="node">defaults to http://localhost:3456</div>
+  </div>
+  <p style="font-size:12.5px;">Every request carries a Bearer token (<code>lib/session.ts</code>), an <code>x-request-id</code>, and — for writes — an idempotency key (<code>lib/id.ts</code>). This means <b>mobile inherits the exact same Phase 1 schema gap as web</b> — the same missing tables block both clients identically.</p>
+
+  <h2 class="section">Resilience layers — more built than expected</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>🔌 Offline-first</h3>
+      <ul>
+        <li><code>offline-cache.ts</code> — TTL'd local cache, <code>apiGetCached()</code> serves stale data on failure rather than erroring</li>
+        <li><code>mutation-queue.ts</code> / <code>mutation-queue-core.ts</code> — failed writes (5xx, timeout, 429) queue instead of failing; <code>background-sync.ts</code> + <code>expo-background-task</code> flush the queue later</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🔒 Security</h3>
+      <ul>
+        <li><code>SecurityGate.tsx</code> + <code>app-security.ts</code> — gates app usage on device security posture</li>
+        <li><code>expo-screen-capture</code> — blocks screenshots on sensitive screens</li>
+        <li><code>expo-local-authentication</code> — biometric unlock available</li>
+        <li><code>expo-secure-store</code> — session tokens never touch plain storage</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>📡 Push &amp; deep links</h3>
+      <ul>
+        <li><code>push.ts</code> + <code>notifications.ts</code> via <code>expo-notifications</code></li>
+        <li><code>deep-links.ts</code> via <code>expo-linking</code> — routes external links into the app's own screens</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🚦 Release gating</h3>
+      <ul>
+        <li><code>ReleaseGate.tsx</code> + <code>release-policy.ts</code> — can force-block outdated app versions from proceeding, paired with <code>expo-updates</code> for OTA</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 class="section">App composition (<code>app/_layout.tsx</code>)</h2>
+  <p>The root layout wraps every screen in this exact nesting order — worth knowing before touching any of it, since gates are order-dependent:</p>
+  <div class="layer-stack">
+    <div class="layer"><span class="idx">1</span><span class="name">AppErrorBoundary</span><span class="desc">catches render crashes app-wide</span></div>
+    <div class="layer"><span class="idx">2</span><span class="name">NetworkBanner</span><span class="desc">shows a persistent banner when offline</span></div>
+    <div class="layer"><span class="idx">3</span><span class="name">AppLifecycle</span><span class="desc">wires deep links, push registration, background sync, app-state changes</span></div>
+    <div class="layer"><span class="idx">4</span><span class="name">Stack (routes)</span><span class="desc">index, login, signup, onboarding, (tabs), settings, support, notifications, referrals</span></div>
+    <div class="layer"><span class="idx">5</span><span class="name">SecurityGate</span><span class="desc">rendered last — can overlay/block the whole stack</span></div>
+    <div class="layer"><span class="idx">6</span><span class="name">ReleaseGate</span><span class="desc">outermost check — forced-update blocking</span></div>
+  </div>
+
+  <h2 class="section">Screens</h2>
+  <table>
+    <tr><th>Screen</th><th>Notes</th></tr>
+    <tr><td><code>index, login, signup, onboarding</code></td><td>Entry flow — separate from the web login/signup, own implementation</td></tr>
+    <tr><td><code>(tabs)/index, journey, household, opportunities, products, nia</code></td><td>Mirrors the web platform-era pages 1:1 — same five domains</td></tr>
+    <tr><td><code>settings, support, notifications, referrals</code></td><td>Stack screens outside the tab bar</td></tr>
+  </table>
+
+  <h2 class="section">Design tokens — also unreconciled</h2>
+  <div class="finding"><span>⚠</span><span><b><code>mobile/lib/theme.ts</code> uses the old flat palette</b> — navy <code>#102A43</code>, teal <code>#0B7285</code> — the same pre-hybrid colours as the ported web platform CSS, not the hybrid tokens (<code>#0D2036</code> / <code>#0E7A78</code>) built this session. A single-line file, cheapest possible fix once Phase 2's palette decision is made — but currently a third place (web brand, web platform CSS, mobile) carrying its own colour truth.</span></div>
+  <table>
+    <tr><th>System</th><th>Status</th></tr>
+    <tr><td>Web — hybrid tokens (<code>globals.css</code> <code>:root</code>)</td><td><span class="status-pill canon">Canonical</span></td></tr>
+    <tr><td>Web — ported platform CSS</td><td><span class="status-pill legacy">Unreconciled</span></td></tr>
+    <tr><td>Mobile — <code>lib/theme.ts</code></td><td><span class="status-pill legacy">Unreconciled</span></td></tr>
+  </table>
+
+  <h2 class="section">To actually run it</h2>
+  <div class="flow">
+    <div class="node">npm --prefix mobile install</div><div class="arrow">→</div>
+    <div class="node">set EXPO_PUBLIC_BEGINLY_API_URL</div><div class="arrow">→</div>
+    <div class="node">npm run android / ios</div>
+  </div>
+  <p style="font-size:12.5px;">Untested claim from the app's own README, not verified in this session — Roadmap Phase 4 covers actually doing this and fixing whatever breaks on first run.</p>
+
+  <footer>Beginly Mobile · architecture reference · verified against source as of 2026-07-13</footer>
+
+</div>

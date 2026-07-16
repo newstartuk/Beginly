@@ -1,0 +1,7 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { PUBLIC_OPPORTUNITY_CATEGORIES } from "@/lib/seo/public-opportunity-categories";
+import { SITE_URL } from "@/lib/seo/public-content";
+
+export const metadata: Metadata = { title: "Opportunity categories | Beginly", description: "Explore Beginly's trust-led opportunity categories for jobs, training, events, founder programmes and family support.", alternates: { canonical: `${SITE_URL}/opportunity-categories` } };
+export default function OpportunityCategoriesPage() { return <main className="public-content-page"><header><span>Opportunity intelligence</span><h1>Relevant opportunities, explained before you act.</h1><p>Beginly separates suitability from commission value and records commercial disclosure before a tracked destination opens.</p></header><section className="public-content-grid">{PUBLIC_OPPORTUNITY_CATEGORIES.map((item)=><article key={item.slug}><h2>{item.title}</h2><p>{item.summary}</p><Link href={`/opportunity-categories/${item.slug}`}>Explore the trust method</Link></article>)}</section><section className="public-content-callout"><h2>Personal recommendations remain private</h2><p>Sign in to receive route-, city-, household- and readiness-aware matches. Public pages explain the categories and safeguards; they do not expose personalised opportunity decisions.</p><Link href="/signup">Start free</Link></section></main>; }

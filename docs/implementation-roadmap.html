@@ -1,0 +1,403 @@
+<title>Beginly — End-to-End Implementation Roadmap</title>
+<style>
+  :root {
+    --bg: #F7FAFB;
+    --surface: #FFFFFF;
+    --surface-2: #EFF4F7;
+    --border: #E2E8F0;
+    --border-strong: #CBD5E1;
+    --text-primary: #0D2036;
+    --text-secondary: #4B5D71;
+    --text-muted: #8092A3;
+    --teal: #0E7A78;
+    --teal-bg: #E8F4F3;
+    --aqua: #1F8FB0;
+    --aqua-bg: #E7F5FA;
+    --gold: #B97700;
+    --gold-bg: #FBF1DD;
+    --coral: #C43F3A;
+    --coral-bg: #FBEAEA;
+    --slate: #64748B;
+    --slate-bg: #F1F5F9;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(13,32,54,.04), 0 8px 24px -12px rgba(13,32,54,.10);
+  }
+  :root[data-theme="dark"] {
+    --bg: #07182E;
+    --surface: #0D2036;
+    --surface-2: #10233F;
+    --border: rgba(255,255,255,.10);
+    --border-strong: rgba(255,255,255,.18);
+    --text-primary: #F4F8FA;
+    --text-secondary: #B8CAD8;
+    --text-muted: #7E93A5;
+    --teal: #4DD4CE;
+    --teal-bg: rgba(77,212,206,.12);
+    --aqua: #6FCBEA;
+    --aqua-bg: rgba(111,203,234,.12);
+    --gold: #E8B95D;
+    --gold-bg: rgba(232,185,93,.14);
+    --coral: #E8817C;
+    --coral-bg: rgba(232,129,124,.14);
+    --slate: #9AACBC;
+    --slate-bg: rgba(154,172,188,.12);
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #07182E;
+      --surface: #0D2036;
+      --surface-2: #10233F;
+      --border: rgba(255,255,255,.10);
+      --border-strong: rgba(255,255,255,.18);
+      --text-primary: #F4F8FA;
+      --text-secondary: #B8CAD8;
+      --text-muted: #7E93A5;
+      --teal: #4DD4CE;
+      --teal-bg: rgba(77,212,206,.12);
+      --aqua: #6FCBEA;
+      --aqua-bg: rgba(111,203,234,.12);
+      --gold: #E8B95D;
+      --gold-bg: rgba(232,185,93,.14);
+      --coral: #E8817C;
+      --coral-bg: rgba(232,129,124,.14);
+      --slate: #9AACBC;
+      --slate-bg: rgba(154,172,188,.12);
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+
+  /* ── Header ── */
+  .masthead { margin-bottom: 2.5rem; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--teal); margin-bottom: .9rem;
+  }
+  .eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
+  h1 {
+    font-size: clamp(28px, 4vw, 38px); font-weight: 800; letter-spacing: -.02em;
+    line-height: 1.12; margin: 0 0 .6rem; text-wrap: balance;
+    color: var(--text-primary);
+  }
+  .lede { font-size: 16px; color: var(--text-secondary); max-width: 62ch; margin: 0; }
+  .meta-row {
+    display: flex; gap: 1.25rem; flex-wrap: wrap; margin-top: 1rem;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .meta-row span { display: inline-flex; align-items: center; gap: .4rem; }
+
+  /* ── Stat strip (echoes the app's roadmap card) ── */
+  .stat-strip {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+    background: var(--border); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; margin: 2rem 0 2.75rem;
+    box-shadow: var(--shadow);
+  }
+  .stat {
+    background: var(--surface); padding: 1.15rem 1.3rem;
+  }
+  .stat .n {
+    font-size: 28px; font-weight: 800; letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .stat .l { font-size: 11.5px; color: var(--text-muted); margin-top: .4rem; font-weight: 600; }
+  .stat.done .n { color: var(--teal); }
+  .stat.next .n { color: var(--gold); }
+  .stat.later .n { color: var(--slate); }
+  .stat.pct .n { color: var(--aqua); }
+
+  /* ── Phase sections ── */
+  .phase {
+    border: 1px solid var(--border); border-radius: 18px; background: var(--surface);
+    box-shadow: var(--shadow); margin-bottom: 1.1rem; overflow: hidden;
+  }
+  .phase-head {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: 1.35rem 1.5rem; border-bottom: 1px solid var(--border);
+  }
+  .phase-num {
+    font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums;
+    color: var(--text-muted); width: 26px; padding-top: 3px; flex-shrink: 0;
+  }
+  .phase-head-main { flex: 1; min-width: 0; }
+  .phase-title-row { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; margin-bottom: .3rem; }
+  .phase-title { font-size: 17px; font-weight: 750; letter-spacing: -.01em; margin: 0; }
+  .pill {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em;
+    padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+  }
+  .pill.done { background: var(--teal-bg); color: var(--teal); }
+  .pill.progress { background: var(--aqua-bg); color: var(--aqua); }
+  .pill.next { background: var(--gold-bg); color: var(--gold); }
+  .pill.blocked { background: var(--coral-bg); color: var(--coral); }
+  .pill.later { background: var(--slate-bg); color: var(--slate); }
+  .phase-goal { font-size: 13.5px; color: var(--text-secondary); margin: 0; }
+  .phase-body { padding: 1.1rem 1.5rem 1.4rem; }
+
+  .deliverables { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .55rem; }
+  .deliverables li {
+    display: flex; align-items: flex-start; gap: .65rem; font-size: 13.5px;
+  }
+  .check {
+    width: 17px; height: 17px; border-radius: 50%; flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .check.y { background: var(--teal); }
+  .check.y::after { content: ""; width: 5px; height: 8px; border: solid white; border-width: 0 1.6px 1.6px 0; transform: rotate(45deg) translate(-1px,-1px); }
+  .check.n { border: 1.6px solid var(--border-strong); }
+  li.done-item span { color: var(--text-secondary); }
+  li.pending-item span { color: var(--text-primary); }
+
+  .note {
+    margin-top: 1rem; padding: .8rem 1rem; border-radius: 10px;
+    background: var(--surface-2); border-left: 3px solid var(--gold);
+    font-size: 12.5px; color: var(--text-secondary); line-height: 1.55;
+  }
+  .note b { color: var(--text-primary); }
+  .note.blocked { border-left-color: var(--coral); }
+
+  .depends {
+    margin-top: .9rem; font-size: 11.5px; color: var(--text-muted);
+    display: flex; align-items: center; gap: .4rem;
+  }
+  .depends b { color: var(--text-secondary); font-weight: 700; }
+
+  /* ── Scope note / footer ── */
+  .scope-note {
+    margin-top: 3rem; padding: 1.4rem 1.6rem; border-radius: var(--radius);
+    background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow);
+  }
+  .scope-note h2 { font-size: 14px; font-weight: 750; margin: 0 0 .6rem; }
+  .scope-note p { font-size: 13px; color: var(--text-secondary); margin: 0 0 .5rem; }
+  .scope-note p:last-child { margin-bottom: 0; }
+  .scope-note code {
+    background: var(--surface-2); padding: 1px 6px; border-radius: 5px; font-size: 12px;
+    font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+
+  footer {
+    margin-top: 2.5rem; font-size: 11.5px; color: var(--text-muted);
+    text-align: center;
+  }
+</style>
+
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="eyebrow">Implementation roadmap</div>
+    <h1>Beginly — end-to-end build plan</h1>
+    <p class="lede">One dependency-ordered sequence from the current codebase state through launch readiness, covering web, mobile, data and content.</p>
+    <div class="meta-row">
+      <span>Generated 2026-07-13</span>
+      <span>Supersedes <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;">ROADMAP.md</code> (June 2026)</span>
+      <span>8 phases</span>
+    </div>
+  </div>
+
+  <div class="stat-strip">
+    <div class="stat done"><div class="n">1</div><div class="l">Phase complete</div></div>
+    <div class="stat next"><div class="n">1</div><div class="l">Blocking, next up</div></div>
+    <div class="stat later"><div class="n">6</div><div class="l">Not started</div></div>
+    <div class="stat pct"><div class="n">~15%</div><div class="l">Overall progress</div></div>
+  </div>
+
+  <!-- PHASE 0 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">00</div>
+      <div class="phase-head-main">
+        <div class="phase-title-row">
+          <h2 class="phase-title">Foundation — brand, landing page, platform code</h2>
+          <span class="pill done">Complete</span>
+        </div>
+        <p class="phase-goal">Establish a real visual identity and merge the full platform codebase (web + mobile) into the working project.</p>
+      </div>
+    </div>
+    <div class="phase-body">
+      <ul class="deliverables">
+        <li class="done-item"><span class="check y"></span><span>Stepping Stones logo — icon, primary lockup, monochrome, clearspace rule, entrance animation — implemented in header, nav, favicon</span></li>
+        <li class="done-item"><span class="check y"></span><span>Hybrid design tokens (navy / teal / aqua / gold), Lexend display type, evidence-matched via design-system search rather than guesswork</span></li>
+        <li class="done-item"><span class="check y"></span><span>Landing page rebuilt: self-playing roadmap-preview card, hero entrance choreography, scroll-triggered reveals</span></li>
+        <li class="done-item"><span class="check y"></span><span>Platform code merged from the v1.3 archive — 90 <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">app/</code> routes, 59 <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">lib/</code> files, 18 components, full mobile app — without regressing the rebrand</span></li>
+        <li class="done-item"><span class="check y"></span><span><code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">tsc --noEmit</code> passes clean project-wide; dev server verified against landing, journey and cities pages</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">01</div>
+      <div class="phase-head-main">
+        <div class="phase-title-row">
+          <h2 class="phase-title">Data layer reconciliation</h2>
+          <span class="pill blocked">Blocking — next</span>
+        </div>
+        <p class="phase-goal">The newly merged API routes reference tables that likely don't exist in the live Supabase project yet.</p>
+      </div>
+    </div>
+    <div class="phase-body">
+      <ul class="deliverables">
+        <li class="pending-item"><span class="check n"></span><span>Audit every new API route (household, journey, opportunities, products, billing, admin) against the actual deployed schema</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Write and run migrations for missing tables — <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">entitlements</code>, <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">billing_events</code>, <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">journey_tasks</code>, household/opportunity/product tables</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Verify RLS policies on every new table before any route goes live</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Smoke-test each new route against a real (or local) Supabase instance, not just a clean TypeScript compile</span></li>
+      </ul>
+      <div class="note blocked"><b>Why this blocks everything below:</b> the new pages render and compile today, but without real tables behind them, Journey / Household / Opportunities / Products will fail at runtime the moment a user interacts past the static shell.</div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">02</div>
+      <div class="phase-head-main">
+        <div class="phase-title-row">
+          <h2 class="phase-title">Visual unification</h2>
+          <span class="pill next">Ready to start</span>
+        </div>
+        <p class="phase-goal">The merged platform pages carry their own hardcoded palette, close to but not identical to the hybrid brand tokens — and one literal logo placeholder survived the merge.</p>
+      </div>
+    </div>
+    <div class="phase-body">
+      <ul class="deliverables">
+        <li class="pending-item"><span class="check n"></span><span>Decide deliberately: adopt the hybrid brand tokens across platform pages, or keep the Adaptive Compass palette as an intentional distinct sub-brand — don't let it stay accidental</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Replace the plain <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">&lt;div className="platform-brand-mark"&gt;B&lt;/div&gt;</code> in <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">PlatformShell.tsx</code> with the real Logo component</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Reconcile <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">Navigation.tsx</code> (sidebar, ours) against <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">Navbar.tsx</code> + <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">PlatformShell.tsx</code> (new) — pick which shell owns which route group and remove the unused one</span></li>
+      </ul>
+      <div class="depends"><b>Depends on:</b>&nbsp;nothing blocking — can run in parallel with Phase 1</div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">03</div>
+      <div class="phase-head-main">
+        <div class="phase-title-row">
+          <h2 class="phase-title">Core flow rebrand</h2>
+          <span class="pill later">Not started</span>
+        </div>
+        <p class="phase-goal">Onboarding, dashboard and checklist are still on the pre-session design — the parts of the product a signed-up user actually lives in.</p>
+      </div>
+    </div>
+    <div class="phase-body">
+      <ul class="deliverables">
+        <li class="pending-item"><span class="check n"></span><span>Onboarding flow — apply Logo, Lexend, hybrid palette; this is still first-impression territory right after signup</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Dashboard — daily-use surface, highest-frequency touchpoint</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Checklist / task detail pages</span></li>
+      </ul>
+      <div class="depends"><b>Depends on:</b>&nbsp;Phase 2 decision on shell/palette strategy, so this isn't rebuilt twice</div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">04</div>
+      <div class="phase-head-main">
+        <div class="phase-title-row">
+          <h2 class="phase-title">Mobile bring-up</h2>
+          <span class="pill later">Not started</span>
+        </div>
+        <p class="phase-goal">The full Expo app exists in the repo but has never been installed or run.</p>
+      </div>
+    </div>
+    <div class="phase-body">
+      <ul class="deliverables">
+        <li class="pending-item"><span class="check n"></span><span><code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">npm --prefix mobile install</code>, resolve any version conflicts</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Run via Expo dev client, smoke-test login, journey and Nia tabs</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Fix React Native–specific issues surfaced only at runtime (not caught by the root <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">tsc</code>, which correctly excludes <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">mobile/</code>)</span></li>
+      </ul>
+      <div class="depends"><b>Depends on:</b>&nbsp;Phase 1 — mobile hits the same API routes</div>
+    </div>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">05</div>
+      <div class="phase-head-main">
+        <div class="phase-title-row">
+          <h2 class="phase-title">Content &amp; identity polish</h2>
+          <span class="pill later">Not started</span>
+        </div>
+        <p class="phase-goal">Two design gaps identified early in the session and never closed.</p>
+      </div>
+    </div>
+    <div class="phase-body">
+      <ul class="deliverables">
+        <li class="pending-item"><span class="check n"></span><span>Bespoke SVG illustration set for empty states and onboarding — <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">creating-svg-illustrations</code> skill is installed, unused</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Nia's visual identity — the abstract beacon/orb concept from the design brief, with an idle animation; currently just a name in a feature card</span></li>
+      </ul>
+      <div class="depends"><b>Depends on:</b>&nbsp;nothing blocking — lowest-risk phase to run whenever capacity allows</div>
+    </div>
+  </div>
+
+  <!-- PHASE 6 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">06</div>
+      <div class="phase-head-main">
+        <div class="phase-title-row">
+          <h2 class="phase-title">Provider activation</h2>
+          <span class="pill later">Not started</span>
+        </div>
+        <p class="phase-goal">Stripe, Resend and the platform's own activation runbooks exist as code and documentation, not as configured live services.</p>
+      </div>
+    </div>
+    <div class="phase-body">
+      <ul class="deliverables">
+        <li class="pending-item"><span class="check n"></span><span>Wire real Stripe keys, verify checkout + webhook round-trip against the <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">/api/webhooks/stripe</code> route</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Wire real Resend keys for transactional email, verify against <code style="background:var(--surface-2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:11px;">/api/webhooks/resend</code></span></li>
+        <li class="pending-item"><span class="check n"></span><span>Work through the activation runbooks already present in the codebase docs (Supabase, Resend, Stripe, Nia, opportunity connectors, push, observability)</span></li>
+      </ul>
+      <div class="depends"><b>Depends on:</b>&nbsp;Phase 1 — billing/entitlement tables must exist first</div>
+    </div>
+  </div>
+
+  <!-- PHASE 7 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">07</div>
+      <div class="phase-head-main">
+        <div class="phase-title-row">
+          <h2 class="phase-title">QA &amp; launch readiness</h2>
+          <span class="pill later">Not started</span>
+        </div>
+        <p class="phase-goal">The gates every prior closure package flagged as open and never claimed complete.</p>
+      </div>
+    </div>
+    <div class="phase-body">
+      <ul class="deliverables">
+        <li class="pending-item"><span class="check n"></span><span>Real interactive browser E2E — every prior evidence package recorded this as environmentally blocked, not passed</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Accessibility pass against the merged pages (WCAG 2.1/2.2 AA)</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Physical mobile device QA, signed build</span></li>
+        <li class="pending-item"><span class="check n"></span><span>Controlled human pilot — no version to date has claimed one</span></li>
+      </ul>
+      <div class="depends"><b>Depends on:</b>&nbsp;every phase above</div>
+    </div>
+  </div>
+
+  <div class="scope-note">
+    <h2>Scope note</h2>
+    <p>This roadmap replaces <code>ROADMAP.md</code> at the project root, which was written in June 2026 and predates the brand rebuild and the v1.3 platform merge — several of its P0 items (no landing page, no onboarding gate) are already resolved.</p>
+    <p>It does not touch the pre-existing strategy documents in the project root (<code>BEGINLY_STRATEGIC_COMPENDIUM.md</code>, the Sir Edmund Hale briefs, the <code>beginly_*_roadmap.html</code> files) — those are business-strategy and naming exploration, not implementation status, and rewriting them wasn't part of this pass. Flag it if any of those should be reconciled too.</p>
+  </div>
+
+  <footer>Beginly · internal implementation roadmap · reflects codebase state as of 2026-07-13</footer>
+
+</div>

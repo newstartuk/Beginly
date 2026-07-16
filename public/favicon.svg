@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <defs>
+    <linearGradient id="fav-beam" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0"    stop-color="#FF7358" stop-opacity="0.95"/>
+      <stop offset="0.58" stop-color="#F8B547" stop-opacity="0.80"/>
+      <stop offset="1"    stop-color="#F6EBDD" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fav-door" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#FFF9F1"/>
+      <stop offset="1" stop-color="#F6C6B5"/>
+    </linearGradient>
+    <clipPath id="fav-clip">
+      <circle cx="300" cy="300" r="258"/>
+    </clipPath>
+  </defs>
+  <circle cx="300" cy="300" r="258" fill="#071B34"/>
+  <g clip-path="url(#fav-clip)" transform="translate(18,-5) scale(.94)">
+    <path d="M132 122 H242 C324 122 376 164 376 232 C376 276 350 306 305 320 C362 336 396 372 396 428 C396 500 338 542 242 542 H132 Z" fill="#FFF9F1"/>
+    <path d="M176 188 L250 206 L250 432 L176 414 Z" fill="#041225"/>
+    <path d="M176 188 L190 191 L190 417 L176 414 Z" fill="#FF7358"/>
+    <path d="M190 192 L239 211 L239 402 L190 416 Z" fill="url(#fav-door)"/>
+    <path d="M190 192 L197 195 L197 414 L190 416 Z" fill="#FF7358" opacity="0.98"/>
+    <circle cx="225" cy="307" r="4.5" fill="#041225"/>
+    <path d="M190 416 L242 402 L526 478 L456 516 L292 466 L214 438 Z" fill="url(#fav-beam)" opacity="0.90"/>
+  </g>
+</svg>

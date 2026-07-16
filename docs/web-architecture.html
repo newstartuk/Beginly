@@ -1,0 +1,213 @@
+<title>Beginly — Architecture &amp; Current-State Reference</title>
+<style>
+  :root {
+    --bg: #F7FAFB; --surface: #FFFFFF; --surface-2: #EFF4F7;
+    --border: #E2E8F0; --border-strong: #CBD5E1;
+    --text-primary: #0D2036; --text-secondary: #4B5D71; --text-muted: #8092A3;
+    --teal: #0E7A78; --teal-bg: #E8F4F3;
+    --aqua: #1F8FB0; --aqua-bg: #E7F5FA;
+    --gold: #B97700; --gold-bg: #FBF1DD;
+    --coral: #C43F3A; --coral-bg: #FBEAEA;
+    --violet: #6B4FD6; --violet-bg: #F1EDFB;
+    --slate: #64748B; --slate-bg: #F1F5F9;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(13,32,54,.04), 0 8px 24px -12px rgba(13,32,54,.10);
+    --mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+  :root[data-theme="dark"] {
+    --bg: #07182E; --surface: #0D2036; --surface-2: #10233F;
+    --border: rgba(255,255,255,.10); --border-strong: rgba(255,255,255,.18);
+    --text-primary: #F4F8FA; --text-secondary: #B8CAD8; --text-muted: #7E93A5;
+    --teal: #4DD4CE; --teal-bg: rgba(77,212,206,.12);
+    --aqua: #6FCBEA; --aqua-bg: rgba(111,203,234,.12);
+    --gold: #E8B95D; --gold-bg: rgba(232,185,93,.14);
+    --coral: #E8817C; --coral-bg: rgba(232,129,124,.14);
+    --violet: #B7A6F2; --violet-bg: rgba(183,166,242,.14);
+    --slate: #9AACBC; --slate-bg: rgba(154,172,188,.12);
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #07182E; --surface: #0D2036; --surface-2: #10233F;
+      --border: rgba(255,255,255,.10); --border-strong: rgba(255,255,255,.18);
+      --text-primary: #F4F8FA; --text-secondary: #B8CAD8; --text-muted: #7E93A5;
+      --teal: #4DD4CE; --teal-bg: rgba(77,212,206,.12);
+      --aqua: #6FCBEA; --aqua-bg: rgba(111,203,234,.12);
+      --gold: #E8B95D; --gold-bg: rgba(232,185,93,.14);
+      --coral: #E8817C; --coral-bg: rgba(232,129,124,.14);
+      --violet: #B7A6F2; --violet-bg: rgba(183,166,242,.14);
+      --slate: #9AACBC; --slate-bg: rgba(154,172,188,.12);
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text-primary);
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: .5rem; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .08em; color: var(--teal); margin-bottom: .9rem;
+  }
+  .eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
+  h1 { font-size: clamp(26px,4vw,34px); font-weight: 800; letter-spacing: -.02em; line-height: 1.15; margin: 0 0 .6rem; text-wrap: balance; }
+  .lede { font-size: 16px; color: var(--text-secondary); max-width: 66ch; margin: 0 0 2.5rem; }
+  h2.section {
+    font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--text-muted); margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+  }
+  h2.section:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+  h3 { font-size: 16px; font-weight: 750; margin: 0 0 .5rem; letter-spacing: -.01em; }
+  p { color: var(--text-secondary); margin: 0 0 .8rem; }
+  code { background: var(--surface-2); padding: 1px 6px; border-radius: 5px; font-size: 12.5px; font-family: var(--mono); color: var(--text-primary); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.3rem 1.5rem; margin-bottom: 1rem; }
+
+  /* era comparison */
+  .era-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem; }
+  .era-card { border-radius: var(--radius); padding: 1.2rem 1.4rem; border: 1px solid var(--border); }
+  .era-card.checklist { background: var(--teal-bg); border-color: color-mix(in srgb, var(--teal) 30%, var(--border)); }
+  .era-card.platform { background: var(--violet-bg); border-color: color-mix(in srgb, var(--violet) 30%, var(--border)); }
+  .era-card .tag { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .5rem; display: block; }
+  .era-card.checklist .tag { color: var(--teal); }
+  .era-card.platform .tag { color: var(--violet); }
+  .era-card ul { margin: .6rem 0 0; padding-left: 1.1rem; font-size: 13px; color: var(--text-secondary); }
+  .era-card li { margin-bottom: .3rem; }
+  .era-card .count { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+
+  /* file tree */
+  .tree { font-family: var(--mono); font-size: 12.5px; line-height: 1.9; background: var(--surface-2); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; }
+  .tree .dir { color: var(--text-primary); font-weight: 700; }
+  .tree .meta { color: var(--text-muted); }
+  .tree .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; }
+  .tree .dot.original { background: var(--teal); }
+  .tree .dot.merged { background: var(--violet); }
+  .tree .dot.mixed { background: var(--gold); }
+
+  /* table */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); padding: 8px 10px; border-bottom: 1px solid var(--border-strong); }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .status-pill { display: inline-flex; align-items: center; gap: .3rem; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .status-pill.have { background: var(--teal-bg); color: var(--teal); }
+  .status-pill.missing { background: var(--coral-bg); color: var(--coral); }
+
+  .finding { display: flex; gap: .75rem; padding: .85rem 1rem; border-radius: 10px; background: var(--surface-2); border-left: 3px solid var(--gold); margin-bottom: .7rem; font-size: 13px; }
+  .finding.dead { border-left-color: var(--slate); }
+  .finding.split { border-left-color: var(--coral); }
+  .finding b { color: var(--text-primary); }
+
+  .flow { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; font-size: 12.5px; margin: 1rem 0; }
+  .flow .node { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; font-weight: 600; color: var(--text-primary); }
+  .flow .arrow { color: var(--text-muted); font-size: 14px; }
+
+  .service-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: .8rem; }
+  .service { border: 1px solid var(--border); border-radius: 10px; padding: .9rem 1.1rem; background: var(--surface); }
+  .service .name { font-weight: 750; font-size: 13.5px; display: flex; align-items: center; gap: .5rem; margin-bottom: .25rem; }
+  .service .role { font-size: 12px; color: var(--text-muted); }
+  .dot-live { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); }
+  .dot-off { width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong); }
+
+  footer { margin-top: 3rem; font-size: 11.5px; color: var(--text-muted); text-align: center; }
+</style>
+
+<div class="wrap">
+
+  <div class="eyebrow">Architecture reference</div>
+  <h1>Beginly — architecture &amp; current-state reference</h1>
+  <p class="lede">How the two eras of this codebase actually fit together right now — verified against the source, not assumed. Pairs with the implementation roadmap; this is the map, that is the plan.</p>
+
+  <h2 class="section">Two eras, one codebase</h2>
+  <p>The working project is the checklist-era product (built and rebranded this session). The v1.3 platform archive merge added a second, larger product surface on top of it. They currently coexist rather than being unified.</p>
+  <div class="era-grid">
+    <div class="era-card checklist">
+      <span class="tag">Checklist era · original</span>
+      <span class="count">16 pages</span>
+      <p style="margin:.4rem 0 0;font-size:12.5px;">Shell: <code>components/Navigation.tsx</code> (sidebar)</p>
+      <ul>
+        <li>dashboard, checklist, tasks/[id], budget, guides, settings, support, bank, emergency, nhs, document-helper</li>
+        <li>admin, admin/guides, admin/tasks</li>
+      </ul>
+    </div>
+    <div class="era-card platform">
+      <span class="tag">Platform era · merged from v1.3</span>
+      <span class="count">17 pages</span>
+      <p style="margin:.4rem 0 0;font-size:12.5px;">Shell: <code>components/platform/PlatformShell.tsx</code></p>
+      <ul>
+        <li>journey, household(+invitations), opportunities, products(+[id], workspace), nia, referrals, notifications, cities(+[city]), evidence-room</li>
+        <li>partners/commission-readiness, platform</li>
+        <li>admin/operations, admin/observability</li>
+      </ul>
+    </div>
+  </div>
+  <div class="finding split"><span>⚠</span><span><b>Admin is split across both shells.</b> <code>app/admin/page.tsx</code>, <code>admin/guides</code>, <code>admin/tasks</code> use <code>Navigation.tsx</code>; <code>admin/operations</code> and <code>admin/observability</code> use <code>PlatformShell</code>. Same section of the product, two different navigation chromes — this is Roadmap Phase 2's job to resolve.</span></div>
+
+  <p style="margin-top:1rem;">A third pattern exists for fully public pages — <code>/</code>, <code>/login</code>, <code>/signup</code> hand-roll their own header markup rather than using any shared shell component.</p>
+
+  <h2 class="section">Dead code found during the merge</h2>
+  <div class="finding dead"><span>○</span><span><b><code>app/_components/LandingPageClient.tsx</code></b> — v1.3's own landing page. Copied in by the file-diff merge (it didn't exist locally), but nothing imports it — <code>app/page.tsx</code> still points at our rebranded landing page. Safe to delete, or keep as reference for the "Adaptive Compass" positioning copy.</span></div>
+  <div class="finding dead"><span>○</span><span><b><code>components/Navbar.tsx</code></b> — also copied in, also unreferenced by any page. Likely intended for the public marketing pages but never wired up.</span></div>
+
+  <h2 class="section">Directory map</h2>
+  <div class="tree">
+<span class="meta">beginly/</span>
+  <span class="dir">app/</span>                    <span class="meta">— Next.js App Router</span>
+    <span class="dot mixed"></span><span class="meta">admin/            split across both shells (see above)</span>
+    <span class="dot original"></span><span class="meta">dashboard/ checklist/ tasks/ budget/ guides/ …   checklist-era</span>
+    <span class="dot merged"></span><span class="meta">journey/ household/ opportunities/ products/ …  platform-era</span>
+    <span class="dot merged"></span><span class="meta">api/platform/*  api/admin/*  api/webhooks/*      ~54 new routes</span>
+    <span class="dot original"></span><span class="meta">page.tsx login/ signup/                         rebranded this session</span>
+  <span class="dir">components/</span>
+    <span class="dot original"></span><span class="meta">Logo.tsx RoadmapPreviewCard.tsx Navigation.tsx   ours</span>
+    <span class="dot merged"></span><span class="meta">platform/  Navbar.tsx                            merged (Navbar unused)</span>
+  <span class="dir">lib/</span>
+    <span class="dot original"></span><span class="meta">supabase.ts utils.ts auth-client.ts             ours (11 files)</span>
+    <span class="dot merged"></span><span class="meta">platform/ navigation/ providers/ email.ts …      merged (59 files)</span>
+  <span class="dir">mobile/</span>                 <span class="dot merged"></span><span class="meta">Expo/React Native app — separate package.json, never installed/run</span>
+  <span class="dir">supabase/</span>
+    <span class="meta">schema.sql                    — 5 tables, checklist-era only (see gap below)</span>
+  </div>
+
+  <h2 class="section">Data model — the actual gap</h2>
+  <p><code>supabase/schema.sql</code> defines exactly five tables. The platform-era API routes reference many more that do not exist anywhere in the repo. This is Roadmap Phase 1.</p>
+  <table>
+    <tr><th>Table</th><th>Status</th><th>Referenced by</th></tr>
+    <tr><td><code>users</code></td><td><span class="status-pill have">Exists</span></td><td>Auth, checklist-era</td></tr>
+    <tr><td><code>arrival_profiles</code></td><td><span class="status-pill have">Exists</span></td><td>Onboarding</td></tr>
+    <tr><td><code>user_tasks</code></td><td><span class="status-pill have">Exists</span></td><td>Checklist</td></tr>
+    <tr><td><code>reminder_prefs</code></td><td><span class="status-pill have">Exists</span></td><td>Settings</td></tr>
+    <tr><td><code>support_tickets</code></td><td><span class="status-pill have">Exists</span></td><td>Support</td></tr>
+    <tr><td><code>entitlements</code></td><td><span class="status-pill missing">Missing</span></td><td><code>api/webhooks/stripe</code>, products, subscriptions</td></tr>
+    <tr><td><code>billing_events</code></td><td><span class="status-pill missing">Missing</span></td><td><code>api/webhooks/stripe</code></td></tr>
+    <tr><td><code>subscriptions</code></td><td><span class="status-pill missing">Missing</span></td><td><code>api/webhooks/stripe</code>, products</td></tr>
+    <tr><td><code>checkout_sessions</code></td><td><span class="status-pill missing">Missing</span></td><td><code>api/webhooks/stripe</code>, products/[id]/checkout</td></tr>
+    <tr><td>household / invitations / members</td><td><span class="status-pill missing">Missing</span></td><td><code>api/platform/household/*</code></td></tr>
+    <tr><td>journey tasks / forecast</td><td><span class="status-pill missing">Missing</span></td><td><code>api/platform/journey/*</code></td></tr>
+    <tr><td>opportunities / action sessions</td><td><span class="status-pill missing">Missing</span></td><td><code>api/platform/opportunit(y|ies)/*</code></td></tr>
+    <tr><td>notifications</td><td><span class="status-pill missing">Missing</span></td><td><code>api/platform/notifications/*</code></td></tr>
+    <tr><td>admin incidents / work-items</td><td><span class="status-pill missing">Missing</span></td><td><code>api/admin/incidents</code>, <code>work-items/*</code></td></tr>
+  </table>
+
+  <h2 class="section">Auth &amp; post-auth redirect flow</h2>
+  <p>Wired this session into the checklist-era login/signup pages, using the merged <code>lib/navigation/post-auth.ts</code> helper — this is the one piece of platform-era logic already integrated into our own pages rather than left in the merged shell.</p>
+  <div class="flow">
+    <div class="node">Sign in / Sign up</div><div class="arrow">→</div>
+    <div class="node">Supabase Auth</div><div class="arrow">→</div>
+    <div class="node">resolvePostAuthRedirect(redirect, product)</div><div class="arrow">→</div>
+    <div class="node">/dashboard or /onboarding (fallback)</div>
+  </div>
+
+  <h2 class="section">External services</h2>
+  <div class="service-grid">
+    <div class="service"><div class="name"><span class="dot-live"></span>Supabase</div><div class="role">Auth + Postgres — live, checklist-era tables only</div></div>
+    <div class="service"><div class="name"><span class="dot-off"></span>Stripe</div><div class="role">SDK installed this session — no live keys, no tables yet</div></div>
+    <div class="service"><div class="name"><span class="dot-off"></span>Resend</div><div class="role">SDK installed this session — no live keys</div></div>
+    <div class="service"><div class="name"><span class="dot-live"></span>Vercel + Cloudflare</div><div class="role">Hosting for the checklist-era build</div></div>
+  </div>
+
+  <footer>Beginly · architecture reference · verified against source as of 2026-07-13</footer>
+
+</div>

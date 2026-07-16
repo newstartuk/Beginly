@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /guides
+Allow: /guides/
+Disallow: /dashboard
+Disallow: /checklist
+Disallow: /budget
+Disallow: /settings
+Disallow: /admin
+Disallow: /tasks
+
+Sitemap: https://beginly.app/sitemap.xml

@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Beginly Referral Opportunity Engine Strategy v1.0</title><style>
+@page {
+  size: A4;
+  margin: 18mm 16mm 20mm 16mm;
+  @bottom-center {
+    content: "Beginly Referral, Opportunity & Notification Engine v1.0 - Page " counter(page) " of " counter(pages);
+    font-size: 8.5pt;
+    color: #627D98;
+  }
+}
+:root {
+  --navy: #102A43;
+  --teal: #0B7285;
+  --green: #2F9E44;
+  --amber: #F08C00;
+  --red: #C92A2A;
+  --violet: #8B5CF6;
+  --mist: #F8FAFC;
+  --line: #D9E2EC;
+  --muted: #627D98;
+  --text: #243B53;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: Inter, Arial, sans-serif;
+  color: var(--text);
+  line-height: 1.48;
+  font-size: 10.2pt;
+  margin: 0;
+}
+h1, h2, h3, h4 { color: var(--navy); line-height: 1.18; margin: 0.75em 0 0.35em; }
+h1 { font-size: 27pt; letter-spacing: -0.5px; }
+h2 { font-size: 18pt; border-bottom: 2px solid var(--line); padding-bottom: 5px; margin-top: 1.3em; }
+h3 { font-size: 13.5pt; margin-top: 1em; }
+h4 { font-size: 11.5pt; }
+p { margin: 0.35em 0 0.75em; }
+ul, ol { margin-top: 0.25em; padding-left: 1.35em; }
+li { margin-bottom: 0.25em; }
+a { color: var(--teal); text-decoration: none; }
+.cover {
+  height: 250mm;
+  padding: 20mm 10mm 10mm 10mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #F8FAFC 0%, #E6F7FA 100%);
+  border: 1px solid #E6EEF5;
+}
+.logo-row { display: flex; align-items: center; gap: 12px; }
+.logo-mark {
+  width: 52px; height: 52px; border-radius: 16px; background: var(--teal); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 24pt; font-weight: 800;
+}
+.cover .kicker { color: var(--teal); font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; font-size: 9pt; }
+.cover .subtitle { font-size: 15pt; color: #334E68; max-width: 650px; }
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
+.meta-item { background: rgba(255,255,255,0.75); border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; }
+.meta-label { display: block; font-size: 8pt; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.meta-value { font-weight: 700; color: var(--navy); }
+.note, .callout, .warning, .success, .quote, .source-note {
+  border-radius: 12px;
+  padding: 11px 13px;
+  margin: 10px 0;
+  break-inside: avoid;
+}
+.callout { background: #E6F7FA; border-left: 5px solid var(--teal); }
+.note { background: #F8FAFC; border: 1px solid var(--line); }
+.warning { background: #FFF4E6; border-left: 5px solid var(--amber); }
+.success { background: #EBFBEE; border-left: 5px solid var(--green); }
+.quote { background: #F8FAFC; border-left: 5px solid var(--navy); font-size: 12pt; color: var(--navy); }
+.source-note { background: #F4F0FF; border-left: 5px solid var(--violet); }
+.small { font-size: 8.8pt; color: var(--muted); }
+.badge { display: inline-block; padding: 3px 8px; border-radius: 999px; background: #E6F7FA; color: var(--teal); font-weight: 700; font-size: 8pt; margin: 1px 3px 1px 0; }
+.badge.green { background: #EBFBEE; color: #2B8A3E; }
+.badge.amber { background: #FFF4E6; color: #D9480F; }
+.badge.red { background: #FFF5F5; color: #C92A2A; }
+.badge.violet { background: #F3F0FF; color: #7048E8; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0 16px; }
+tr { break-inside: avoid; }
+th, td { border: 1px solid var(--line); padding: 7px 8px; vertical-align: top; }
+th { background: var(--navy); color: white; font-size: 8.7pt; text-align: left; }
+td { font-size: 8.6pt; }
+tr:nth-child(even) td { background: #FBFCFE; }
+.figure { margin: 12px 0 18px; break-inside: avoid; }
+.figure-title { font-weight: 800; color: var(--navy); margin: 0 0 6px; }
+.diagram {
+  border: 1px solid var(--line);
+  background: #FFFFFF;
+  border-radius: 14px;
+  padding: 13px;
+}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.card { border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: #fff; break-inside: avoid; }
+.card h4 { margin-top: 0; }
+.hr { border-top: 1px solid var(--line); margin: 12px 0; }
+.page-break { page-break-before: always; }
+pre { background: #0B1F33; color: #E6F7FA; padding: 12px; border-radius: 12px; overflow-wrap: break-word; white-space: pre-wrap; font-size: 8.2pt; line-height: 1.35; }
+code { background: #F1F5F9; color: #0B7285; padding: 1px 4px; border-radius: 4px; font-size: 8.8pt; }
+.checklist li { list-style: none; margin-left: -1em; }
+.checklist li:before { content: "□ "; color: var(--teal); font-weight: bold; }
+.toc a { color: var(--navy); }
+.ref { font-size: 8.5pt; color: #334E68; }
+.footer-note { font-size: 8.5pt; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; }
+</style></head>
+<body>
+<section class="cover">
+  <div>
+    <div class="logo-row"><div class="logo-mark">B</div><div><div class="kicker">Beginly.app</div><h1>Referral, Opportunity Scanner, Notifications & Package Monetisation Strategy</h1></div></div>
+    <p class="subtitle">A comprehensive strategy and technical integration document converting the NewStartUK referral spreadsheet into a trust-safe Beginly engagement, referral, notification, geo-location and subscription package engine.</p>
+    <div class="meta-grid">
+      <div class="meta-item"><span class="meta-label">Version</span><span class="meta-value">v1.0</span></div>
+      <div class="meta-item"><span class="meta-label">Prepared For</span><span class="meta-value">Beginly.app / NewStart UK v1.2 lineage</span></div>
+      <div class="meta-item"><span class="meta-label">Source Inputs</span><span class="meta-value">Referral workbook, Beginly codebase, prior strategy decisions</span></div>
+      <div class="meta-item"><span class="meta-label">Primary Goal</span><span class="meta-value">Trust-safe monetisation through useful settlement opportunities</span></div>
+    </div>
+  </div>
+  <div class="footer-note">This document is a product strategy and implementation guide. It is not legal, tax, financial, immigration, medical, housing or regulatory advice. Before public launch, obtain appropriate legal/compliance review for affiliate, subscription, data, notification and partner workflows.</div>
+</section>
+
+<section class="page-break toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li>Executive summary</li>
+    <li>What the spreadsheet really represents</li>
+    <li>Strategic reframing: referral list to opportunity engine</li>
+    <li>How this fits the existing Beginly solution</li>
+    <li>Core system architecture</li>
+    <li>Opportunity Registry data model</li>
+    <li>Opportunity Scanner design</li>
+    <li>Referral-in-content strategy</li>
+    <li>Device notification and geo/radius strategy</li>
+    <li>Subscription/package notification strategy</li>
+    <li>Consent, disclosure and compliance framework</li>
+    <li>Admin governance and review workflow</li>
+    <li>Technical integration plan for the current codebase</li>
+    <li>Database schema proposal</li>
+    <li>API and component implementation plan</li>
+    <li>UX copy, notification and disclosure examples</li>
+    <li>Roadmap, acceptance criteria and risks</li>
+    <li>References</li>
+  </ol>
+</section>
+
+<section class="page-break">
+  <h2>1. Executive Summary</h2>
+  <div class="quote">Referral links are not the product. The product feature is a trust-safe Opportunity Engine that helps newcomers discover timely settlement actions, savings, safety checks, partner options and package support.</div>
+  <p>The uploaded workbook is commercially valuable, but it should not be implemented as a direct affiliate-link dump. The strategic implementation should be a broader <strong>Beginly Engagement & Opportunity Engine</strong>. This engine should combine:</p>
+  <ul>
+    <li><strong>Opportunity Scanner</strong> - a personalised feed of useful settlement opportunities based on profile, journey stage, checklist status and preferences.</li>
+    <li><strong>Contextual referral-in-content</strong> - relevant partner/referral blocks inside guides, task details, budget pages and support flows.</li>
+    <li><strong>Notification system</strong> - opt-in in-app, email and device push reminders that bring users back before they forget important settlement steps.</li>
+    <li><strong>Geo/radius-sensitive layer</strong> - optional, consent-led location relevance for campus, transport, health, accommodation and local setup prompts.</li>
+    <li><strong>Package notification engine</strong> - value-triggered prompts for free, plus, premium, support, trial, renewal and sponsored access packages.</li>
+    <li><strong>Governance layer</strong> - admin review, source verification, disclosure, consent, frequency capping and compliance controls.</li>
+  </ul>
+  <div class="success"><strong>Recommended positioning:</strong> Beginly should not sell links. Beginly should surface timely settlement opportunities. Where a trusted partner link genuinely helps, it can be clearly disclosed and used.</div>
+  <h3>Executive verdict</h3>
+  <table><tr><th>Question</th><th>Verdict</th></tr>
+    <tr><td>Should the spreadsheet be used?</td><td>Yes, but as a structured Opportunity Registry, not as a live affiliate-link sheet.</td></tr>
+    <tr><td>Should Opportunity Scanner be the only monetisation surface?</td><td>No. It should be the brain, while content, notifications, Nia, budget pages, task details and package prompts are distribution surfaces.</td></tr>
+    <tr><td>Should geo-location be used?</td><td>Yes, later, only with explicit opt-in, clear user control and a service-first purpose.</td></tr>
+    <tr><td>Should package/subscription notifications be used?</td><td>Yes, but as value-triggered package prompts, not aggressive sales notifications.</td></tr>
+    <tr><td>What should be built first?</td><td>Opportunity Registry, disclosure components, consent preferences, in-app scanner, contextual content blocks and admin review workflow.</td></tr>
+  </table>
+</section>
+
+<section class="page-break">
+  <h2>2. What the Spreadsheet Really Represents</h2>
+  <p>The workbook <strong>NewStartUK_Referral_Opportunities_Complete.xlsx</strong> contains seven sheets and is best understood as a commercial opportunity map for Beginly's settlement journey.</p>
+  <table><tr><th>Sheet</th><th>Purpose</th><th>How it should be reused</th></tr>
+    <tr><td>1_Executive_Summary</td><td>Lists major referral categories, brands, effort, revenue potential, timeline and priority.</td><td>Use to create category priorities and first implementation phases.</td></tr>
+    <tr><td>2_Currently_Named_In_Code</td><td>Identifies brands already referenced in the codebase.</td><td>Use as an audit to remove unsafe ranking language and convert mentions into governed options.</td></tr>
+    <tr><td>3_Full_Referral_Database</td><td>Large opportunity list with programmes, networks, payout estimates, code locations, task links and implementation notes.</td><td>Convert into the <code>opportunities</code> and <code>opportunity_triggers</code> tables.</td></tr>
+    <tr><td>4_Awin_Programmes</td><td>Affiliate-network specific opportunity subset.</td><td>Use as an application tracker, not as proof of approval.</td></tr>
+    <tr><td>5_Implementation_Roadmap</td><td>Phased roadmap across quick wins and later categories.</td><td>Convert into sprint tickets and release gates.</td></tr>
+    <tr><td>6_Revenue_Model_Analysis</td><td>Estimated revenue potential by brand/category.</td><td>Use as directional prioritisation, not as a forecast.</td></tr>
+    <tr><td>7_Compliance_Checklist</td><td>Flags affiliate disclosure, financial promotion, cookie consent, data sharing, Nia disclaimer, accessibility and mobile requirements.</td><td>Promote into release-blocking acceptance criteria.</td></tr>
+  </table>
+  <h3>Priority categories from the workbook</h3>
+  <p>The workbook correctly identifies early high-intent categories such as banking/finance, SIM/mobile, transport/rail and currency/forex as P0 categories. These align with first-90-day newcomer needs and can be integrated into existing Beginly pages such as <code>/bank</code>, guidance articles, seed tasks and budget flows.</p>
+  <div class="warning"><strong>Important:</strong> The revenue model is useful for prioritisation, but it should not be treated as a confirmed forecast. Programme availability, approval status, payouts, partner terms, conversion rates and compliance suitability must be verified before production use.</div>
+  <h3>Workbook transformation principle</h3>
+  <table><tr><th>Spreadsheet language</th><th>Product language</th><th>Production treatment</th></tr>
+    <tr><td>Brand / Service</td><td>Opportunity provider or source</td><td>Must be verified before being shown as live.</td></tr>
+    <tr><td>Affiliate Programme</td><td>Monetisation route</td><td>Must be approved and disclosed.</td></tr>
+    <tr><td>Avg. Payout</td><td>Internal revenue estimate</td><td>Never shown to users; never used as the main ranking factor.</td></tr>
+    <tr><td>In Codebase</td><td>Integration touchpoint</td><td>Use to find page/component placement.</td></tr>
+    <tr><td>Journey Stage</td><td>Trigger condition</td><td>Use for scanner and notification rules.</td></tr>
+    <tr><td>Implementation Notes</td><td>Admin/developer task</td><td>Must pass trust, source and compliance review.</td></tr>
+  </table>
+</section>
+
+<section class="page-break">
+  <h2>3. Strategic Reframing: From Referral List to Opportunity Engine</h2>
+  <p>The strongest strategic move is to make the referral layer behave like part of the user journey, not like advertising pasted onto the product.</p>
+  <div class="callout"><strong>Strategic reframing:</strong> The workbook becomes Beginly's <strong>Opportunity Registry</strong>. The app uses this registry to power Opportunity Scanner, content blocks, notifications, Nia explanations and package prompts.</div>
+  <h3>Five opportunity types</h3>
+  <table><tr><th>Type</th><th>Example</th><th>Revenue?</th><th>Trust note</th></tr>
+    <tr><td>Official</td><td>GOV.UK, NHS, university, council or UKCISA guidance.</td><td>No</td><td>Should be prioritised for sensitive topics.</td></tr>
+    <tr><td>Safety</td><td>Housing scam warning, job scam warning, document protection reminder.</td><td>No</td><td>Must never be mixed with aggressive sales.</td></tr>
+    <tr><td>Savings</td><td>Railcard, student discount, SIM comparison education, budget review.</td><td>Sometimes</td><td>Frame as things to compare, not as guaranteed savings.</td></tr>
+    <tr><td>Partner</td><td>Verified accommodation, airport pickup, student support or local service.</td><td>Possibly</td><td>Requires partner vetting and complaint tracking.</td></tr>
+    <tr><td>Referral</td><td>SIM, money transfer, banking comparison, insurance, utilities, broadband.</td><td>Yes</td><td>Requires clear disclosure and consent where tracking is used.</td></tr>
+    <tr><td>Package</td><td>Beginly Plus, premium reminders, support sessions, sponsored access.</td><td>Yes</td><td>Must be value-triggered and transparent.</td></tr>
+  </table>
+  <h3>Ranking logic</h3>
+  <p>The scanner should rank by user value and trust fit before revenue. Revenue must be a secondary internal signal.</p>
+  <ol>
+    <li>User safety</li>
+    <li>Current settlement need</li>
+    <li>Journey stage relevance</li>
+    <li>Trust/source confidence</li>
+    <li>User value score</li>
+    <li>Compliance simplicity</li>
+    <li>Revenue potential</li>
+  </ol>
+  <div class="warning"><strong>Do not rank by commission.</strong> The product must not feel like a disguised affiliate site. This is central to preserving Beginly's trust position.</div>
+</section>
+
+<section class="page-break">
+  <h2>4. How This Fits the Existing Beginly Solution</h2>
+  <p>The current Beginly codebase already has several natural entry points for the referral/opportunity system. The integration should extend these surfaces rather than create a separate commercial island.</p>
+  <h3>Existing surfaces found in the codebase</h3>
+  <table><tr><th>Current file/route</th><th>Current role</th><th>Recommended integration</th></tr>
+    <tr><td><code>app/bank/page.tsx</code></td><td>Banking guidance page.</td><td>Add neutral provider comparison blocks and financial-disclaimer-safe referral cards after verification.</td></tr>
+    <tr><td><code>app/budget/page.tsx</code></td><td>Budget planner and cost tracking.</td><td>Add savings scanner prompts for SIM, transport, food, utilities and subscriptions.</td></tr>
+    <tr><td><code>app/checklist/page.tsx</code></td><td>Checklist interface.</td><td>Add related opportunities generated from task stage/category.</td></tr>
+    <tr><td><code>app/tasks/[id]/page.tsx</code></td><td>Task detail experience.</td><td>Add contextual opportunity panels: safety first, official sources second, partner/referral last.</td></tr>
+    <tr><td><code>app/guides/page.tsx</code> and <code>app/guides/[slug]/page.tsx</code></td><td>Guidance library and article pages.</td><td>Add governed content-referral blocks and disclosure components.</td></tr>
+    <tr><td><code>components/Nia.tsx</code></td><td>AI-assisted guide.</td><td>Add opportunity explanation, but prevent product ranking and regulated advice.</td></tr>
+    <tr><td><code>app/onboarding/page.tsx</code></td><td>Collects arrival profile and already requests browser notification permission.</td><td>Separate permissions for checklist reminders, safety alerts, opportunity alerts, location alerts and package prompts.</td></tr>
+    <tr><td><code>app/settings/page.tsx</code></td><td>Notification and user preferences.</td><td>Expand into a consent centre with granular controls and quiet hours.</td></tr>
+    <tr><td><code>app/admin/*</code></td><td>Admin preview routes.</td><td>Add Opportunity Registry admin workflow after admin security/persistence is fixed.</td></tr>
+    <tr><td><code>lib/seed-data.ts</code> and <code>lib/guidance-data.ts</code></td><td>Task and guidance seed content.</td><td>Map task IDs and guide slugs to approved opportunities.</td></tr>
+  </table>
+  <div class="warning"><strong>Dependency warning:</strong> The current codebase still has split auth/localStorage state and admin-security weaknesses. The Opportunity Engine should be designed now, but production use should follow the stabilisation sprint: Supabase-backed auth, persisted profile/tasks, secure roles and safe RLS.</div>
+</section>
+
+<section class="page-break">
+  <h2>5. Core System Architecture</h2>
+  <p>The full implementation should be a modular engine, not scattered hardcoded links.</p>
+  <div class="figure"><p class="figure-title">Figure 1 - Beginly Engagement & Opportunity Engine Architecture</p><div class="diagram">
+<svg width="100%" height="310" viewBox="0 0 760 310" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Beginly Engagement and Opportunity Engine architecture">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#0B7285" /></marker>
+    <style>.box{fill:#fff;stroke:#D9E2EC;stroke-width:1.4}.teal{fill:#E6F7FA;stroke:#0B7285}.navy{fill:#102A43}.txt{font: 13px Arial; fill:#243B53}.title{font: bold 14px Arial; fill:#102A43}.small{font: 11px Arial; fill:#627D98}.line{stroke:#0B7285;stroke-width:2;marker-end:url(#arrow)}</style>
+  </defs>
+  <rect x="20" y="30" width="170" height="80" rx="14" class="box"/><text x="38" y="58" class="title">User Context</text><text x="38" y="80" class="txt">Profile, stage, city</text><text x="38" y="98" class="txt">tasks, budget, consent</text>
+  <rect x="295" y="25" width="190" height="90" rx="14" class="teal"/><text x="323" y="55" class="title">Opportunity Scanner</text><text x="315" y="78" class="txt">Scores relevance, trust</text><text x="315" y="96" class="txt">timing and category fit</text>
+  <rect x="570" y="30" width="170" height="80" rx="14" class="box"/><text x="588" y="58" class="title">Opportunity Registry</text><text x="588" y="80" class="txt">Official, safety, savings,</text><text x="588" y="98" class="txt">partner, referral, package</text>
+  <rect x="70" y="195" width="150" height="70" rx="14" class="box"/><text x="92" y="222" class="title">Content Blocks</text><text x="92" y="244" class="small">Guides, tasks, budget</text>
+  <rect x="305" y="195" width="160" height="70" rx="14" class="box"/><text x="327" y="222" class="title">Notifications</text><text x="327" y="244" class="small">Email, in-app, push</text>
+  <rect x="555" y="195" width="150" height="70" rx="14" class="box"/><text x="583" y="222" class="title">Nia Explain</text><text x="583" y="244" class="small">Why shown, safe wording</text>
+  <line x1="190" y1="70" x2="295" y2="70" class="line"/><line x1="485" y1="70" x2="570" y2="70" class="line"/><line x1="390" y1="115" x2="145" y2="195" class="line"/><line x1="390" y1="115" x2="385" y2="195" class="line"/><line x1="390" y1="115" x2="630" y2="195" class="line"/>
+  <text x="237" y="46" class="small">trigger inputs</text><text x="504" y="46" class="small">approved options</text>
+</svg>
+</div></div>
+  <h3>Engine components</h3>
+  <table><tr><th>Component</th><th>Function</th><th>First implementation level</th></tr>
+    <tr><td>Opportunity Registry</td><td>Stores all official, safety, savings, partner, referral and package opportunities.</td><td>Supabase table seeded from the workbook.</td></tr>
+    <tr><td>Trigger Engine</td><td>Decides when an opportunity is relevant.</td><td>Stage, profile, task and content triggers first.</td></tr>
+    <tr><td>Notification Engine</td><td>Sends in-app, email and push notifications where allowed.</td><td>Email/in-app first; push later.</td></tr>
+    <tr><td>Location Engine</td><td>Adds city, university and optional radius sensitivity.</td><td>Profile city first; manual near-me later; background radius later.</td></tr>
+    <tr><td>Content Referral Component</td><td>Displays relevant partner options in guides/tasks.</td><td>Component-based and disclosure-controlled.</td></tr>
+    <tr><td>Nia Explanation Layer</td><td>Explains why an opportunity was shown.</td><td>Rule-based at MVP; AI-enhanced later.</td></tr>
+    <tr><td>Consent & Disclosure Layer</td><td>Controls privacy, marketing, affiliate and notification permissions.</td><td>Must be built before live affiliate tracking.</td></tr>
+    <tr><td>Admin Review Console</td><td>Approves opportunities, wording, partners and sources.</td><td>Required before monetised links go public.</td></tr>
+    <tr><td>Analytics Layer</td><td>Measures usefulness, conversion, dismissals and complaints.</td><td>Privacy-safe events only.</td></tr>
+  </table>
+  <div class="figure"><p class="figure-title">Figure 2 - Trigger, policy gate and delivery flow</p><div class="diagram">
+<svg width="100%" height="260" viewBox="0 0 760 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trigger to notification and referral flow">
+  <defs><marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#102A43" /></marker><style>.b{fill:#fff;stroke:#D9E2EC;stroke-width:1.2}.a{fill:#E6F7FA;stroke:#0B7285}.w{fill:#FFF4E6;stroke:#F08C00}.g{fill:#EBFBEE;stroke:#2F9E44}.t{font: bold 12px Arial; fill:#102A43}.s{font:11px Arial;fill:#627D98}.l{stroke:#102A43;stroke-width:1.8;marker-end:url(#arrow2)}</style></defs>
+  <rect x="20" y="80" width="120" height="58" rx="12" class="b"/><text x="38" y="105" class="t">Signal</text><text x="38" y="124" class="s">arrival/task/location</text>
+  <rect x="165" y="80" width="120" height="58" rx="12" class="a"/><text x="185" y="105" class="t">Consent</text><text x="185" y="124" class="s">allowed channel?</text>
+  <rect x="310" y="80" width="120" height="58" rx="12" class="w"/><text x="330" y="105" class="t">Policy gate</text><text x="330" y="124" class="s">safe, current, disclosed</text>
+  <rect x="455" y="80" width="120" height="58" rx="12" class="a"/><text x="474" y="105" class="t">Rank</text><text x="474" y="124" class="s">value before revenue</text>
+  <rect x="600" y="80" width="135" height="58" rx="12" class="g"/><text x="620" y="105" class="t">Deliver</text><text x="620" y="124" class="s">in-app, email, push</text>
+  <line x1="140" y1="109" x2="165" y2="109" class="l"/><line x1="285" y1="109" x2="310" y2="109" class="l"/><line x1="430" y1="109" x2="455" y2="109" class="l"/><line x1="575" y1="109" x2="600" y2="109" class="l"/>
+  <rect x="165" y="175" width="410" height="54" rx="12" class="b"/><text x="185" y="198" class="t">Feedback loop</text><text x="185" y="217" class="s">save, dismiss, open, convert, report bad recommendation, update next scan</text>
+  <line x1="670" y1="138" x2="370" y2="175" class="l"/>
+</svg>
+</div></div>
+</section>
+
+<section class="page-break">
+  <h2>6. Opportunity Registry Data Model</h2>
+  <p>The spreadsheet should be normalised into production-ready records. The registry must contain both user-facing details and internal governance fields.</p>
+  <h3>Core fields</h3>
+  <table><tr><th>Field</th><th>Purpose</th><th>Example</th></tr>
+    <tr><td><code>opportunity_id</code></td><td>Stable identifier for product logic and analytics.</td><td><code>OP_SIM_GIFFGAFF_001</code></td></tr>
+    <tr><td><code>title</code></td><td>User-facing title.</td><td>Compare UK SIM setup options</td></tr>
+    <tr><td><code>category</code></td><td>SIM, Banking, Transport, Accommodation, Health, Budget, Package.</td><td>SIM / Mobile</td></tr>
+    <tr><td><code>opportunity_type</code></td><td>Official, safety, savings, partner, referral, package.</td><td>Referral</td></tr>
+    <tr><td><code>journey_stage</code></td><td>PRE, D1, D7, D30, D90, GROW.</td><td>PRE / D1</td></tr>
+    <tr><td><code>audience</code></td><td>Student, skilled worker, dependant, visitor, broad newcomer.</td><td>International student</td></tr>
+    <tr><td><code>trigger_conditions</code></td><td>Profile, task, budget, content, location or package rules.</td><td><code>{"arrival_status":"not_arrived","task":"STU_PRE_007"}</code></td></tr>
+    <tr><td><code>risk_level</code></td><td>Compliance/trust risk.</td><td>Low / Medium / High</td></tr>
+    <tr><td><code>monetisation_type</code></td><td>None, affiliate, direct partner, B2B, package.</td><td>Affiliate</td></tr>
+    <tr><td><code>tracking_link</code></td><td>Approved link only, never guessed.</td><td>Stored only after approval.</td></tr>
+    <tr><td><code>disclosure_required</code></td><td>Whether to show affiliate/partner label.</td><td>Yes</td></tr>
+    <tr><td><code>cookie_consent_required</code></td><td>Whether non-essential tracking/storage consent is required.</td><td>Yes</td></tr>
+    <tr><td><code>last_verified_at</code></td><td>Source and partner programme freshness.</td><td>2026-06-12</td></tr>
+    <tr><td><code>trust_score</code></td><td>Internal trust rating.</td><td>1-5</td></tr>
+    <tr><td><code>user_value_score</code></td><td>Internal user-value rating.</td><td>1-5</td></tr>
+    <tr><td><code>implementation_status</code></td><td>Draft, verified, approved, live, paused.</td><td>Approved</td></tr>
+  </table>
+  <h3>100-point opportunity score</h3>
+  <table><tr><th>Area</th><th>Weight</th><th>Reason</th></tr>
+    <tr><td>User value</td><td>30</td><td>The opportunity must genuinely help the user.</td></tr>
+    <tr><td>Settlement relevance</td><td>20</td><td>It must match the user's stage and context.</td></tr>
+    <tr><td>Trust/safety fit</td><td>20</td><td>It must not undermine Beginly's guidance-first posture.</td></tr>
+    <tr><td>Compliance simplicity</td><td>15</td><td>Lower-risk opportunities can launch earlier.</td></tr>
+    <tr><td>Revenue potential</td><td>10</td><td>Revenue matters, but should not dominate ranking.</td></tr>
+    <tr><td>Implementation ease</td><td>5</td><td>Quick wins should still pass the above gates.</td></tr>
+  </table>
+</section>
+
+<section class="page-break">
+  <h2>7. Opportunity Scanner Design</h2>
+  <p>The Opportunity Scanner is the main recurring engagement mechanism. It gives users a reason to return because Beginly continues scanning their stage and surfacing useful next steps.</p>
+  <h3>Dashboard card</h3>
+  <div class="card">
+    <h4>Opportunity Scanner</h4>
+    <p><strong>Nia found 4 useful opportunities for your current stage.</strong></p>
+    <p><span class="badge red">Safety</span> Check housing deposit warning signs</p>
+    <p><span class="badge">Setup</span> Prepare bank account documents</p>
+    <p><span class="badge green">Savings</span> Compare student transport options</p>
+    <p><span class="badge violet">Guidance</span> Review GP registration steps</p>
+    <p class="small">Shown because you are in your first 7 days and have not completed transport, bank or GP setup tasks.</p>
+  </div>
+  <h3>Opportunity detail page structure</h3>
+  <ol>
+    <li>Title</li>
+    <li>Why this may matter</li>
+    <li>Who this is for</li>
+    <li>What to check first</li>
+    <li>Official source or Beginly guidance</li>
+    <li>Partner/referral disclosure, if relevant</li>
+    <li>CTA: view guide, compare options, save, dismiss, mark done</li>
+    <li>Why shown: transparent trigger explanation</li>
+  </ol>
+  <h3>User controls</h3>
+  <table><tr><th>Control</th><th>Reason</th></tr>
+    <tr><td>Save opportunity</td><td>Creates a personal opportunity list and increases return behaviour.</td></tr>
+    <tr><td>Dismiss opportunity</td><td>Prevents noise and teaches the engine user preferences.</td></tr>
+    <tr><td>Hide category</td><td>Allows users to avoid categories they do not want, such as partner offers.</td></tr>
+    <tr><td>Report bad recommendation</td><td>Protects trust and gives admin a quality signal.</td></tr>
+    <tr><td>Why shown?</td><td>Explains the trigger and reduces the feeling of manipulation.</td></tr>
+  </table>
+</section>
+
+<section class="page-break">
+  <h2>8. Referral-in-Content Strategy</h2>
+  <p>Referral should not only appear in the Opportunity Scanner. It should be used where suitable inside the normal product experience, but always through governed content blocks.</p>
+  <div class="figure"><p class="figure-title">Figure 3 - Referral surfaces across Beginly</p><div class="diagram">
+<svg width="100%" height="275" viewBox="0 0 760 275" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Referral surfaces in Beginly">
+  <defs><style>.c{fill:#fff;stroke:#D9E2EC;stroke-width:1.2}.core{fill:#102A43}.txt{font:12px Arial;fill:#243B53}.white{font:bold 14px Arial;fill:white}.ttl{font:bold 13px Arial;fill:#102A43}</style></defs>
+  <circle cx="380" cy="138" r="65" fill="#0B7285"/><text x="340" y="130" class="white">Opportunity</text><text x="348" y="150" class="white">Registry</text>
+  <rect x="25" y="25" width="165" height="62" rx="12" class="c"/><text x="45" y="50" class="ttl">Scanner Feed</text><text x="45" y="70" class="txt">weekly useful opportunities</text>
+  <rect x="295" y="18" width="170" height="62" rx="12" class="c"/><text x="316" y="43" class="ttl">Guides & Articles</text><text x="316" y="63" class="txt">contextual option blocks</text>
+  <rect x="570" y="25" width="165" height="62" rx="12" class="c"/><text x="592" y="50" class="ttl">Task Details</text><text x="592" y="70" class="txt">related setup options</text>
+  <rect x="25" y="185" width="165" height="62" rx="12" class="c"/><text x="45" y="210" class="ttl">Budget Planner</text><text x="45" y="230" class="txt">savings prompts</text>
+  <rect x="295" y="205" width="170" height="62" rx="12" class="c"/><text x="316" y="230" class="ttl">Notifications</text><text x="316" y="250" class="txt">opt-in re-engagement</text>
+  <rect x="570" y="185" width="165" height="62" rx="12" class="c"/><text x="592" y="210" class="ttl">Nia & Support</text><text x="592" y="230" class="txt">explain, not pressure</text>
+</svg>
+</div></div>
+  <h3>Recommended content surfaces</h3>
+  <table><tr><th>Surface</th><th>Example</th><th>Rules</th></tr>
+    <tr><td>Guidance articles</td><td>SIM/eSIM guide shows things to compare and partner options.</td><td>Use neutral language, label partner links, and include official/safety context.</td></tr>
+    <tr><td>Task detail pages</td><td>Bank-account preparation task shows documents to prepare and options to compare.</td><td>No financial ranking, no "best bank", no guaranteed approval.</td></tr>
+    <tr><td>Budget planner</td><td>High mobile or transport spend triggers savings prompts.</td><td>Show insight first; referral block second.</td></tr>
+    <tr><td>Reminder emails</td><td>Weekly scan links to a guide with a clearly labelled partner section.</td><td>Marketing consent required for promotional content.</td></tr>
+    <tr><td>Nia responses</td><td>Nia explains what to compare before choosing a SIM.</td><td>Nia should explain, not recommend regulated products.</td></tr>
+    <tr><td>Resource hub</td><td>Tools and options page separates official, non-commercial and partner resources.</td><td>Never mix official sources with paid partners without clear labels.</td></tr>
+  </table>
+  <h3>Content block example</h3>
+  <div class="card">
+    <h4>Things to compare before choosing a UK SIM</h4>
+    <ul>
+      <li>Coverage in your postcode and university area.</li>
+      <li>Contract length and cancellation terms.</li>
+      <li>International call/data needs.</li>
+      <li>Whether pay-as-you-go is safer before committing.</li>
+    </ul>
+    <p><span class="badge amber">Partner disclosure</span> Some links in this section may be partner links. Beginly may receive a referral fee, but you remain free to compare and choose any provider.</p>
+  </div>
+</section>
+
+<section class="page-break">
+  <h2>9. Device Notification and Geo/Radius Strategy</h2>
+  <p>Beginly should not wait until the user opens the app. Notifications should turn the product into an active settlement companion. However, this must be consent-led and frequency-capped.</p>
+  <h3>Notification classes</h3>
+  <table><tr><th>Class</th><th>Purpose</th><th>Example</th></tr>
+    <tr><td>Checklist reminders</td><td>Core service reminders tied to arrival timeline and task status.</td><td>Your arrival is in 7 days. Save offline copies of your key documents.</td></tr>
+    <tr><td>Safety alerts</td><td>Protect users from costly mistakes and scams.</td><td>Before paying a housing deposit, check warning signs and keep written evidence.</td></tr>
+    <tr><td>Opportunity alerts</td><td>Bring users back to useful scanner findings.</td><td>Nia found 3 opportunities for your first week: transport, GP setup and SIM comparison.</td></tr>
+    <tr><td>Location-aware prompts</td><td>Use city or optional radius context to show timely local prompts.</td><td>You may be near your university area. Review your campus setup checklist.</td></tr>
+    <tr><td>Package notifications</td><td>Explain relevant Beginly packages, trials, renewals and support options.</td><td>Your Plus trial ends in 3 days. Review renewal and cancellation options.</td></tr>
+  </table>
+  <h3>Geo-location maturity ladder</h3>
+  <table><tr><th>Phase</th><th>Approach</th><th>Reason</th></tr>
+    <tr><td>1</td><td>City/profile-based relevance.</td><td>Uses onboarding data and avoids GPS privacy risk.</td></tr>
+    <tr><td>2</td><td>Manual "scan near me" action.</td><td>User intentionally asks for local context.</td></tr>
+    <tr><td>3</td><td>Optional location alerts.</td><td>Only after separate explicit opt-in and clear controls.</td></tr>
+    <tr><td>4</td><td>Native geofencing/radius triggers.</td><td>Later native app/PWA maturity feature, not MVP launch blocker.</td></tr>
+  </table>
+  <div class="warning"><strong>Geo rule:</strong> Use location to surface the settlement need, not to push a sale. Example: notify about campus setup, then show a package card only after the user opens the relevant screen.</div>
+  <h3>Frequency caps</h3>
+  <table><tr><th>Type</th><th>Recommended cap</th></tr>
+    <tr><td>Urgent checklist reminders</td><td>Maximum 1 per day.</td></tr>
+    <tr><td>Safety alerts</td><td>Maximum 2 per week unless user-triggered or critical.</td></tr>
+    <tr><td>Opportunity alerts</td><td>Maximum 2 per week.</td></tr>
+    <tr><td>Location-aware alerts</td><td>Maximum 1 per day and only where useful.</td></tr>
+    <tr><td>Marketing/package prompts</td><td>Maximum 1 per week unless transactional.</td></tr>
+    <tr><td>Weekly scan summary</td><td>1 per week.</td></tr>
+  </table>
+</section>
+
+<section class="page-break">
+  <h2>10. Subscription / Package Notification Strategy</h2>
+  <p>Subscription and package prompts should exist, but they must be value-triggered. Beginly should avoid blunt sales notifications.</p>
+  <div class="quote">Best principle: free roadmap first, value proof second, package prompt third, notification only when relevant and consented.</div>
+  <h3>Separate package notification types</h3>
+  <table><tr><th>Type</th><th>Nature</th><th>Example</th></tr>
+    <tr><td>Free feature reminder</td><td>Service/value notification.</td><td>Your free roadmap is ready.</td></tr>
+    <tr><td>Upgrade prompt</td><td>Marketing/upsell notification.</td><td>Extra guided support is available if you want more help staying on track.</td></tr>
+    <tr><td>Trial reminder</td><td>Transactional/lifecycle notification.</td><td>Your Beginly Plus trial ends in 3 days.</td></tr>
+    <tr><td>Renewal reminder</td><td>Transactional notification.</td><td>Your package renews on [date]. Review or cancel in Settings.</td></tr>
+    <tr><td>Support-session prompt</td><td>Contextual support option.</td><td>You asked for housing support. A general guidance session is available.</td></tr>
+    <tr><td>Sponsored access notice</td><td>B2B/account notification.</td><td>Your university has sponsored Beginly access until [date].</td></tr>
+  </table>
+  <h3>Best package triggers</h3>
+  <table><tr><th>Trigger</th><th>Best prompt</th></tr>
+    <tr><td>User completes onboarding.</td><td>Your free roadmap is ready. You can upgrade later if you need extra support.</td></tr>
+    <tr><td>User has many urgent tasks incomplete.</td><td>You have several tasks this week. Extra guided support is available.</td></tr>
+    <tr><td>User opens Document Helper repeatedly.</td><td>More document explanation capacity is available in Plus.</td></tr>
+    <tr><td>User saves many opportunities.</td><td>Save and track more opportunities with Plus.</td></tr>
+    <tr><td>User is near arrival date.</td><td>Your arrival week is close. Review your roadmap and support options.</td></tr>
+    <tr><td>User tries a premium feature.</td><td>This feature is part of Beginly Plus. Continue free or view packages.</td></tr>
+  </table>
+  <h3>Package prompt copy model</h3>
+  <div class="card"><h4>Want extra help staying on track?</h4><p>Your free Beginly roadmap remains available. Beginly Plus adds weekly planning support, saved opportunities and enhanced reminder controls. View packages when you are ready.</p><p class="small">Beginly provides general settlement guidance, not legal, immigration, financial, tax, medical or housing advice.</p></div>
+</section>
+
+<section class="page-break">
+  <h2>11. Consent, Disclosure and Compliance Framework</h2>
+  <p>The engine requires strong consent and disclosure architecture because it combines affiliate links, marketing notifications, cookies/tracking, location and subscriptions.</p>
+  <h3>Consent categories</h3>
+  <table><tr><th>Consent</th><th>Default</th><th>Reason</th></tr>
+    <tr><td>Essential account/service emails</td><td>Required for service operation.</td><td>Password/account/security notifications.</td></tr>
+    <tr><td>Email reminders</td><td>Opt-in.</td><td>Settlement reminders and weekly scan summaries.</td></tr>
+    <tr><td>Push service notifications</td><td>Opt-in.</td><td>Checklist, safety and service notifications.</td></tr>
+    <tr><td>Push marketing/package notifications</td><td>Separate opt-in.</td><td>Upgrade or partner/package prompts.</td></tr>
+    <tr><td>Location-aware alerts</td><td>Separate explicit opt-in.</td><td>Geo/radius prompts are sensitive.</td></tr>
+    <tr><td>Partner offers</td><td>Separate opt-in where used as marketing.</td><td>Avoid combining with essential service consent.</td></tr>
+    <tr><td>Affiliate tracking cookies/pixels</td><td>Consent required before non-essential tracking.</td><td>Required under PECR/UK GDPR-style consent standards.</td></tr>
+  </table>
+  <h3>Disclosure language</h3>
+  <div class="card"><h4>Universal affiliate disclosure</h4><p><strong>Partner disclosure:</strong> Some links may be partner links. Beginly may receive a referral fee if you use them. This does not make the provider official or guaranteed. You should compare options and check provider terms before choosing.</p></div>
+  <div class="card"><h4>Financial/banking-safe wording</h4><p>Beginly does not recommend financial products. We provide general things to compare and signpost official provider information. Check your own circumstances and provider terms before applying.</p></div>
+  <div class="card"><h4>Package wording</h4><p>Beginly Plus renews monthly unless cancelled. You can cancel from Settings. Free roadmap access remains available unless clearly stated otherwise.</p></div>
+  <h3>Prohibited wording</h3>
+  <table><tr><th>Avoid</th><th>Safer replacement</th></tr>
+    <tr><td>Best bank account</td><td>Options students often compare</td></tr>
+    <tr><td>Cheapest insurance</td><td>Things to compare before choosing cover</td></tr>
+    <tr><td>Guaranteed approval</td><td>Provider terms and eligibility vary</td></tr>
+    <tr><td>Officially recommended by Beginly</td><td>Listed as an option, not an official recommendation</td></tr>
+    <tr><td>Subscribe now before you miss out</td><td>View packages if you want extra support</td></tr>
+  </table>
+  <div class="source-note"><strong>Compliance basis:</strong> UK advertising guidance expects affiliate marketing to be identifiable as advertising where necessary; cookie/storage guidance requires valid consent for non-essential technologies; subscription policies require clear disclosure of cost, billing frequency, auto-renewal and cancellation terms. See references at the end of this document.</div>
+</section>
+
+<section class="page-break">
+  <h2>12. Admin Governance and Review Workflow</h2>
+  <p>Beginly should not allow developers or content editors to paste referral links directly into pages without review. The Opportunity Registry should have a controlled approval workflow.</p>
+  <h3>Lifecycle statuses</h3>
+  <table><tr><th>Status</th><th>Meaning</th><th>Allowed in public app?</th></tr>
+    <tr><td>Draft</td><td>Imported from spreadsheet or proposed internally.</td><td>No</td></tr>
+    <tr><td>Source review</td><td>Official source/programme being checked.</td><td>No</td></tr>
+    <tr><td>Compliance review</td><td>Disclosure, wording, consent and risk assessed.</td><td>No</td></tr>
+    <tr><td>Approved</td><td>Ready to appear in a controlled surface.</td><td>Yes</td></tr>
+    <tr><td>Live</td><td>Currently visible in production.</td><td>Yes</td></tr>
+    <tr><td>Paused</td><td>Temporarily hidden due to issue, expiry or review.</td><td>No</td></tr>
+    <tr><td>Archived</td><td>Retired opportunity retained for records.</td><td>No</td></tr>
+  </table>
+  <h3>Required admin checks before going live</h3>
+  <ul class="checklist">
+    <li>Provider programme verified.</li>
+    <li>Application approved or direct relationship confirmed.</li>
+    <li>Tracking link generated and tested.</li>
+    <li>Disclosure text attached.</li>
+    <li>Cookie/tracking consent requirement defined.</li>
+    <li>Risk level assigned.</li>
+    <li>Source URL recorded.</li>
+    <li>Last verified date recorded.</li>
+    <li>Page/task/guide placement approved.</li>
+    <li>Claims reviewed for "best", "cheapest", "guaranteed" or regulated-advice wording.</li>
+    <li>Fallback/free/official option provided where appropriate.</li>
+    <li>Owner and next review date assigned.</li>
+  </ul>
+</section>
+
+<section class="page-break">
+  <h2>13. Technical Integration Plan for the Current Codebase</h2>
+  <p>The implementation should be layered so it can slot into the current Next.js App Router/Supabase direction without destabilising the existing MVP.</p>
+  <h3>New folders and files</h3>
+  <pre>lib/opportunities.ts
+lib/opportunity-engine.ts
+lib/notification-rules.ts
+lib/package-prompts.ts
+lib/consent.ts
+components/OpportunityCard.tsx
+components/OpportunityFeed.tsx
+components/OpportunityDisclosure.tsx
+components/PackagePromptCard.tsx
+components/ConsentCentre.tsx
+app/opportunities/page.tsx
+app/opportunities/[id]/page.tsx
+app/api/opportunities/route.ts
+app/api/notifications/subscribe/route.ts
+app/api/notifications/preferences/route.ts
+app/api/packages/route.ts
+app/admin/opportunities/page.tsx
+app/admin/notifications/page.tsx
+public/sw.js  # later, for push notifications </pre>
+  <h3>Existing files to extend</h3>
+  <table><tr><th>File</th><th>Change</th></tr>
+    <tr><td><code>app/dashboard/page.tsx</code></td><td>Add weekly Opportunity Scanner card after urgent tasks.</td></tr>
+    <tr><td><code>components/ChecklistContent.tsx</code></td><td>Add related opportunities per task/stage/category.</td></tr>
+    <tr><td><code>app/guides/[slug]/page.tsx</code></td><td>Render content referral blocks using guide slug mappings.</td></tr>
+    <tr><td><code>app/budget/page.tsx</code></td><td>Show savings prompts when budget categories exceed thresholds.</td></tr>
+    <tr><td><code>components/Nia.tsx</code></td><td>Add safe opportunity explanation responses and hard blocks for financial/legal conclusions.</td></tr>
+    <tr><td><code>app/settings/page.tsx</code></td><td>Add granular consent centre, quiet hours, notification frequency and location controls.</td></tr>
+    <tr><td><code>app/onboarding/page.tsx</code></td><td>Ask for notification interests after explaining value, not during rushed signup.</td></tr>
+    <tr><td><code>supabase/schema.sql</code></td><td>Add opportunity, notification, consent, package and admin review tables.</td></tr>
+  </table>
+  <h3>Implementation order</h3>
+  <ol>
+    <li>Fix current auth/data/admin stabilisation issues.</li>
+    <li>Add Opportunity Registry schema and seed only non-commercial official/safety/savings records.</li>
+    <li>Add in-app Opportunity Feed on dashboard.</li>
+    <li>Add Content Referral Block component with disclosure support.</li>
+    <li>Add consent centre and notification preferences.</li>
+    <li>Add email/in-app weekly scan summary.</li>
+    <li>Add affiliate/referral links only after programme verification and disclosure review.</li>
+    <li>Add push notifications after service worker/subscription storage is implemented.</li>
+    <li>Add manual location scan before passive/radius-sensitive alerts.</li>
+    <li>Add package notification rules after package/pricing terms are final.</li>
+  </ol>
+</section>
+
+<section class="page-break">
+  <h2>14. Database Schema Proposal</h2>
+  <p>The schema below is implementation guidance. It should be adapted to the final Supabase auth/data model and RLS policies.</p>
+  <pre>-- Opportunities
+create table opportunities (
+  id uuid primary key default gen_random_uuid(),
+  opportunity_code text unique not null,
+  title text not null,
+  description text not null,
+  category text not null,
+  opportunity_type text not null check (opportunity_type in ('official','safety','savings','partner','referral','package')),
+  journey_stage text,
+  audience text default 'student',
+  risk_level text default 'medium',
+  monetisation_type text default 'none',
+  partner_name text,
+  destination_url text,
+  tracking_url text,
+  is_affiliate boolean default false,
+  disclosure_text text,
+  cookie_consent_required boolean default false,
+  source_url text,
+  last_verified_at date,
+  next_review_at date,
+  trust_score int check (trust_score between 1 and 5),
+  user_value_score int check (user_value_score between 1 and 5),
+  revenue_score int check (revenue_score between 1 and 5),
+  status text default 'draft' check (status in ('draft','source_review','compliance_review','approved','live','paused','archived')),
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- Trigger rules
+create table opportunity_triggers (
+  id uuid primary key default gen_random_uuid(),
+  opportunity_id uuid references opportunities(id) on delete cascade,
+  trigger_type text not null check (trigger_type in ('stage','task','profile','location','budget','content','package')),
+  conditions_json jsonb not null default '{}',
+  radius_meters int,
+  city text,
+  university text,
+  priority int default 50,
+  status text default 'active'
+);
+
+-- User interactions
+create table user_opportunities (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null,
+  opportunity_id uuid references opportunities(id),
+  status text default 'shown' check (status in ('shown','saved','dismissed','completed','reported')),
+  reason_shown text,
+  shown_at timestamptz default now(),
+  clicked_at timestamptz,
+  dismissed_at timestamptz,
+  completed_at timestamptz
+);
+
+-- Consent and notification preferences
+create table notification_preferences (
+  user_id uuid primary key,
+  email_reminders boolean default false,
+  push_service boolean default false,
+  push_marketing boolean default false,
+  safety_alerts boolean default false,
+  opportunity_alerts boolean default false,
+  location_alerts boolean default false,
+  partner_offers boolean default false,
+  quiet_hours_start time,
+  quiet_hours_end time,
+  frequency_cap_json jsonb default '{}',
+  updated_at timestamptz default now()
+);
+
+-- Notification events
+create table notification_events (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null,
+  notification_type text not null,
+  opportunity_id uuid references opportunities(id),
+  package_id uuid,
+  channel text not null check (channel in ('in_app','email','push')),
+  title text not null,
+  body text not null,
+  consent_basis text,
+  sent_at timestamptz default now(),
+  opened_at timestamptz,
+  dismissed_at timestamptz
+);
+
+-- Packages
+create table packages (
+  id uuid primary key default gen_random_uuid(),
+  code text unique not null,
+  name text not null,
+  package_type text not null check (package_type in ('subscription','one_off','support_session','sponsored_access')),
+  price_gbp numeric(10,2),
+  billing_period text,
+  features_json jsonb default '[]',
+  limitations text,
+  terms_url text,
+  status text default 'draft'
+);
+
+-- Package prompt rules
+create table package_prompt_rules (
+  id uuid primary key default gen_random_uuid(),
+  package_id uuid references packages(id) on delete cascade,
+  trigger_conditions jsonb not null default '{}',
+  suppression_rules jsonb not null default '{}',
+  frequency_cap text default 'weekly',
+  priority int default 50,
+  status text default 'active'
+); </pre>
+</section>
+
+<section class="page-break">
+  <h2>15. API and Component Implementation Plan</h2>
+  <h3>Core API routes</h3>
+  <table><tr><th>Route</th><th>Purpose</th></tr>
+    <tr><td><code>GET /api/opportunities</code></td><td>Returns approved opportunities relevant to the current user.</td></tr>
+    <tr><td><code>POST /api/opportunities/:id/save</code></td><td>Saves an opportunity.</td></tr>
+    <tr><td><code>POST /api/opportunities/:id/dismiss</code></td><td>Dismisses an opportunity and records feedback.</td></tr>
+    <tr><td><code>GET /api/opportunities/content?slug=...</code></td><td>Returns approved opportunity blocks for a guidance article.</td></tr>
+    <tr><td><code>POST /api/notifications/subscribe</code></td><td>Stores web push subscription after user opt-in.</td></tr>
+    <tr><td><code>PATCH /api/notifications/preferences</code></td><td>Updates granular notification consent and frequency settings.</td></tr>
+    <tr><td><code>GET /api/packages</code></td><td>Returns visible packages and user eligibility.</td></tr>
+    <tr><td><code>GET /api/package-prompts</code></td><td>Returns value-triggered package prompts.</td></tr>
+  </table>
+  <h3>Opportunity engine pseudo-code</h3>
+  <pre>export function scoreOpportunity(user, opportunity, context) {
+  let score = 0;
+  score += opportunity.user_value_score * 6;       // 30 max
+  score += stageMatches(user.stage, opportunity) ? 20 : 0;
+  score += opportunity.trust_score * 4;           // 20 max
+  score += complianceWeight(opportunity);         // 15 max
+  score += opportunity.revenue_score * 2;         // 10 max
+  score += implementationEase(opportunity);       // 5 max
+
+  if (!hasRequiredConsent(user, opportunity, context.channel)) return null;
+  if (!isWithinFrequencyCap(user, opportunity, context.channel)) return null;
+  if (opportunity.status !== 'live' && opportunity.status !== 'approved') return null;
+  if (isSensitiveSuppressed(context)) return null;
+
+  return score;
+}
+
+export function getRecommendedOpportunities(user, context) {
+  return opportunities
+    .filter(o => triggerMatches(user, o, context))
+    .map(o => ({ opportunity: o, score: scoreOpportunity(user, o, context) }))
+    .filter(x => x.score !== null)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5);
+} </pre>
+  <h3>Component hierarchy</h3>
+  <pre>&lt;OpportunityFeed&gt;
+  &lt;OpportunityCard&gt;
+    &lt;OpportunityTypeBadge /&gt;
+    &lt;WhyShown /&gt;
+    &lt;Disclosure /&gt;
+    &lt;SaveDismissActions /&gt;
+  &lt;/OpportunityCard&gt;
+&lt;/OpportunityFeed&gt;
+
+&lt;ContentReferralBlock guideSlug="student-sim-esim-options" /&gt;
+
+&lt;PackagePromptCard trigger="urgent_tasks" package="beginly_plus" /&gt;
+
+&lt;ConsentCentre&gt;
+  &lt;NotificationPreferences /&gt;
+  &lt;LocationConsent /&gt;
+  &lt;PartnerOffersConsent /&gt;
+  &lt;AffiliateTrackingConsent /&gt;
+&lt;/ConsentCentre&gt; </pre>
+</section>
+
+<section class="page-break">
+  <h2>16. UX Copy, Notification and Disclosure Examples</h2>
+  <h3>Opportunity notifications</h3>
+  <table><tr><th>Context</th><th>Recommended wording</th></tr>
+    <tr><td>Weekly scan</td><td>Your Beginly Opportunity Scan is ready. Nia found 3 useful things to review this week.</td></tr>
+    <tr><td>Safety alert</td><td>Before paying a housing deposit, review warning signs and keep written evidence.</td></tr>
+    <tr><td>Transport</td><td>You may want to review student travel options before regular commuting.</td></tr>
+    <tr><td>SIM/mobile</td><td>First-week setup tip: compare coverage, contract length and cancellation terms before choosing a SIM.</td></tr>
+    <tr><td>Location-aware</td><td>You may be near your university area. Review your campus setup checklist.</td></tr>
+  </table>
+  <h3>Package notifications</h3>
+  <table><tr><th>Context</th><th>Recommended wording</th></tr>
+    <tr><td>Soft upgrade</td><td>Want extra help staying on track? Your free roadmap remains available. Beginly Plus adds weekly planning support and enhanced reminders.</td></tr>
+    <tr><td>Trial ending</td><td>Your Beginly Plus trial ends in 3 days. Review your package, renewal date and cancellation options in Settings.</td></tr>
+    <tr><td>Premium feature</td><td>This is a Plus feature. You can continue with your free roadmap or view packages.</td></tr>
+    <tr><td>Support package</td><td>Need guided support? Beginly support packages can help you organise next steps. We provide general settlement guidance only.</td></tr>
+    <tr><td>Geo-safe package path</td><td>Push notification: You may be near your university area. Review your campus setup checklist. In-app card: Extra guided setup support is available through Beginly packages.</td></tr>
+  </table>
+  <h3>Nia safe response pattern</h3>
+  <div class="card"><p><strong>User:</strong> Which bank should I choose?</p><p><strong>Nia:</strong> I cannot choose a financial product for you, but I can show general things students often compare: proof-of-address requirements, fees, app access, international transfers, branch access and provider terms. Some provider links may be partner links and will be clearly labelled. Always check official provider terms before applying.</p></div>
+</section>
+
+<section class="page-break">
+  <h2>17. Roadmap, Acceptance Criteria and Risks</h2>
+  <h3>Phased roadmap</h3>
+  <table><tr><th>Phase</th><th>Scope</th><th>Release rule</th></tr>
+    <tr><td>Phase 0 - Stabilisation</td><td>Fix auth/data/admin/Tailwind/Supabase issues already identified in Beginly v1.2 evaluation.</td><td>No monetised links yet.</td></tr>
+    <tr><td>Phase 1 - Non-commercial opportunity engine</td><td>Official, safety and savings opportunities only. In-app scanner and content blocks.</td><td>Can launch without affiliate tracking.</td></tr>
+    <tr><td>Phase 2 - Low-risk referrals</td><td>SIM/eSIM, transport, student discounts, budget tools.</td><td>Disclosure and consent centre must be live.</td></tr>
+    <tr><td>Phase 3 - Notifications</td><td>Email/in-app weekly scans, then PWA push with service worker and subscription storage.</td><td>Opt-in preferences, frequency caps and unsubscribe must work.</td></tr>
+    <tr><td>Phase 4 - Sensitive referrals</td><td>Banking, insurance, utilities, accommodation and money transfer.</td><td>Compliance review and safe wording required.</td></tr>
+    <tr><td>Phase 5 - Packages</td><td>Beginly Plus, support sessions, premium reminders, sponsored access.</td><td>Transparent price, billing, cancellation, free alternative and terms.</td></tr>
+    <tr><td>Phase 6 - Geo/radius intelligence</td><td>Manual near-me scan, then optional location-aware alerts.</td><td>Separate explicit location consent and clear controls.</td></tr>
+    <tr><td>Phase 7 - B2B intelligence</td><td>Anonymised partner insights: missed tasks, guide demand, support patterns, opportunity categories.</td><td>No identifiable user sharing without explicit opt-in and data terms.</td></tr>
+  </table>
+  <h3>Acceptance criteria</h3>
+  <ul class="checklist">
+    <li>Every live opportunity has a verified source/programme record and next review date.</li>
+    <li>Every referral/partner block has visible disclosure near the CTA.</li>
+    <li>Financial, insurance, housing and immigration-adjacent content avoids advice, guarantees and rankings.</li>
+    <li>Users can save, dismiss, hide category and understand why an opportunity was shown.</li>
+    <li>Marketing push/email notifications are not sent without separate opt-in.</li>
+    <li>Location-aware alerts are not enabled by default.</li>
+    <li>Package prompts always show free alternative, price/terms where relevant, and cancellation/renewal information.</li>
+    <li>Admin can pause an opportunity globally without code deployment.</li>
+    <li>Analytics distinguish helpful engagement from aggressive conversion chasing.</li>
+    <li>High-risk categories require compliance review before publication.</li>
+  </ul>
+  <h3>Risk register summary</h3>
+  <table><tr><th>Risk</th><th>Impact</th><th>Control</th></tr>
+    <tr><td>Beginly feels like an affiliate site.</td><td>Loss of trust.</td><td>Rank by user value first; mix official/safety with partner options; disclose clearly.</td></tr>
+    <tr><td>Financial/insurance promotion risk.</td><td>Regulatory and reputational exposure.</td><td>Neutral comparison language, official sources, compliance review.</td></tr>
+    <tr><td>Notification fatigue.</td><td>Uninstalls, opt-outs, lower trust.</td><td>Frequency caps, quiet hours, user controls.</td></tr>
+    <tr><td>Location feels creepy.</td><td>Privacy concern.</td><td>Manual near-me first, explicit opt-in, clear why shown.</td></tr>
+    <tr><td>Outdated partner/source claims.</td><td>User harm and credibility loss.</td><td>Review dates, pause status, source register.</td></tr>
+    <tr><td>Package prompts become pushy.</td><td>Brand damage.</td><td>Value-triggered prompts, free alternative, suppression in crisis/safety flows.</td></tr>
+  </table>
+</section>
+
+<section class="page-break">
+  <h2>18. References</h2>
+  <p class="ref">1. ASA/CAP, "Get yourself affiliated with the rules on affiliate marketing", 10 October 2024. https://www.asa.org.uk/news/get-yourself-affiliated-with-the-rules-on-affiliate-marketing.html</p>
+  <p class="ref">2. ASA/CAP, "Online Affiliate Marketing", 22 March 2023. https://www.asa.org.uk/advice-online/affiliate-marketing.html</p>
+  <p class="ref">3. ICO, "Cookies and similar technologies". https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guide-to-pecr/cookies-and-similar-technologies/</p>
+  <p class="ref">4. ICO, "Guidance on the use of storage and access technologies", 20 December 2024. https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guidance-on-the-use-of-storage-and-access-technologies/</p>
+  <p class="ref">5. ICO, "What are PECR?" https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guide-to-pecr/what-are-pecr/</p>
+  <p class="ref">6. MDN Web Docs, "Push API", updated 28 May 2025. https://developer.mozilla.org/en-US/docs/Web/API/Push_API</p>
+  <p class="ref">7. MDN Web Docs, "PushSubscription", updated 30 October 2025. https://developer.mozilla.org/en-US/docs/Web/API/PushSubscription</p>
+  <p class="ref">8. Google Play Console Help, "Subscriptions", subscription transparency requirements. https://support.google.com/googleplay/android-developer/answer/9900533</p>
+  <p class="ref">9. Google Play Help, "Cancel, pause, or change a subscription on Google Play". https://support.google.com/googleplay/answer/7018481</p>
+  <p class="ref">10. Internal source: NewStart UK Documentation Pack v1.2 and Delivery Note - MVP scope, compliance boundary, privacy boundary, Nia role, design direction and trust-before-growth rules.</p>
+  <p class="ref">11. Internal source: NewStartUK_Referral_Opportunities_Complete.xlsx - seven-sheet referral opportunity workbook.</p>
+  <p class="ref">12. Internal source: Beginly-main.zip - current Beginly app codebase inspection, including routes, components, seed data, Nia, notification permission surfaces and Supabase draft schema.</p>
+</section>
+</body></html>

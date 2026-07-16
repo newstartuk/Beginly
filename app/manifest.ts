@@ -1,0 +1,1 @@
+import type { MetadataRoute } from "next";export default function manifest():MetadataRoute.Manifest{return{name:"Beginly",short_name:"Beginly",description:"Adaptive UK transition and opportunity operating system",start_url:"/platform",display:"standalone",background_color:"#F7FAFC",theme_color:"#0B7285",icons:[{src:"/favicon.svg",sizes:"any",type:"image/svg+xml"}]}}

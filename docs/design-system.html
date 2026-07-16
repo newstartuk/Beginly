@@ -1,0 +1,211 @@
+<title>Beginly — Design System Reference</title>
+<style>
+  :root {
+    --bg: #F7FAFB; --surface: #FFFFFF; --surface-2: #EFF4F7;
+    --border: #E2E8F0; --border-strong: #CBD5E1;
+    --text-primary: #0D2036; --text-secondary: #4B5D71; --text-muted: #8092A3;
+    --teal: #0E7A78; --teal-bg: #E8F4F3;
+    --aqua: #1F8FB0; --aqua-bg: #E7F5FA;
+    --gold: #B97700; --gold-bg: #FBF1DD;
+    --coral: #C43F3A; --coral-bg: #FBEAEA;
+    --violet: #6B4FD6; --violet-bg: #F1EDFB;
+    --slate: #64748B; --slate-bg: #F1F5F9;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(13,32,54,.04), 0 8px 24px -12px rgba(13,32,54,.10);
+    --mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+  :root[data-theme="dark"] {
+    --bg: #07182E; --surface: #0D2036; --surface-2: #10233F;
+    --border: rgba(255,255,255,.10); --border-strong: rgba(255,255,255,.18);
+    --text-primary: #F4F8FA; --text-secondary: #B8CAD8; --text-muted: #7E93A5;
+    --teal: #4DD4CE; --teal-bg: rgba(77,212,206,.12);
+    --aqua: #6FCBEA; --aqua-bg: rgba(111,203,234,.12);
+    --gold: #E8B95D; --gold-bg: rgba(232,185,93,.14);
+    --coral: #E8817C; --coral-bg: rgba(232,129,124,.14);
+    --violet: #B7A6F2; --violet-bg: rgba(183,166,242,.14);
+    --slate: #9AACBC; --slate-bg: rgba(154,172,188,.12);
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #07182E; --surface: #0D2036; --surface-2: #10233F;
+      --border: rgba(255,255,255,.10); --border-strong: rgba(255,255,255,.18);
+      --text-primary: #F4F8FA; --text-secondary: #B8CAD8; --text-muted: #7E93A5;
+      --teal: #4DD4CE; --teal-bg: rgba(77,212,206,.12);
+      --aqua: #6FCBEA; --aqua-bg: rgba(111,203,234,.12);
+      --gold: #E8B95D; --gold-bg: rgba(232,185,93,.14);
+      --coral: #E8817C; --coral-bg: rgba(232,129,124,.14);
+      --violet: #B7A6F2; --violet-bg: rgba(183,166,242,.14);
+      --slate: #9AACBC; --slate-bg: rgba(154,172,188,.12);
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text-primary);
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+  .eyebrow { display: inline-flex; align-items: center; gap: .5rem; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--teal); margin-bottom: .9rem; }
+  .eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
+  h1 { font-size: clamp(26px,4vw,34px); font-weight: 800; letter-spacing: -.02em; line-height: 1.15; margin: 0 0 .6rem; text-wrap: balance; }
+  .lede { font-size: 16px; color: var(--text-secondary); max-width: 66ch; margin: 0 0 2.5rem; }
+  h2.section { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  h2.section:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+  h3 { font-size: 15px; font-weight: 750; margin: 0 0 .6rem; letter-spacing: -.01em; }
+  p { color: var(--text-secondary); margin: 0 0 .8rem; }
+  code { background: var(--surface-2); padding: 1px 6px; border-radius: 5px; font-size: 12.5px; font-family: var(--mono); color: var(--text-primary); }
+
+  /* status banner */
+  .canonical-note { display: flex; gap: .8rem; padding: 1rem 1.2rem; border-radius: var(--radius); background: var(--gold-bg); border: 1px solid color-mix(in srgb, var(--gold) 35%, var(--border)); margin-bottom: 2rem; font-size: 13.5px; }
+  .canonical-note b { color: var(--text-primary); }
+
+  /* swatches */
+  .swatch-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: .8rem; margin-bottom: 1rem; }
+  .swatch { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+  .swatch .fill { height: 64px; }
+  .swatch .info { padding: .6rem .7rem; background: var(--surface); }
+  .swatch .name { font-size: 12px; font-weight: 700; }
+  .swatch .hex { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+
+  /* type specimen */
+  .specimen { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem 1.7rem; box-shadow: var(--shadow); margin-bottom: 1rem; }
+  .specimen .display { font-size: 30px; font-weight: 800; letter-spacing: -.02em; margin-bottom: .3rem; }
+  .specimen .body-sample { font-size: 15px; color: var(--text-secondary); max-width: 60ch; }
+  .specimen .label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-bottom: .5rem; font-weight: 700; }
+
+  /* logo mark rendering */
+  .logo-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin: 1rem 0; }
+  .logo-icon { width: 52px; height: 52px; border-radius: 14px; background: #0D2036; position: relative; }
+  .logo-icon svg { position: absolute; inset: 0; }
+
+  /* component samples */
+  .comp-row { display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; margin: .8rem 0 1.2rem; }
+  .btn-demo { display: inline-flex; align-items: center; gap: .4rem; padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 700; border: none; cursor: default; }
+  .btn-demo.primary { background: #0E7A78; color: white; }
+  .btn-demo.ghost { background: transparent; border: 1px solid var(--border-strong); color: var(--text-primary); }
+  .card-demo { border: 1px solid var(--border); border-radius: 16px; padding: 1.2rem; background: var(--surface); box-shadow: var(--shadow); max-width: 260px; }
+  .card-demo .icon-box { width: 40px; height: 40px; border-radius: 12px; background: var(--teal-bg); display: flex; align-items: center; justify-content: center; margin-bottom: .7rem; color: var(--teal); font-weight: 800; }
+  .card-demo h4 { font-size: 13px; margin: 0 0 .3rem; }
+  .card-demo p { font-size: 11.5px; margin: 0; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); padding: 8px 10px; border-bottom: 1px solid var(--border-strong); }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+
+  .status-pill { display: inline-flex; align-items: center; gap: .3rem; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .status-pill.canon { background: var(--teal-bg); color: var(--teal); }
+  .status-pill.legacy { background: var(--slate-bg); color: var(--slate); }
+
+  .archetype-row { display: flex; gap: .8rem; margin: .8rem 0; }
+  .archetype { flex: 1; border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; background: var(--surface); }
+  .archetype .tag { font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: var(--violet); letter-spacing: .05em; margin-bottom: .4rem; }
+  .archetype p { font-size: 12.5px; margin: 0; }
+
+  .motion-row { display: flex; gap: .6rem; flex-wrap: wrap; margin: .6rem 0 1rem; }
+  .motion-chip { background: var(--surface-2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-family: var(--mono); color: var(--text-secondary); }
+
+  footer { margin-top: 3rem; font-size: 11.5px; color: var(--text-muted); text-align: center; }
+</style>
+
+<div class="wrap">
+
+  <div class="eyebrow">Design system reference</div>
+  <h1>Beginly — design system reference</h1>
+  <p class="lede">The canonical, currently-implemented system — pulled directly from <code>globals.css</code> and the components built this session, not aspirational. Pairs with the architecture reference.</p>
+
+  <div class="canonical-note">
+    <span>⚠</span>
+    <span><b>Two systems currently coexist in <code>globals.css</code>.</b> The tokens and components below are canonical — used by the landing page, login/signup, and all checklist-era pages. A second, ~48KB hardcoded-hex CSS block (<code>.platform-*</code>, <code>.journey-*</code>, <code>.public-*</code> …) was ported wholesale from the v1.3 merge to make the new platform pages render, and has <b>not</b> been reconciled against these tokens yet — that reconciliation is Roadmap Phase 2, not done here.</span>
+  </div>
+
+  <h2 class="section">Brand identity</h2>
+  <p>Archetype: <b>Caregiver</b> (primary) + <b>Sage</b> (secondary) — protective and warm, backed by cited sources and plain-English trust, not triumphalist or magical.</p>
+  <div class="archetype-row">
+    <div class="archetype"><div class="tag">Caregiver</div><p>Service-first, protective. Scam alerts prominent, never fear-mongering. "We're with you."</p></div>
+    <div class="archetype"><div class="tag">Sage</div><p>Credibility register. Cited sources, plain-English decoding, AI clearly labelled.</p></div>
+  </div>
+  <p><b>Positioning:</b> "Beginly turns overwhelming, scattered settlement information into a single, personalised 90-day plan — tailored to your city, situation and arrival date, telling you plainly what to avoid."</p>
+
+  <h3 style="margin-top:1.5rem;">Logo — Stepping Stones</h3>
+  <p>Four dots growing in size, muted grey through teal to gold, connected by a rising line — the last stone haloed as "current." Chosen over five other concepts specifically because it survives scaling to favicon size unmodified (no curves to blur) and echoes the app's own stage-tracker UI.</p>
+  <div class="logo-row">
+    <div class="logo-icon">
+      <svg viewBox="0 0 140 140" width="52" height="52">
+        <line x1="26" y1="115" x2="56" y2="93" stroke="#AAB8C8" stroke-width="4"/>
+        <line x1="56" y1="93" x2="86" y2="68" stroke="#5DCAA5" stroke-width="4"/>
+        <line x1="86" y1="68" x2="117" y2="37" stroke="#46C8F1" stroke-width="4"/>
+        <circle cx="26" cy="115" r="8" fill="#AAB8C8"/>
+        <circle cx="56" cy="93" r="10" fill="#5DCAA5"/>
+        <circle cx="86" cy="68" r="11" fill="#46C8F1"/>
+        <circle cx="117" cy="37" r="20" fill="none" stroke="#E8B95D" stroke-width="4"/>
+        <circle cx="117" cy="37" r="13" fill="#E8B95D"/>
+      </svg>
+    </div>
+    <div style="font-size:12.5px;color:var(--text-secondary);max-width:40ch;">
+      <code>components/Logo.tsx</code> — props: <code>size</code> (px, default 36), <code>animated</code> (one-time entrance sequence, respects <code>prefers-reduced-motion</code>), <code>className</code>.
+    </div>
+  </div>
+
+  <h2 class="section">Color</h2>
+  <p>Hybrid palette — evidence-matched via design-system search to the "Accessible &amp; Ethical" archetype (government/civic/trust category), not guessed.</p>
+  <div class="swatch-grid">
+    <div class="swatch"><div class="fill" style="background:#0D2036;"></div><div class="info"><div class="name">Navy</div><div class="hex">#0D2036</div></div></div>
+    <div class="swatch"><div class="fill" style="background:#0E7A78;"></div><div class="info"><div class="name">Teal</div><div class="hex">#0E7A78</div></div></div>
+    <div class="swatch"><div class="fill" style="background:#46C8F1;"></div><div class="info"><div class="name">Aqua</div><div class="hex">#46C8F1</div></div></div>
+    <div class="swatch"><div class="fill" style="background:#E8B95D;"></div><div class="info"><div class="name">Gold</div><div class="hex">#E8B95D</div></div></div>
+    <div class="swatch"><div class="fill" style="background:#7764FF;"></div><div class="info"><div class="name">Violet</div><div class="hex">#7764FF</div></div></div>
+    <div class="swatch"><div class="fill" style="background:#1FA36A;"></div><div class="info"><div class="name">Green</div><div class="hex">#1FA36A</div></div></div>
+    <div class="swatch"><div class="fill" style="background:#64748B;"></div><div class="info"><div class="name">Muted</div><div class="hex">#64748B</div></div></div>
+    <div class="swatch"><div class="fill" style="background:#F8FAFC;border-bottom:1px solid #E2E8F0;"></div><div class="info"><div class="name">Mist bg</div><div class="hex">#F8FAFC</div></div></div>
+  </div>
+  <p style="font-size:12.5px;">Usage: navy for headings/trust anchors, teal for primary actions, gold reserved for progress/premium signals (the readiness score, the "current" stage), aqua for informational accents. Never convey status by colour alone — every colour pairs with an icon or label.</p>
+
+  <h2 class="section">Typography</h2>
+  <div class="specimen">
+    <div class="label">Display — Lexend, weight 700</div>
+    <div class="display">Your UK settlement journey, sorted into one plan.</div>
+    <div class="label" style="margin-top:1rem;">Body — Inter, weight 400</div>
+    <div class="body-sample">Beginly gives you a personalised 90-day checklist, plain-English guidance, and scam alerts — all built around your arrival. Chosen for this pairing because Lexend was the top match for government/healthcare/finance/accessibility-focused products; Inter stays for body copy since it was already the working font and is functionally interchangeable with the evidence-matched Source Sans pairing.</div>
+  </div>
+
+  <h2 class="section">Motion principles</h2>
+  <p>Restraint is the brand signal, not an afterthought — the matched "Accessible &amp; Ethical" archetype explicitly lists decorative motion as an anti-pattern. Functional motion (feedback, entrance, progress) is on-brand; ambient/looping/parallax motion is not.</p>
+  <div class="motion-row">
+    <div class="motion-chip">fast: 140ms</div>
+    <div class="motion-chip">base: 220ms</div>
+    <div class="motion-chip">slow: 420ms</div>
+    <div class="motion-chip">ease: cubic-bezier(.16, .8, .3, 1)</div>
+  </div>
+  <p style="font-size:12.5px;">Applied: hero entrance stagger (0.12s per element), the self-playing roadmap card (2-state loop, functional not decorative — demonstrates the product rather than decorating the page), scroll reveals (once per element, 20–30% viewport threshold). Everything respects <code>prefers-reduced-motion</code> by disabling animation and showing the final state immediately.</p>
+
+  <h2 class="section">Components</h2>
+  <h3>Buttons</h3>
+  <div class="comp-row">
+    <button class="btn-demo primary">Create your roadmap →</button>
+    <button class="btn-demo ghost">Browse guidance articles</button>
+  </div>
+  <p style="font-size:12.5px;">Classes: <code>.btn-primary</code>, <code>.btn-ghost</code>, <code>.btn-amber</code>, <code>.btn-danger</code> — all defined in <code>globals.css</code> §6.</p>
+
+  <h3 style="margin-top:1.2rem;">Cards</h3>
+  <div class="comp-row">
+    <div class="card-demo">
+      <div class="icon-box">→</div>
+      <h4>Your Personal 90-Day Roadmap</h4>
+      <p>A checklist built around your arrival date, city, and situation.</p>
+    </div>
+  </div>
+  <p style="font-size:12.5px;">Classes: <code>.card</code>, <code>.card-hover</code>, <code>.feature-card</code> (with gradient top-border reveal on hover) — <code>globals.css</code> §5 &amp; §18.</p>
+
+  <h2 class="section">Token / component status</h2>
+  <table>
+    <tr><th>System</th><th>Status</th><th>Used by</th></tr>
+    <tr><td><code>:root</code> hybrid tokens, <code>.btn-*</code>, <code>.card</code>, <code>.feature-card</code>, <code>.logo-mark</code></td><td><span class="status-pill canon">Canonical</span></td><td>Landing, login, signup, all 16 checklist-era pages</td></tr>
+    <tr><td><code>.platform-*</code>, <code>.journey-*</code>, <code>.household-*</code>, <code>.public-*</code>, <code>.onboarding-*</code> (ported, hardcoded hex)</td><td><span class="status-pill legacy">Unreconciled</span></td><td>All 17 platform-era pages</td></tr>
+  </table>
+
+  <footer>Beginly · design system reference · reflects <code>globals.css</code> as of 2026-07-13</footer>
+
+</div>
