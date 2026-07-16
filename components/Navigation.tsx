@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { clearUser } from "@/lib/utils";
+import { clearUser, getUser } from "@/lib/utils";
+import { isClientDemoMode } from "@/lib/platform/runtime";
 import {
   LayoutDashboard,
   CheckSquare,
@@ -62,6 +63,21 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
   const [collapsed, setCollapsedState] = useState(true);
 
   useEffect(() => {
+    if (isClientDemoMode()) {
+      const stored = getUser();
+      if (stored) {
+        setSession({
+          user: {
+            id: stored.id,
+            email: stored.email,
+            user_metadata: { name: stored.name },
+          },
+        });
+      }
+      setCollapsedState(getCollapsedKey(true));
+      return;
+    }
+
     // Read the session from local storage (instant, no network round-trip).
     supabase.auth.getSession().then(({ data }) => setSession({ user: data.session?.user ?? null }));
 
