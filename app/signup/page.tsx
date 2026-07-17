@@ -62,8 +62,6 @@ export default function SignupPage() {
         return;
       }
 
-      // With email confirmation ON, Supabase usually returns a user but no active session.
-      // In that case we must not fake an auth cookie or redirect into protected pages.
       if (!data.session) {
         setSuccessEmail(normalisedEmail);
         setLoading(false);

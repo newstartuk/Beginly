@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -18,7 +19,7 @@ const capabilities = [
   { icon: Route, title: "A journey that keeps evolving", text: "Beginly connects what matters now with the next transition—settlement, study, work, family and progression." },
   { icon: BriefcaseBusiness, title: "Opportunities with reasons", text: "Jobs, training, events and services are matched by fit, trust, readiness and timing—not hidden commercial pressure." },
   { icon: Sparkles, title: "Nia, your adaptive navigator", text: "Nia checks free, owned, household, sponsored and reward-funded access before suggesting anything paid." },
-  { icon: Users, title: "One household, private workspaces", text: "Coordinate shared family actions while preserving each adult member’s private career, notes and product work." },
+  { icon: Users, title: "One household, private workspaces", text: "Coordinate shared family actions while preserving each adult member's private career, notes and product work." },
   { icon: Network, title: "Flexible products, not forced tiers", text: "Use the Free OS, add a focused standalone tool, combine products or activate institution-sponsored access." },
   { icon: Building2, title: "Partner and commission infrastructure", text: "Verified businesses can structure offers, attribution, conversions and reconciliation without compromising user fit." },
 ];
@@ -27,7 +28,10 @@ export default function LandingPageClient() {
   return (
     <main className="public-site">
       <header className="public-nav">
-        <Link href="/" className="public-brand" aria-label="Beginly home"><span>B</span><div><strong>Beginly</strong><small>Living Path OS</small></div></Link>
+        <Link href="/" className="public-brand" aria-label="Beginly home">
+          <Logo size={36} className="rounded-xl" />
+          <div><strong>Beginly</strong><small>Living Path OS</small></div>
+        </Link>
         <nav aria-label="Public navigation"><a href="#platform">Platform</a><Link href="/guides">Guides</Link><Link href="/cities">Cities</Link><Link href="/opportunity-categories">Opportunities</Link><Link href="/products">Products</Link><Link href="/partners/commission-readiness">For business</Link></nav>
         <div className="public-nav-actions"><Link href="/login" className="public-link">Sign in</Link><Link href="/signup" className="public-button">Start free <ArrowRight size={16}/></Link></div>
       </header>
@@ -59,7 +63,14 @@ export default function LandingPageClient() {
 
       <section className="public-cta"><div><span>Beginly Free OS</span><h2>Build the path you need now—and keep it when life changes.</h2><p>Explore the coded multi-route platform, adaptive journey, opportunities, Nia, household access and flexible products.</p></div><div><Link href="/signup" className="public-button light-button">Create my account <ArrowRight size={17}/></Link><Link href="/platform" className="public-ghost light-ghost">Open demo platform</Link></div></section>
 
-      <footer className="public-footer"><div className="public-brand inverse"><span>B</span><div><strong>Beginly</strong><small>Adaptive UK transition and opportunity OS</small></div></div><p>General information and organisational support—not personal legal, immigration, medical or financial advice.</p><nav><Link href="/guides">Guides</Link><Link href="/cities">Cities</Link><Link href="/opportunity-categories">Opportunities</Link><Link href="/privacy-policy">Privacy</Link><Link href="/terms-of-service">Terms</Link><Link href="/support">Support</Link></nav></footer>
+      <footer className="public-footer">
+        <div className="public-brand inverse">
+          <Logo size={32} className="rounded-xl" />
+          <div><strong>Beginly</strong><small>Adaptive UK transition and opportunity OS</small></div>
+        </div>
+        <p>General information and organisational support—not personal legal, immigration, medical or financial advice.</p>
+        <nav><Link href="/guides">Guides</Link><Link href="/cities">Cities</Link><Link href="/opportunity-categories">Opportunities</Link><Link href="/privacy-policy">Privacy</Link><Link href="/terms-of-service">Terms</Link><Link href="/support">Support</Link></nav>
+      </footer>
     </main>
   );
 }

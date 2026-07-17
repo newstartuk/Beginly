@@ -51,3 +51,5 @@ next-env.d.ts
 .tmp-pluginutils/
 .tmp-rolldown-binding/
 *.tgz
+
+.vercel
