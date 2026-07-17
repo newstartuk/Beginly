@@ -11,6 +11,11 @@ type DbArrivalProfile = {
   nationality?: string | null;
   english_level?: string | null;
   work_interest?: boolean | string | null;
+  drives_from_origin?: boolean | null;
+  has_idl?: boolean | null;
+  has_dependants?: boolean | null;
+  sector?: string | null;
+  employer_name?: string | null;
 };
 
 export function dbProfileToArrivalProfile(row: DbArrivalProfile): ArrivalProfile {
@@ -25,24 +30,52 @@ export function dbProfileToArrivalProfile(row: DbArrivalProfile): ArrivalProfile
     englishLevel: (row.english_level as ArrivalProfile["englishLevel"]) ?? undefined,
     interestedInWork: row.work_interest === true || row.work_interest === "true",
     profileCompleted: true,
+    drivesFromOrigin: row.drives_from_origin ?? undefined,
+    hasIDL: row.has_idl ?? undefined,
+    hasDependants: row.has_dependants ?? undefined,
+    sector: row.sector ?? undefined,
+    employerName: row.employer_name ?? undefined,
   };
+}
+
+function routeMatches(task: Task, profile: ArrivalProfile): boolean {
+  if (!task.routes || task.routes === "all") return true;
+  return (task.routes as string[]).includes(profile.arrivalType);
 }
 
 function conditionMatches(task: Task, profile: ArrivalProfile): boolean {
   const condition = task.conditional?.toLowerCase() ?? "";
-  const accommodation = profile.accommodationType;
-
   if (!condition) return true;
 
-  if (condition.includes("renting privately")) {
-    return accommodation === "private_rental";
+  const accommodation = profile.accommodationType;
+
+  // Council tax: only private rental or own home
+  if (condition.includes("renting privately") || condition.includes("own a home") || condition.includes("private rental or own")) {
+    return accommodation === "private_rental" || accommodation === "own_home";
   }
 
   if (condition.includes("deposit")) {
     return accommodation === "private_rental";
   }
 
-  if (condition.includes("work")) {
+  // Driving licence exchange
+  if (condition.includes("drive from") || condition.includes("drives from")) {
+    return profile.drivesFromOrigin === true;
+  }
+
+  // International driving licence
+  if (condition.includes("international driving licence") || condition.includes("idl")) {
+    return profile.hasIDL === true;
+  }
+
+  // Dependants / children
+  if (condition.includes("dependant") || condition.includes("children")) {
+    // If hasDependants is undefined (old data), show the task — let user decide
+    return profile.hasDependants !== false;
+  }
+
+  // Work interest
+  if (condition.includes("work") && !condition.includes("right to work")) {
     return Boolean(profile.interestedInWork);
   }
 
@@ -52,6 +85,7 @@ function conditionMatches(task: Task, profile: ArrivalProfile): boolean {
 export function generateTasksForProfile(profile: ArrivalProfile, seedTasks: Task[] = SEED_TASKS): UserTask[] {
   return seedTasks
     .filter((task) => task.active)
+    .filter((task) => routeMatches(task, profile))
     .filter((task) => conditionMatches(task, profile))
     .map((task) => ({ taskId: task.taskId, status: "not_started" as const }));
 }

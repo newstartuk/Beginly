@@ -27,13 +27,13 @@ const STAGE_LABELS: Record<string, string> = {
 };
 
 const STAGE_SUMMARIES: Record<string, string> = {
-  PRE: "Prepare your documents, housing, travel and university setup before you fly.",
-  D1: "Handle arrival-day essentials so you feel safe, connected and properly checked in.",
-  D7: "Set up banking, healthcare, transport and your university routine in the first week.",
-  D30: "Stabilise money, admin, work rights and your student systems in the first month.",
+  PRE: "Prepare your documents, eVisa, accommodation, and travel essentials before you fly.",
+  D1: "Handle arrival-day essentials so you feel safe, connected, and properly checked in.",
+  D7: "Register with a GP, apply for your NI number, and open a bank account in your first week.",
+  D30: "Sort council tax, your driving licence exchange, and work admin in your first month.",
   D90_A: "Strengthen your routines and fix weak spots between day 31 and day 60.",
-  D90_B: "Use day 61 to day 90 to move from survival into confidence and momentum.",
-  GROW: "Keep progressing once your first settlement foundation is in place.",
+  D90_B: "Use day 61 to day 90 to move from survival mode into confidence and momentum.",
+  GROW: "Plan your long-term path — ILR, career progression, and permanent settlement.",
 };
 
 const D90_TASK_IDS = SEED_TASKS.filter((task) => task.stage === "D90").map((task) => task.taskId);
@@ -81,6 +81,14 @@ export default function ChecklistContent() {
         .from("user_tasks")
         .select("task_id,status,completed_at")
         .eq("user_id", user.id);
+
+      // If all stored tasks are from the old student schema (STU_ prefix) and no longer
+      // in SEED_TASKS, clear them so the profile-based regeneration below can run.
+      const validTaskIds = new Set(SEED_TASKS.map((task) => task.taskId));
+      if (taskData?.length && !taskData.some((t) => validTaskIds.has(t.task_id))) {
+        await supabase.from("user_tasks").delete().eq("user_id", user.id);
+        taskData = [];
+      }
 
       if (!taskData?.length) {
         const { data: profileRow } = await supabase
@@ -160,8 +168,8 @@ export default function ChecklistContent() {
 
   if (loading) return <ChecklistSkeleton />;
 
-  const validTaskIds = new Set(SEED_TASKS.map((task) => task.taskId));
-  const visibleTasks = tasks.filter((task) => validTaskIds.has(task.taskId));
+  const knownTaskIds = new Set(SEED_TASKS.map((task) => task.taskId));
+  const visibleTasks = tasks.filter((task) => knownTaskIds.has(task.taskId));
   const filteredTasks = visibleTasks.filter((task) => {
     if (filter === "pending") return task.status !== "complete";
     if (filter === "complete") return task.status === "complete";

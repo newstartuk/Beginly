@@ -12,7 +12,9 @@ export interface User {
 export type ArrivalStatus = "not_arrived" | "arriving_soon" | "arrived";
 export type AccommodationType =
   | "private_rental"
+  | "own_home"
   | "university_accommodation"
+  | "employer_provided"
   | "homestay"
   | "family_friend"
   | "temporary"
@@ -25,12 +27,13 @@ export type ArrivalType =
   | "family_visa"
   | "graduate"
   | "global_talent"
-  | "health_and_care";
+  | "health_and_care"
+  | "founder";
 
 export interface ArrivalProfile {
   arrivalType: ArrivalType;
   arrivalStatus: ArrivalStatus;
-  arrivalDate: string; // ISO date string
+  arrivalDate: string;
   city: string;
   university: string;
   accommodationType: AccommodationType;
@@ -38,6 +41,11 @@ export interface ArrivalProfile {
   englishLevel?: EnglishLevel;
   interestedInWork: boolean;
   profileCompleted: boolean;
+  drivesFromOrigin?: boolean;
+  hasIDL?: boolean;
+  hasDependants?: boolean;
+  sector?: string;
+  employerName?: string;
 }
 
 // ===== Checklist Tasks =====
@@ -91,6 +99,7 @@ export interface Task {
   whyItMatters: string;
   sourceSignpost?: string;
   officialLinks?: ResourceLink[];
+  routes?: ArrivalType[] | "all"; // which routes this task applies to; omit = "all"
   conditional?: string; // e.g. "Only if renting privately"
   // v1.2 new fields
   dependencies?: string[];          // taskIds that should be complete first
