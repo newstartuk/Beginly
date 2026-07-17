@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import Logo from "@/components/Logo";
 
 export const metadata: Metadata = {
   title: "Terms of Service — Beginly",
@@ -17,9 +18,7 @@ export default function TermsOfServicePage() {
       <header className="border-b bg-white sticky top-0 z-50">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">B</span>
-            </div>
+            <Logo size={32} className="rounded-lg" />
             <span className="font-bold text-navy">Beginly</span>
           </Link>
           <Link href="/guides" className="text-sm text-muted hover:text-primary transition-colors">

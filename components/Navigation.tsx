@@ -28,7 +28,7 @@ import Logo from "./Logo";
 const NAV_ITEMS = [
   { href: "/journey",           label: "Journey",          icon: Compass },
   { href: "/platform",          label: "Today",            icon: LayoutDashboard },
-  { href: "/dashboard",         label: "Dashboard Ref",    icon: LayoutDashboard },
+  { href: "/dashboard",         label: "Dashboard",        icon: LayoutDashboard },
   { href: "/checklist",         label: "Task Library",     icon: CheckSquare },
   { href: "/budget",            label: "Budget Planner",   icon: TrendingUp },
   { href: "/guides",            label: "Guidance",        icon: BookOpen },
@@ -65,15 +65,13 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     if (isClientDemoMode()) {
       const stored = getUser();
-      if (stored) {
-        setSession({
-          user: {
-            id: stored.id,
-            email: stored.email,
-            user_metadata: { name: stored.name },
-          },
-        });
-      }
+      setSession({
+        user: {
+          id: stored?.id ?? "demo-user",
+          email: stored?.email ?? "demo@beginly.app",
+          user_metadata: { name: stored?.name ?? "Demo User" },
+        },
+      });
       setCollapsedState(getCollapsedKey(true));
       return;
     }
