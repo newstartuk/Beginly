@@ -43,6 +43,7 @@ export interface ArrivalProfile {
   profileCompleted: boolean;
   drivesFromOrigin?: boolean;
   hasIDL?: boolean;
+  wantsProvisionalLicence?: boolean;
   hasDependants?: boolean;
   sector?: string;
   employerName?: string;

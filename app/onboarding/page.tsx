@@ -17,6 +17,7 @@ import {
   Users,
   Briefcase,
   Building2,
+  Target,
 } from "lucide-react";
 
 const CITIES = [
@@ -109,15 +110,16 @@ const UK_SECTORS = [
 type OnboardingProfile = Partial<ArrivalProfile>;
 
 const STEPS = [
-  { label: "Route", icon: User },
-  { label: "Status", icon: Calendar },
-  { label: "Location", icon: MapPin },
-  { label: "Housing", icon: Home },
-  { label: "Driving", icon: Car },
-  { label: "Dependants", icon: Users },
-  { label: "Sector", icon: Briefcase },
-  { label: "Employer", icon: Building2 },
-  { label: "Done", icon: CheckCircle },
+  { label: "Route", icon: User },       // 0
+  { label: "Status", icon: Calendar },   // 1
+  { label: "Location", icon: MapPin },   // 2
+  { label: "Housing", icon: Home },      // 3
+  { label: "Driving", icon: Car },       // 4
+  { label: "Dependants", icon: Users },  // 5
+  { label: "Focus", icon: Target },      // 6 — family_visa only; others skip
+  { label: "Sector", icon: Briefcase },  // 7 — skipped for family_visa non-workers
+  { label: "Employer", icon: Building2 },// 8
+  { label: "Done", icon: CheckCircle },  // 9
 ];
 
 const STORAGE_KEY = "beginly_onboarding_v2";
@@ -145,6 +147,23 @@ function isStudent(profile: OnboardingProfile) {
 
 function isFounder(profile: OnboardingProfile) {
   return profile.arrivalType === "founder";
+}
+
+function isFamilyVisa(profile: OnboardingProfile) {
+  return profile.arrivalType === "family_visa";
+}
+
+// Smart navigation — skips step 6 (Focus) for non-FAM, skips step 7 (Sector) for FAM non-workers
+function getNextStep(s: number, profile: OnboardingProfile, totalSteps: number): number {
+  if (s === 5) return isFamilyVisa(profile) ? 6 : 7;
+  if (s === 6) return profile.interestedInWork ? 7 : 8;
+  return Math.min(s + 1, totalSteps - 1);
+}
+
+function getPrevStep(s: number, profile: OnboardingProfile): number {
+  if (s === 7) return isFamilyVisa(profile) ? 6 : 5;
+  if (s === 8 && isFamilyVisa(profile) && !profile.interestedInWork) return 6;
+  return Math.max(s - 1, 0);
 }
 
 export default function OnboardingPage() {
@@ -191,8 +210,8 @@ export default function OnboardingPage() {
     setProfile((p) => ({ ...p, [key]: value }));
 
   const totalSteps = STEPS.length;
-  const next = () => setStep((s) => Math.min(s + 1, totalSteps - 1));
-  const back = () => setStep((s) => Math.max(s - 1, 0));
+  const next = () => setStep((s) => getNextStep(s, profile, totalSteps));
+  const back = () => setStep((s) => getPrevStep(s, profile));
   const isLastStep = step === totalSteps - 1;
 
   const canProceed = () => {
@@ -220,6 +239,7 @@ export default function OnboardingPage() {
       profileCompleted: true,
       drivesFromOrigin: profile.drivesFromOrigin,
       hasIDL: profile.hasIDL,
+      wantsProvisionalLicence: profile.wantsProvisionalLicence,
       hasDependants: profile.hasDependants,
       sector: profile.sector,
       employerName: profile.employerName,
@@ -241,6 +261,7 @@ export default function OnboardingPage() {
       work_interest: completeProfile.interestedInWork,
       drives_from_origin: completeProfile.drivesFromOrigin ?? null,
       has_idl: completeProfile.hasIDL ?? null,
+      wants_provisional_licence: completeProfile.wantsProvisionalLicence ?? null,
       has_dependants: completeProfile.hasDependants ?? null,
       sector: completeProfile.sector || null,
       employer_name: completeProfile.employerName || null,
@@ -513,24 +534,53 @@ export default function OnboardingPage() {
                 Do you hold a driving licence from your home country?
               </label>
               <div className="space-y-2">
-                {[
-                  { value: true, label: "Yes, I drive and hold a licence", desc: "We'll add a DVLA licence exchange task to your roadmap" },
-                  { value: false, label: "No, I don't drive", desc: "No driving tasks will be added" },
-                ].map((opt) => (
-                  <button
-                    key={String(opt.value)}
-                    type="button"
-                    onClick={() => update("drivesFromOrigin", opt.value)}
-                    className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                      profile.drivesFromOrigin === opt.value
-                        ? "border-primary bg-teal-50"
-                        : "border-border hover:border-primary/40"
-                    }`}
-                  >
-                    <p className="text-sm font-semibold text-navy">{opt.label}</p>
-                    <p className="text-xs text-muted">{opt.desc}</p>
-                  </button>
-                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    update("drivesFromOrigin", true);
+                    setProfile((p) => ({ ...p, wantsProvisionalLicence: undefined }));
+                  }}
+                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                    profile.drivesFromOrigin === true
+                      ? "border-primary bg-teal-50"
+                      : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <p className="text-sm font-semibold text-navy">Yes, I drive and hold a licence</p>
+                  <p className="text-xs text-muted">We&apos;ll add a DVLA licence exchange task to your roadmap</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    update("drivesFromOrigin", false);
+                    update("wantsProvisionalLicence", true);
+                    setProfile((p) => ({ ...p, hasIDL: undefined }));
+                  }}
+                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                    profile.drivesFromOrigin === false && profile.wantsProvisionalLicence === true
+                      ? "border-primary bg-teal-50"
+                      : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <p className="text-sm font-semibold text-navy">No, but I&apos;d like to learn to drive in the UK</p>
+                  <p className="text-xs text-muted">We&apos;ll add a provisional licence task to your roadmap</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    update("drivesFromOrigin", false);
+                    update("wantsProvisionalLicence", false);
+                    setProfile((p) => ({ ...p, hasIDL: undefined }));
+                  }}
+                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                    profile.drivesFromOrigin === false && profile.wantsProvisionalLicence === false
+                      ? "border-primary bg-teal-50"
+                      : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <p className="text-sm font-semibold text-navy">No, I don&apos;t drive</p>
+                  <p className="text-xs text-muted">No driving tasks will be added</p>
+                </button>
               </div>
               {profile.drivesFromOrigin === true && (
                 <div className="space-y-2">
@@ -593,8 +643,48 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 6 — Sector */}
+          {/* Step 6 — Focus (family_visa only; others skip via getNextStep) */}
           {step === 6 && (
+            <div className="space-y-3">
+              <label className="input-label">
+                <Target className="w-3 h-3 inline mr-1" />
+                What are you focusing on first?
+              </label>
+              <p className="text-xs text-muted">This helps us personalise your roadmap — you can always change your mind later.</p>
+              {[
+                {
+                  value: false,
+                  label: "Settling my family in",
+                  desc: "Getting everyone comfortable, registered, and settled — work can wait",
+                },
+                {
+                  value: true,
+                  label: "Finding work as well",
+                  desc: "I plan to look for a job alongside settling in",
+                },
+              ].map((opt) => (
+                <button
+                  key={String(opt.value)}
+                  type="button"
+                  onClick={() => update("interestedInWork", opt.value)}
+                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                    profile.interestedInWork === opt.value
+                      ? "border-primary bg-teal-50"
+                      : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <p className="text-sm font-semibold text-navy">{opt.label}</p>
+                  <p className="text-xs text-muted">{opt.desc}</p>
+                </button>
+              ))}
+              <button type="button" onClick={next} className="btn-ghost text-xs text-muted w-full justify-center">
+                Skip this question
+              </button>
+            </div>
+          )}
+
+          {/* Step 7 — Sector */}
+          {step === 7 && (
             <div className="space-y-4">
               <label className="input-label">
                 <Briefcase className="w-3 h-3 inline mr-1" />
@@ -616,8 +706,8 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 7 — Employer / company name */}
-          {step === 7 && (
+          {/* Step 8 — Employer / company name */}
+          {step === 8 && (
             <div className="space-y-4">
               <label className="input-label">
                 <Building2 className="w-3 h-3 inline mr-1" />
@@ -660,8 +750,8 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 8 — Review & finish */}
-          {step === 8 && (
+          {/* Step 9 — Review & finish */}
+          {step === 9 && (
             <div className="space-y-4">
               <div className="text-center py-2">
                 <CheckCircle className="w-10 h-10 text-primary mx-auto mb-2" />

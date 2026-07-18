@@ -144,6 +144,39 @@ export const SEED_TASKS: Task[] = [
     ],
     sourceSignpost: "MoneySavingExpert.com — 'Cost of living in the UK'; Numbeo for city-specific estimates",
   },
+  {
+    taskId: "UNI_PRE_006",
+    title: "Apply for a UK provisional driving licence",
+    summary: "If you want to learn to drive in the UK, apply for a provisional licence with the DVLA before booking lessons.",
+    stage: "PRE",
+    category: "Transport",
+    priority: "Low",
+    required: false,
+    active: true,
+    aiHelperAllowed: true,
+    estimatedMinutes: 30,
+    routes: "all",
+    conditional: "provisional",
+    whyItMatters:
+      "You cannot legally take driving lessons in the UK without a provisional driving licence. The DVLA processes applications online in minutes — the licence itself arrives by post within 1–3 weeks. Getting this done early means you can start lessons as soon as you are settled, rather than waiting for the licence to arrive after you have already found an instructor.",
+    whatToPrepare: [
+      "Your passport (it must be the one you entered the UK on)",
+      "Your UK address",
+      "A debit or credit card (the fee is currently £34 online)",
+    ],
+    stepsToTake: [
+      "Apply online at gov.uk/apply-first-provisional-driving-licence — it takes about 10 minutes.",
+      "You will need to provide your National Insurance number if you have one (not mandatory if you do not yet have one).",
+      "The provisional licence is sent by post within 1–3 weeks to your UK address.",
+      "Once you have it, you can legally take lessons — find a DVSA-approved driving instructor (ADI) in your area.",
+      "As a learner, you must display L plates on any car you drive and be accompanied by a qualified driver.",
+    ],
+    commonMistakes: [
+      "Booking driving lessons before the provisional licence arrives — instructors cannot legally teach you without it.",
+      "Applying to the wrong body — it is the DVLA (not the DSA or any third party website).",
+    ],
+    sourceSignpost: "gov.uk — 'Apply for your first provisional driving licence'",
+  },
 
   // ─── ARRIVAL DAY (D1) ─────────────────────────────────────────
   {

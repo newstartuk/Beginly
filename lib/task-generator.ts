@@ -13,6 +13,7 @@ type DbArrivalProfile = {
   work_interest?: boolean | string | null;
   drives_from_origin?: boolean | null;
   has_idl?: boolean | null;
+  wants_provisional_licence?: boolean | null;
   has_dependants?: boolean | null;
   sector?: string | null;
   employer_name?: string | null;
@@ -32,6 +33,7 @@ export function dbProfileToArrivalProfile(row: DbArrivalProfile): ArrivalProfile
     profileCompleted: true,
     drivesFromOrigin: row.drives_from_origin ?? undefined,
     hasIDL: row.has_idl ?? undefined,
+    wantsProvisionalLicence: row.wants_provisional_licence ?? undefined,
     hasDependants: row.has_dependants ?? undefined,
     sector: row.sector ?? undefined,
     employerName: row.employer_name ?? undefined,
@@ -66,6 +68,11 @@ function conditionMatches(task: Task, profile: ArrivalProfile): boolean {
   // International driving licence
   if (condition.includes("international driving licence") || condition.includes("idl")) {
     return profile.hasIDL === true;
+  }
+
+  // Provisional driving licence (wants to learn to drive in the UK)
+  if (condition.includes("provisional")) {
+    return profile.wantsProvisionalLicence === true;
   }
 
   // Dependants / children
