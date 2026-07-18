@@ -1,6 +1,6 @@
 import type { DocType, DocHelperResponse } from "@/types";
 
-const RESPONSES: Record<DocType, DocHelperResponse> = {
+const RESPONSES: Partial<Record<DocType, DocHelperResponse>> = {
   tenancy_agreement: {
     plainEnglish:
       "A tenancy agreement is a contract between you (the tenant) and your landlord. It sets out: how much rent you pay and when; how long the tenancy lasts (the 'term'); who is responsible for repairs and bills; what you can and cannot do in the property; and how the tenancy can be ended. Most student tenancies in the UK are 'assured shorthold tenancies' (ASTs), which give landlords certain rights to reclaim the property at the end of the term. As a tenant, you have significant legal rights — including the right to live in the property without interference, the right to have repairs done, and the right to get your deposit back if you leave the property in good condition.",
@@ -135,8 +135,9 @@ const RESPONSES: Record<DocType, DocHelperResponse> = {
 };
 
 export function getDocHelperResponse(docType: string): DocHelperResponse {
-  if (docType && RESPONSES[docType as DocType]) {
-    return RESPONSES[docType as DocType];
+  const response = RESPONSES[docType as DocType];
+  if (docType && response) {
+    return response;
   }
   return {
     plainEnglish: "I don't have a pre-written explanation for that document type yet. In general, always read any document carefully before signing, keep copies, and ask questions if anything is unclear. For specific advice about a legal, immigration, financial, or medical document, contact a qualified professional.",

@@ -70,7 +70,7 @@ export async function loadPlatformContext(userId?: string, suppliedClient?: Supa
         return [
           String(row.task_id),
           {
-            state: status === "complete" ? "complete" : "not_started",
+            state: (status === "complete" ? "complete" : "not_started") as "not_started" | "complete" | "deferred" | "irrelevant",
             note: undefined,
             evidence: undefined,
           },
