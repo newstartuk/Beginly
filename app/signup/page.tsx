@@ -128,12 +128,6 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label className="input-label">Phone number</label>
-              <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="input-field" placeholder="e.g. 07700 900000" autoComplete="tel" required />
-              <p className="text-xs text-muted mt-1">Used only for account security and urgent support. Never shared.</p>
-            </div>
-
-            <div>
               <label className="input-label">Password</label>
               <div className="relative">
                 <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} className="input-field pr-10" placeholder="At least 8 characters" autoComplete="new-password" required />
@@ -151,6 +145,12 @@ export default function SignupPage() {
                   {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+            </div>
+
+            <div>
+              <label className="input-label">Phone number</label>
+              <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="input-field" placeholder="e.g. 07700 900000" autoComplete="tel" required />
+              <p className="text-xs text-muted mt-1">Used only for account security and urgent support. Never shared.</p>
             </div>
 
             <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-2.5">
