@@ -8,10 +8,10 @@ import PlatformShell from "@/components/platform/PlatformShell";
 import StatusPill from "@/components/platform/StatusPill";
 
 const UK_BANKS = [
-  { name: "Monzo", logo: "M", desc: "Digital bank - easy to open, great app, no branch needed", goodFor: "Quick setup, international students, mobile-first", score: 9, url: "https://monzo.com" },
+  { name: "Revolut", logo: "R", desc: "Digital bank/app - good for currency exchange and travel", goodFor: "Currency exchange, travel, spending management", score: 8, url: "https://revolut.com/referral/?referral-code=oluwatxy3u!JUL2-26-AR-H2&geo-redirect" },
+  { name: "Monzo", logo: "M", desc: "Digital bank - easy to open, great app, no branch needed", goodFor: "Quick setup, international students, mobile-first", score: 9, url: "https://join.monzo.com/c/yt7s55w" },
+  { name: "Lloyds Bank", logo: "L", desc: "Traditional high-street bank - widely available", goodFor: "Branches, student accounts, cash deposits", score: 8, url: "https://apply.lloydsbank.co.uk/sales-content/cwa/l/onboardpca/index-app.html?from=ob&webDirect=true&redesign=true&token=+8fMBFcIr+Z5SJnJ1UFIVDIQ5ywwypmQpwK7hym/vGs=&redesign=true#/refer-friend" },
   { name: "Starling Bank", logo: "S", desc: "Digital bank - fee-free worldwide spending, full UK account", goodFor: "Travel cards, money management, international transfers", score: 9, url: "https://starlingbank.com" },
-  { name: "Revolut", logo: "R", desc: "Digital bank/app - good for currency exchange and travel", goodFor: "Currency exchange, travel, spending management", score: 8, url: "https://revolut.com" },
-  { name: "Lloyds Bank", logo: "L", desc: "Traditional high-street bank - widely available", goodFor: "Branches, student accounts, cash deposits", score: 8, url: "https://www.lloydsbank.com" },
   { name: "Barclays", logo: "B", desc: "Traditional bank with strong student account offering", goodFor: "Student account with overdraft, branches", score: 7, url: "https://www.barclays.co.uk" },
   { name: "HSBC UK", logo: "H", desc: "Large traditional bank with international reach", goodFor: "International students, global transfers", score: 7, url: "https://www.hsbc.co.uk" },
   { name: "Santander", logo: "S", desc: "Popular with students - 123 Student Account", goodFor: "Cashback, UK-wide branches", score: 7, url: "https://www.santander.co.uk" },

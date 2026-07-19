@@ -1,7 +1,16 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { DEMO_CONTEXT } from "./demo";
 import { isExplicitDemoMode, PlatformContextUnavailableError } from "./runtime";
-import type { EntitlementGrant, Goal, HouseholdMember, ProfileFact, UserContext } from "./types";
+import type { EntitlementGrant, Goal, HouseholdMember, ProfileFact, UserContext, UserTaskState } from "./types";
+
+function mapTaskStateRows(rows: Array<Record<string, unknown>> | null | undefined): Record<string, UserTaskState> {
+  return Object.fromEntries((rows ?? []).map((row) => [String(row.task_code), {
+    state: String(row.state) as UserTaskState["state"],
+    deferUntil: row.defer_until ? String(row.defer_until) : undefined,
+    note: row.note ? String(row.note) : undefined,
+    evidence: row.evidence && typeof row.evidence === "object" ? row.evidence as Record<string, unknown> : undefined,
+  }]));
+}
 
 function serverClient(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
@@ -24,9 +33,14 @@ export async function loadPlatformContext(userId?: string, suppliedClient?: Supa
   if (!userId) throw new PlatformContextUnavailableError("An authenticated user is required.");
 
   const supabase = suppliedClient ?? serverClient();
-  const [profileResult, userProfileResult, householdResult, goalsResult, grantsResult, taskStateResult, preferencesResult, pointsResult] = await Promise.all([
+  const [profileResult, userProfileResult, legacyUserResult, householdResult, goalsResult, grantsResult, taskStateResult, preferencesResult, pointsResult] = await Promise.all([
     supabase.from("migration_profiles").select("*").eq("user_id", userId).is("effective_to", null).maybeSingle(),
     supabase.from("user_profiles").select("display_name").eq("id", userId).maybeSingle(),
+    // Real users onboard through the legacy flow (app/onboarding/page.tsx), which never
+    // populates user_profiles.display_name — their name lives on the app's own `users`
+    // table instead (set at signup from the auth user_metadata). Fall back to it before
+    // ever showing a placeholder.
+    supabase.from("users").select("name").eq("id", userId).maybeSingle(),
     supabase.from("household_members").select("*, households!inner(id)").eq("user_id", userId),
     supabase.from("goals").select("*").eq("owner_user_id", userId).eq("status", "active"),
     supabase.from("entitlements").select("*").eq("actor_id", userId),
@@ -34,6 +48,11 @@ export async function loadPlatformContext(userId?: string, suppliedClient?: Supa
     supabase.from("user_preferences").select("*").eq("user_id", userId).maybeSingle(),
     supabase.from("proofpoints_ledger").select("event_type,points,expires_at").eq("user_id", userId),
   ]);
+  const resolvedDisplayName = String(
+    (userProfileResult.data as Record<string, unknown> | null)?.display_name
+      ?? (legacyUserResult.data as Record<string, unknown> | null)?.name
+      ?? "there",
+  );
 
   if (profileResult.error || !profileResult.data) {
     // migration_profiles row missing — fall back to legacy arrival_profiles (v1.x onboarding)
@@ -62,25 +81,28 @@ export async function loadPlatformContext(userId?: string, suppliedClient?: Supa
       if (s === "arriving_soon") return "arrival";
       return "settling";
     };
-    const displayName = String((userProfileResult.data as Record<string, unknown> | null)?.display_name ?? "Beginly member");
+    const displayName = resolvedDisplayName;
     const route = arrivalToRoute(String((arrival as Record<string, unknown>).arrival_type ?? ""));
     const stage = arrivalToStage(String((arrival as Record<string, unknown>).status ?? ""));
-    const taskStates = Object.fromEntries(
-      (legacyTaskRows ?? []).map((row: Record<string, unknown>) => {
-        const status = String(row.status ?? "not_started");
-        return [
+    // Settlement checklist tasks (STU_/UNI_ seed IDs) live in the legacy `user_tasks` table.
+    // Journey Hub's adaptive tasks (common-*, student-*, worker-*, etc.) are never written
+    // there — TaskActions always posts to the newer `user_task_states` table, which this
+    // branch previously never read. Without merging it in, clicking "Complete" on an
+    // adaptive task would upsert successfully but the very next page load would still show
+    // it as not started, since only `user_tasks` was consulted here. The two tables cover
+    // disjoint task-id namespaces, so a plain merge is safe.
+    const taskStates: Record<string, UserTaskState> = {
+      ...Object.fromEntries(
+        (legacyTaskRows ?? []).map((row: Record<string, unknown>) => [
           String(row.task_id),
-          {
-            state: (status === "complete" ? "complete" : "not_started") as "not_started" | "complete" | "deferred" | "irrelevant",
-            note: undefined,
-            evidence: undefined,
-          },
-        ];
-      }),
-    );
-    const completedTaskIds = (legacyTaskRows ?? [])
-      .filter((row: Record<string, unknown>) => String(row.status ?? "") === "complete")
-      .map((row: Record<string, unknown>) => String(row.task_id));
+          { state: (String(row.status ?? "") === "complete" ? "complete" : "not_started") as UserTaskState["state"] },
+        ]),
+      ),
+      ...mapTaskStateRows(taskStateResult.data as Array<Record<string, unknown>> | null),
+    };
+    const completedTaskIds = Object.entries(taskStates)
+      .filter(([, value]) => value.state === "complete")
+      .map(([taskId]) => taskId);
     return {
       actorId: userId, displayName, householdId: `personal-${userId}`, activeMemberId: userId,
       route, stage, city: String((arrival as Record<string, unknown>).city ?? ""),
@@ -101,7 +123,7 @@ export async function loadPlatformContext(userId?: string, suppliedClient?: Supa
     supabase.from("profile_facts").select("*").eq("profile_id", String(profile.id)).is("superseded_at", null),
   ]);
 
-  const displayName = String((userProfileResult.data as Record<string, unknown> | null)?.display_name ?? "Beginly member");
+  const displayName = resolvedDisplayName;
   let householdMembers: HouseholdMember[] = (membersResult.data ?? []).map((row: Record<string, unknown>) => ({
     id: String(row.id),
     displayName: String(row.display_name ?? "Household member"),
@@ -129,12 +151,7 @@ export async function loadPlatformContext(userId?: string, suppliedClient?: Supa
     autonomyLevel: row.autonomy_level as EntitlementGrant["autonomyLevel"], quota: row.quota ? Number(row.quota) : undefined, used: Number(row.used ?? 0),
     conditions: row.conditions && typeof row.conditions === "object" ? row.conditions as Record<string, string | number | boolean> : undefined,
   }));
-  const taskStates = Object.fromEntries((taskStateResult.data ?? []).map((row: Record<string, unknown>) => [String(row.task_code), {
-    state: String(row.state) as "not_started" | "complete" | "deferred" | "irrelevant",
-    deferUntil: row.defer_until ? String(row.defer_until) : undefined,
-    note: row.note ? String(row.note) : undefined,
-    evidence: row.evidence && typeof row.evidence === "object" ? row.evidence as Record<string, unknown> : undefined,
-  }]));
+  const taskStates = mapTaskStateRows(taskStateResult.data as Array<Record<string, unknown>> | null);
   const completedTaskIds = Object.entries(taskStates).filter(([, value]) => value.state === "complete").map(([taskCode]) => taskCode);
   const prefs = preferencesResult.data as Record<string, unknown> | null;
   const proofPoints = (pointsResult.data ?? []).reduce((total: number, row: Record<string, unknown>) => {
