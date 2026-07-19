@@ -7,7 +7,7 @@ import { getUser } from "@/lib/utils";
 import { isClientDemoMode } from "@/lib/platform/runtime";
 import type { SupportCategory } from "@/types";
 import { MessageSquare, Send, CheckCircle, AlertTriangle } from "lucide-react";
-import Navigation from "@/components/Navigation";
+import PlatformShell from "@/components/platform/PlatformShell";
 
 const CATEGORIES: { value: SupportCategory; label: string; desc: string }[] = [
   { value: "account", label: "Account issue", desc: "Problems signing in or accessing your account" },
@@ -77,7 +77,7 @@ export default function SupportPage() {
   };
 
   return (
-    <Navigation>
+    <PlatformShell title="Support" eyebrow="Get help from the Beginly team">
       <div className="max-w-2xl mx-auto space-y-5 animate-fade-in">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center">
@@ -153,6 +153,6 @@ export default function SupportPage() {
           </div>
         </div>
       </div>
-    </Navigation>
+    </PlatformShell>
   );
 }

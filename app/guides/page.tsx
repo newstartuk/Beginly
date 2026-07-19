@@ -4,7 +4,7 @@ import Link from "next/link";
 import { GUIDANCE_PAGES } from "@/lib/guidance-data";
 import { Search, BookOpen, ArrowRight } from "lucide-react";
 import type { GuidanceCategory } from "@/types";
-import Navigation from "@/components/Navigation";
+import PlatformShell from "@/components/platform/PlatformShell";
 
 const CATEGORIES: { value: GuidanceCategory | "ALL"; label: string }[] = [
   { value: "ALL", label: "All Topics" },
@@ -49,14 +49,8 @@ export default function GuidesPage() {
   });
 
   return (
-    <Navigation>
+    <PlatformShell title="Trust & Guides" eyebrow="Plain-English guidance for your first 90 days">
       <div className="max-w-4xl mx-auto space-y-5 animate-fade-in">
-        <div>
-          <h1 className="text-2xl font-bold text-navy">Guidance Library</h1>
-          <p className="text-sm text-muted mt-0.5">
-            Plain-English guides for your first 90 days — written in clear language you can actually use.
-          </p>
-        </div>
 
         {/* Search */}
         <div className="relative">
@@ -111,6 +105,6 @@ export default function GuidesPage() {
           </div>
         )}
       </div>
-    </Navigation>
+    </PlatformShell>
   );
 }

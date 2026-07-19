@@ -7,7 +7,7 @@ import { isClientDemoMode } from "@/lib/platform/runtime";
 import type { ReminderPrefs } from "@/types";
 import { User, Bell, Trash2, CheckCircle, BellRing } from "lucide-react";
 import Disclaimer from "@/components/Disclaimer";
-import Navigation from "@/components/Navigation";
+import PlatformShell from "@/components/platform/PlatformShell";
 import SettingsSkeleton from "@/components/SettingsSkeleton";
 
 interface DisplayUser {
@@ -147,9 +147,8 @@ export default function SettingsPage() {
   if (!user) return <SettingsSkeleton />;
 
   return (
-    <Navigation>
+    <PlatformShell title="Settings" eyebrow="Account and preferences">
       <div className="max-w-2xl mx-auto space-y-5 animate-fade-in">
-        <h1 className="text-xl font-bold text-navy">Settings</h1>
 
         {/* Profile */}
         <div className="card">
@@ -304,6 +303,6 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
-    </Navigation>
+    </PlatformShell>
   );
 }

@@ -6,7 +6,7 @@ import { GUIDANCE_PAGES } from "@/lib/guidance-data";
 import { SEED_TASKS } from "@/lib/seed-data";
 import { ChevronLeft, AlertTriangle, ArrowRight } from "lucide-react";
 import Disclaimer from "@/components/Disclaimer";
-import Navigation from "@/components/Navigation";
+import PlatformShell from "@/components/platform/PlatformShell";
 import InfoCard from "@/components/InfoCard";
 import StepList from "@/components/StepList";
 
@@ -22,12 +22,12 @@ export default function GuideArticlePage() {
 
   if (!guide) {
     return (
-      <Navigation>
+      <PlatformShell title="Guide not found" eyebrow="Trust & Guides">
         <div className="max-w-3xl mx-auto text-center py-20">
           <h1 className="text-lg font-bold text-navy mb-2">Guide not found</h1>
           <Link href="/guides" className="text-sm text-primary hover:underline">← Back to guides</Link>
         </div>
-      </Navigation>
+      </PlatformShell>
     );
   }
 
@@ -48,7 +48,7 @@ export default function GuideArticlePage() {
   };
 
   return (
-    <Navigation>
+    <PlatformShell title={guide.title} eyebrow={`Trust & Guides · ${guide.category}`}>
       <div className="max-w-3xl mx-auto space-y-5 animate-fade-in">
         <Link href="/guides" className="inline-flex items-center gap-1 text-sm text-muted hover:text-primary transition-colors">
           <ChevronLeft className="w-4 h-4" /> Back to guidance library
@@ -155,6 +155,6 @@ export default function GuideArticlePage() {
 
         <Disclaimer text={guide.disclaimer} type="general" />
       </div>
-    </Navigation>
+    </PlatformShell>
   );
 }

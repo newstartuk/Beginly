@@ -15,6 +15,7 @@ export default function SignupPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -39,6 +40,7 @@ export default function SignupPage() {
     const normalisedEmail = email.trim().toLowerCase();
     if (!name.trim()) { setError("Please enter your name."); return; }
     if (!normalisedEmail.includes("@")) { setError("Please enter a valid email address."); return; }
+    if (!phone.trim() || phone.trim().replace(/\s/g, "").length < 7) { setError("Please enter a valid phone number."); return; }
     if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
     if (password !== confirm) { setError("Passwords do not match."); return; }
 
@@ -51,7 +53,7 @@ export default function SignupPage() {
         email: normalisedEmail,
         password,
         options: {
-          data: { name: name.trim() },
+          data: { name: name.trim(), phone: phone.trim() },
           emailRedirectTo: redirectTo,
         },
       });
@@ -123,6 +125,12 @@ export default function SignupPage() {
             <div>
               <label className="input-label">Email address</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field" placeholder="you@example.com" autoComplete="email" required />
+            </div>
+
+            <div>
+              <label className="input-label">Phone number</label>
+              <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="input-field" placeholder="e.g. 07700 900000" autoComplete="tel" required />
+              <p className="text-xs text-muted mt-1">Used only for account security and urgent support. Never shared.</p>
             </div>
 
             <div>

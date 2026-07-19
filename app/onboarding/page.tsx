@@ -91,6 +91,25 @@ const HOUSING_OPTIONS: { value: AccommodationType; label: string; desc: string; 
   { value: "not_secured", label: "Not yet arranged", desc: "I still need to find accommodation", councilTax: false },
 ];
 
+const COURSE_FIELDS = [
+  "Business & Management",
+  "Computer Science & IT",
+  "Engineering",
+  "Medicine & Dentistry",
+  "Law",
+  "Social Sciences",
+  "Arts & Humanities",
+  "Natural Sciences",
+  "Mathematics & Statistics",
+  "Education",
+  "Architecture & Design",
+  "Media & Communications",
+  "Health Sciences (non-medical)",
+  "Economics & Finance",
+  "Psychology",
+  "Other",
+];
+
 const UK_SECTORS = [
   "Healthcare & Social Care",
   "Technology & Software",
@@ -479,6 +498,24 @@ export default function OnboardingPage() {
                     ))}
                     <option value="Other">Other</option>
                   </select>
+                </div>
+              )}
+              {isStudent(profile) && profile.university && (
+                <div>
+                  <label className="input-label">What are you studying?</label>
+                  <select
+                    value={profile.sector || ""}
+                    onChange={(e) => update("sector", e.target.value)}
+                    className="select-field"
+                  >
+                    <option value="">Select your field of study...</option>
+                    {COURSE_FIELDS.map((f) => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-muted mt-1.5">
+                    This helps us tailor career opportunities and growth tasks for your subject area.
+                  </p>
                 </div>
               )}
               {!isStudent(profile) && profile.city && (

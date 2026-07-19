@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { Bell, BookOpenCheck, BriefcaseBusiness, CheckSquare, Compass, FileCheck2, HeartPulse, House, Landmark, LifeBuoy, Menu, MessageCircle, Package, Settings, ShieldCheck, Sparkles, TrendingUp, UserRound, Users, X } from "lucide-react";
+import { Bell, BookOpenCheck, BriefcaseBusiness, CheckSquare, Compass, FileCheck2, HeartPulse, House, Landmark, LifeBuoy, LogOut, Menu, MessageCircle, Package, Settings, ShieldCheck, Sparkles, TrendingUp, UserRound, Users, X } from "lucide-react";
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 const links = [
   { href: "/platform", label: "Today", icon: Compass },
@@ -28,7 +29,13 @@ const links = [
 
 export default function PlatformShell({ children, title, eyebrow, action }: { children: ReactNode; title: string; eyebrow?: string; action?: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
   return (
     <div className="platform-shell">
       <aside className={`platform-sidebar ${open ? "is-open" : ""}`}>
@@ -43,6 +50,7 @@ export default function PlatformShell({ children, title, eyebrow, action }: { ch
             return <Link key={href} href={href} className={active ? "active" : ""} onClick={() => setOpen(false)}><Icon size={18} /><span>{label}</span>{active && <i />}</Link>;
           })}
         </nav>
+        <button onClick={handleSignOut} className="platform-signout"><LogOut size={16} /><span>Sign out</span></button>
         <div className="platform-trust-card"><ShieldCheck size={18} /><div><strong>Trust-first</strong><span>Free, owned and sponsored access is checked before any paid suggestion.</span></div></div>
       </aside>
       {open && <button aria-label="Close navigation overlay" className="platform-overlay" onClick={() => setOpen(false)} />}
