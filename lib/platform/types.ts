@@ -62,7 +62,8 @@ export type DashboardModuleType =
   | "value_recommendation"
   | "readiness"
   | "nia"
-  | "notification";
+  | "notification"
+  | "work_hours";
 
 export interface ProfileFact {
   key: string;

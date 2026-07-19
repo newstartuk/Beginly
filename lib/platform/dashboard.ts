@@ -23,6 +23,23 @@ export function composeDashboard(context: UserContext): DashboardComposition {
     });
   }
 
+  // Student visa holders are capped at 20 hours of work a week in term time. Surface
+  // the tracker prominently on Today so breaches get caught before they happen, rather
+  // than filing it away in a hamburger-menu tab that only gets opened occasionally.
+  if (context.route === "student") {
+    modules.push({
+      id: "module-work-hours",
+      type: "work_hours",
+      title: "Track your weekly work hours",
+      summary: "Student visa work is capped at 20 hours a week in term time, unlimited during official holidays. Log your hours to stay within your visa conditions.",
+      priority: 950,
+      reasonCodes: ["student_route", "visa_compliance"],
+      commercialClass: "none",
+      href: "/work-hours",
+      dismissible: false,
+    });
+  }
+
   for (const [index, task] of journey.nextBestActions.entries()) {
     modules.push({
       id: `module-task-${task.id}`,

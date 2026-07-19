@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, BadgeCheck, BriefcaseBusiness, CircleAlert, Clock3, Compass, House, Sparkles, Target, WandSparkles } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, BriefcaseBusiness, CircleAlert, Clock3, Compass, House, Sparkles, Target, Timer, WandSparkles } from "lucide-react";
 import type { DashboardModule } from "@/lib/platform/types";
 import StatusPill from "./StatusPill";
 
@@ -15,6 +15,7 @@ const icons = {
   readiness: Sparkles,
   nia: Sparkles,
   notification: Clock3,
+  work_hours: Timer,
 };
 
 export default function ModuleCard({ module }: { module: DashboardModule }) {
