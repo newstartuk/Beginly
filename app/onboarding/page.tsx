@@ -669,11 +669,26 @@ export default function OnboardingPage() {
                   type="button"
                   onClick={() => {
                     update("drivesFromOrigin", false);
+                    setProfile((p) => ({ ...p, hasIDL: undefined, wantsProvisionalLicence: undefined }));
+                  }}
+                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                    profile.drivesFromOrigin === false && profile.wantsProvisionalLicence !== false
+                      ? "border-primary bg-teal-50"
+                      : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <p className="text-sm font-semibold text-navy">No, but I&apos;d love to drive</p>
+                  <p className="text-xs text-muted">No tasks added now — Nia will check in with you about learning to drive when the time is right.</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    update("drivesFromOrigin", false);
                     update("wantsProvisionalLicence", false);
                     setProfile((p) => ({ ...p, hasIDL: undefined }));
                   }}
                   className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                    profile.drivesFromOrigin === false
+                    profile.drivesFromOrigin === false && profile.wantsProvisionalLicence === false
                       ? "border-primary bg-teal-50"
                       : "border-border hover:border-primary/40"
                   }`}

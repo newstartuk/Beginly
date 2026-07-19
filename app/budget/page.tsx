@@ -524,6 +524,31 @@ export default function BudgetPage() {
           </p>
         </div>
 
+        <div className="card border border-primary/20 bg-primary/5">
+          <p className="text-sm font-semibold text-navy">Struggling with money? Free help is available.</p>
+          <p className="mt-1 text-sm text-civic-600">
+            If you are finding it hard to make ends meet or dealing with debt, these free UK services offer confidential advice — no judgment, just practical support.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-4">
+            <a
+              href="https://www.moneyhelper.org.uk/en/money-troubles/dealing-with-debt"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs font-semibold text-primary hover:underline"
+            >
+              MoneyHelper — free debt advice ↗
+            </a>
+            <a
+              href="https://www.stepchange.org/get-help.aspx"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs font-semibold text-primary hover:underline"
+            >
+              StepChange Debt Charity ↗
+            </a>
+          </div>
+        </div>
+
         <Disclaimer type="financial" />
       </div>
     </PlatformShell>

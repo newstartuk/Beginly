@@ -170,6 +170,11 @@ export default async function JourneyPage() {
                         ))}
                       </div>
                     ) : null}
+                    <div className="mt-2">
+                      <Link href={`/tasks/${task.id}`} className="text-xs font-semibold text-primary hover:underline">
+                        View full task →
+                      </Link>
+                    </div>
                   </div>
                 );
               })
@@ -201,6 +206,7 @@ export default async function JourneyPage() {
             {adaptiveTasks.map((task) => {
               const complete = context.completedTaskIds.includes(task.id);
               const next = journey.nextBestActions.some((item) => item.id === task.id);
+              const taskLinks = getTaskLinks(task.id);
               return (
                 <article key={task.id} className={`${complete ? "complete" : ""} ${next ? "next" : ""}`}>
                   <span className="task-check">
@@ -218,6 +224,21 @@ export default async function JourneyPage() {
                     <h3>{task.title}</h3>
                     <p>{task.summary}</p>
                     <small>Why: {task.reasonCodes.join(" · ").replaceAll("_", " ")}</small>
+                    {taskLinks.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+                        {taskLinks.slice(0, 3).map((resource) => (
+                          <a
+                            key={resource.url}
+                            href={resource.url}
+                            target={resource.url.startsWith("/") ? "_self" : "_blank"}
+                            rel="noreferrer"
+                            className="text-xs font-semibold text-primary hover:underline"
+                          >
+                            {resource.label} <ExternalLink size={12} className="inline" />
+                          </a>
+                        ))}
+                      </div>
+                    )}
                     <TaskActions
                       taskId={task.id}
                       complete={complete}
