@@ -144,7 +144,7 @@ export default async function JourneyPage() {
           <div className="mt-3 space-y-3">
             {settlementNext.length > 0 ? (
               settlementNext.map((task) => {
-                const links = getTaskLinks(task.id).slice(0, 2);
+                const links = getTaskLinks(task.id, context.city).slice(0, 2);
                 return (
                   <div key={task.id} className="rounded-xl border border-border p-3">
                     <div className="flex items-start justify-between gap-3">
@@ -206,7 +206,7 @@ export default async function JourneyPage() {
             {adaptiveTasks.map((task) => {
               const complete = context.completedTaskIds.includes(task.id);
               const next = journey.nextBestActions.some((item) => item.id === task.id);
-              const taskLinks = getTaskLinks(task.id);
+              const taskLinks = getTaskLinks(task.id, context.city);
               return (
                 <article key={task.id} className={`${complete ? "complete" : ""} ${next ? "next" : ""}`}>
                   <span className="task-check">

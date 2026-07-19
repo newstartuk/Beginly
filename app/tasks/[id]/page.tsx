@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { SEED_TASKS } from "@/lib/seed-data";
 import { getTaskLinks } from "@/lib/task-links";
-import { getUserTask, upsertUserTask } from "@/lib/utils";
+import { getArrivalProfile, getUserTask, upsertUserTask } from "@/lib/utils";
 import { isClientDemoMode } from "@/lib/platform/runtime";
 import type { TaskStatus } from "@/types";
 import {
@@ -27,6 +27,7 @@ export default function TaskDetailPage() {
   const task = SEED_TASKS.find((t) => t.taskId === taskId);
   const [status, setStatus] = useState<TaskStatus>("not_started");
   const [mounted, setMounted] = useState(false);
+  const [city, setCity] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     async function loadStatus() {
@@ -35,17 +36,26 @@ export default function TaskDetailPage() {
       if (isClientDemoMode()) {
         const stored = getUserTask(task.taskId);
         if (stored) setStatus(stored.status);
+        setCity(getArrivalProfile()?.city);
         return;
       }
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push("/login"); return; }
-      const { data } = await supabase
-        .from("user_tasks")
-        .select("status")
-        .eq("user_id", user.id)
-        .eq("task_id", task.taskId)
-        .maybeSingle();
-      if (data?.status) setStatus(data.status as TaskStatus);
+      const [taskRes, profileRes] = await Promise.all([
+        supabase
+          .from("user_tasks")
+          .select("status")
+          .eq("user_id", user.id)
+          .eq("task_id", task.taskId)
+          .maybeSingle(),
+        supabase
+          .from("arrival_profiles")
+          .select("city")
+          .eq("user_id", user.id)
+          .maybeSingle(),
+      ]);
+      if (taskRes.data?.status) setStatus(taskRes.data.status as TaskStatus);
+      if (profileRes.data?.city) setCity(profileRes.data.city);
     }
     loadStatus();
   }, [task, router]);
@@ -85,7 +95,7 @@ export default function TaskDetailPage() {
     "Medium": "text-blue-600 bg-blue-50 border border-blue-200",
     "Low": "text-muted bg-civic-50 border border-civic-200",
   };
-  const officialLinks = getTaskLinks(task.taskId);
+  const officialLinks = getTaskLinks(task.taskId, city);
 
   return (
     <PlatformShell title={task.title} eyebrow={`Task Library · ${task.stage} · ${task.category}`}>

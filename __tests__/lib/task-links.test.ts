@@ -10,12 +10,12 @@ describe("task-links", () => {
 
   it("covers critical newcomer tasks with structured links", () => {
     const criticalTaskIds = [
-      "STU_PRE_006",
       "STU_D7_002",
       "STU_D7_003",
-      "STU_D30_003",
-      "STU_D30_007",
-      "STU_D90_003",
+      "UNI_D7_001",
+      "UNI_D7_002",
+      "UNI_D7_003",
+      "UNI_D30_003",
     ];
     criticalTaskIds.forEach((taskId) => {
       expect(getTaskLinks(taskId).length, taskId).toBeGreaterThan(0);

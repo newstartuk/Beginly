@@ -34,22 +34,17 @@ const PHONE_LINKS = [
   link("Uswitch SIM-only deals", "https://www.uswitch.com/mobiles/compare/sim_only_deals/", "commercial"),
 ];
 
-// Bank links — referral links first, then 2 standard options
+// Normal current account options — referral links first, then 2 standard banks.
+// Used for every bank-account task across every pathway, students included: a
+// UK "student account" is just a current account with a bigger overdraft, so we
+// point everyone at the same normal current account options rather than running
+// two separate banking tasks with different products.
 const BANK_COMPARE = [
   link("Open a Revolut account (recommended)", "https://revolut.com/referral/?referral-code=oluwatxy3u!JUL2-26-AR-H2&geo-redirect", "bank"),
   link("Open a Monzo account (recommended)", "https://join.monzo.com/c/yt7s55w", "bank"),
   link("Open a Lloyds account (recommended)", "https://apply.lloydsbank.co.uk/sales-content/cwa/l/onboardpca/index-app.html?from=ob&webDirect=true&redesign=true&token=+8fMBFcIr+Z5SJnJ1UFIVDIQ5ywwypmQpwK7hym/vGs=&redesign=true#/refer-friend", "bank"),
   link("Starling Bank current account", "https://www.starlingbank.com/current-account/", "bank"),
   link("NatWest current account", "https://www.natwest.com/current-accounts.html", "bank"),
-];
-
-// Student-specific bank options (referral links first, then student accounts)
-const STUDENT_BANK = [
-  link("Open a Revolut account (recommended)", "https://revolut.com/referral/?referral-code=oluwatxy3u!JUL2-26-AR-H2&geo-redirect", "bank"),
-  link("Open a Monzo account (recommended)", "https://join.monzo.com/c/yt7s55w", "bank"),
-  link("Open a Lloyds student account (recommended)", "https://apply.lloydsbank.co.uk/sales-content/cwa/l/onboardpca/index-app.html?from=ob&webDirect=true&redesign=true&token=+8fMBFcIr+Z5SJnJ1UFIVDIQ5ywwypmQpwK7hym/vGs=&redesign=true#/refer-friend", "bank"),
-  link("Santander student account", "https://www.santander.co.uk/personal/current-accounts/123-student-current-account", "bank"),
-  link("HSBC student account", "https://www.hsbc.co.uk/current-accounts/products/student/", "bank"),
 ];
 
 // Business bank accounts (for Global Talent and Founder routes)
@@ -60,7 +55,8 @@ const BUSINESS_BANK = [
   link("Lloyds business banking", "https://www.lloydsbank.com/business/commercial-banking.html", "bank"),
 ];
 
-// Zero-hour and flexible work platforms (for student, graduate, family visa routes)
+// Zero-hour and flexible work platforms — for routes not tied to a single employer
+// (students, graduates job-searching, family visa holders with work rights).
 const FLEX_WORK_LINKS = [
   link("Indeed Flex — earn by the hour (referral bonus)", "https://indeedflex.onelink.me/4jvh/referafriend", "commercial"),
   link("Tempr — flexible shifts, same-day pay", "https://www.tempr.co.uk/", "commercial"),
@@ -80,6 +76,11 @@ const HOUSING_SEARCH = [
   link("SpareRoom", "https://www.spareroom.co.uk/", "housing"),
   link("Shelter housing advice", "https://england.shelter.org.uk/housing_advice/private_renting", "support"),
 ];
+
+const HOW_TO_RENT_LINK = link(
+  "How to Rent — the official gov.uk guide for tenants",
+  "https://www.gov.uk/government/publications/how-to-rent",
+);
 
 const COUNCIL_TAX_LINKS = [
   link("Council Tax — who has to pay", "https://www.gov.uk/council-tax/who-has-to-pay"),
@@ -101,12 +102,6 @@ const SAVINGS_LINKS = [
   link("FSCS protection checker", "https://www.fscs.org.uk/check/check-your-money-is-protected/"),
 ];
 
-const TRANSPORT_LINKS = [
-  link("16-25 Railcard", "https://www.16-25railcard.co.uk/", "commercial"),
-  link("Student Oyster photocard", "https://tfl.gov.uk/fares/free-and-discounted-travel/18-plus-student-oyster-photocard"),
-  link("National Rail railcards", "https://www.nationalrail.co.uk/tickets-railcards-and-offers/railcards/"),
-];
-
 const UTILITIES_LINKS = [
   link("Ofgem consumer advice", "https://www.ofgem.gov.uk/information-consumers"),
   link("Citizens Advice energy help", "https://www.citizensadvice.org.uk/consumer/energy/energy-supply/", "support"),
@@ -116,39 +111,6 @@ const DEPOSIT_LINKS = [
   link("Deposit Protection Service", "https://www.depositprotection.com/"),
   link("Tenancy Deposit Scheme", "https://www.tenancydepositscheme.com/"),
   link("mydeposits", "https://www.mydeposits.co.uk/"),
-];
-
-const COMMUNITY_LINKS = [
-  link("Students' Union finder (NUS)", "https://www.nus.org.uk/", "support"),
-  link("Meetup", "https://www.meetup.com/", "commercial"),
-  link("Student Minds", "https://www.studentminds.org.uk/", "support"),
-];
-
-const SHOPPING_LINKS = [
-  link("Tesco store locator", "https://www.tesco.com/store-locator/", "commercial"),
-  link("Sainsbury's store locator", "https://stores.sainsburys.co.uk/", "commercial"),
-  link("Aldi store finder", "https://store.aldi.co.uk/", "commercial"),
-];
-
-const TENANT_RIGHTS_LINKS = [
-  link("Shelter private renting advice", "https://england.shelter.org.uk/housing_advice/private_renting", "support"),
-  link("How to rent guide", "https://www.gov.uk/government/publications/how-to-rent"),
-];
-
-const WORK_RIGHTS_LINKS = [
-  link("Working in the UK while studying", "https://www.ukcisa.org.uk/Information--Advice/Working/Student-work", "support"),
-  link("Prove your right to work", "https://www.gov.uk/prove-right-to-work"),
-];
-
-const RIGHT_TO_WORK_LINKS = [
-  link("Prove your right to work to an employer", "https://www.gov.uk/prove-right-to-work"),
-  link("Employer right to work checks", "https://www.gov.uk/check-an-employees-right-to-work-documents"),
-];
-
-const NETWORKING_LINKS = [
-  link("LinkedIn", "https://www.linkedin.com/", "commercial"),
-  link("Prospects careers advice", "https://www.prospects.ac.uk/careers-advice", "commercial"),
-  link("TargetJobs internships", "https://targetjobs.co.uk/careers-advice/internships", "commercial"),
 ];
 
 const MENTAL_HEALTH_LINKS = [
@@ -171,6 +133,11 @@ const ILR_LINKS = [
 const SKILLED_WORKER_LINKS = [
   link("Skilled Worker visa overview", "https://www.gov.uk/skilled-worker-visa"),
   link("Skilled Worker visa conditions", "https://www.gov.uk/skilled-worker-visa/when-you-can-start-working"),
+];
+
+const SKILLED_WORKER_SALARY_LINKS = [
+  link("Skilled Worker visa — salary requirements", "https://www.gov.uk/skilled-worker-visa/your-salary"),
+  link("Eligible occupations and salary thresholds", "https://www.gov.uk/government/publications/skilled-worker-visa-eligible-occupations"),
 ];
 
 const PAYE_LINKS = [
@@ -220,21 +187,52 @@ const NHS_CAREER_LINKS = [
   link("NHS AfC pay scales", "https://www.nhsemployers.org/pay-conditions/national-pay-scales"),
 ];
 
-const UNIVERSITY_PREP = [
-  link("UCAS student advice", "https://www.ucas.com/students", "university"),
-  link("UKCISA — preparing and planning", "https://www.ukcisa.org.uk/Information--Advice/Preparing--planning", "support"),
-];
+const NHS_PRECEPTORSHIP_LINK = link(
+  "NHS preceptorship framework",
+  "https://www.healthcareers.nhs.uk/working-health/working-nhs/career-progression/preceptorship",
+);
 
-const UNIVERSITY_PORTAL = [
-  link("UCAS student advice", "https://www.ucas.com/students", "university"),
-  link("UKCISA — studying and living in the UK", "https://www.ukcisa.org.uk/Information--Advice/Studying--living-in-the-UK", "support"),
-];
+const NHS_PAY_BENEFITS_LINK = link(
+  "NHS pay and benefits",
+  "https://www.healthcareers.nhs.uk/working-health/working-nhs/nhs-pay-and-benefits",
+);
 
-// ─── Task link map ─────────────────────────────────────────────────────────────
+const EVIDENCE_ROOM_LINK = link("Beginly Evidence Room", "/evidence-room", "support");
+
+const INNOVATOR_FOUNDER_OVERVIEW_LINK = link(
+  "Innovator Founder visa overview",
+  "https://www.gov.uk/innovator-founder-visa",
+);
+
+const INNOVATOR_FOUNDER_ENDORSEMENT_LINK = link(
+  "Innovator Founder endorsing bodies",
+  "https://www.gov.uk/innovator-founder-visa/endorse-your-business-idea",
+);
+
+const GLOBAL_TALENT_ENDORSEMENT_LINK = link(
+  "Global Talent — endorsing bodies",
+  "https://www.gov.uk/global-talent/endorsement",
+);
+
+const STUDENT_VISA_LINK = link("Student visa overview and your responsibilities", "https://www.gov.uk/student-visa");
+
+const UKCISA_LIVING_LINK = link(
+  "UKCISA — studying and living in the UK",
+  "https://www.ukcisa.org.uk/Information--Advice/Studying--living-in-the-UK",
+  "support",
+);
+
+const UKCISA_PREP_LINK = link(
+  "UKCISA — preparing and planning",
+  "https://www.ukcisa.org.uk/Information--Advice/Preparing--planning",
+  "support",
+);
+
+// ─── Task link map (keys are real taskIds from lib/seed-data.ts) ─────────────
 
 const TASK_LINKS: Record<string, ResourceLink[]> = {
   // ══════════════════════════════════════════════════════════════════════════
-  // UNI_ — Universal (all routes)
+  // UNI_ — Universal (applies to every route)
   // ══════════════════════════════════════════════════════════════════════════
   UNI_PRE_001: EVISA_LINKS,
   UNI_PRE_002: [
@@ -254,6 +252,7 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
   ],
   UNI_D1_003: [
     link("Shelter — moving into rented accommodation", "https://england.shelter.org.uk/housing_advice/private_renting/moving_into_private_rented_accommodation", "support"),
+    HOW_TO_RENT_LINK,
   ],
   UNI_D7_001: GP_LINKS,
   UNI_D7_002: NI_LINKS,
@@ -268,7 +267,7 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("DVLA — driving licences", "https://www.gov.uk/browse/driving/licence"),
   ],
   UNI_D30_003: MENTAL_HEALTH_LINKS,
-  UNI_D30_004: [...UTILITIES_LINKS, ...DEPOSIT_LINKS],
+  UNI_D30_004: [...UTILITIES_LINKS, ...DEPOSIT_LINKS, HOW_TO_RENT_LINK],
   UNI_D30_005: GP_LINKS,
   UNI_D30_006: NHS_LINKS,
   UNI_D30_007: BUDGET_LINKS,
@@ -282,77 +281,20 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
   UNI_GRW_002: [...SAVINGS_LINKS, ...BUDGET_LINKS],
 
   // ══════════════════════════════════════════════════════════════════════════
-  // STU_ — International Student
+  // STU_ — International Student (student-specific tasks on top of UNI_)
   // ══════════════════════════════════════════════════════════════════════════
-  STU_PRE_001: UNIVERSITY_PREP,
-  STU_PRE_002: HOUSING_SEARCH,
-  STU_PRE_003: EVISA_LINKS,
-  STU_PRE_004: [
-    link("National Rail journey planner", "https://www.nationalrail.co.uk/"),
-    link("TfL journey planner", "https://tfl.gov.uk/plan-a-journey/"),
-    link("National Express coaches", "https://www.nationalexpress.com/en", "commercial"),
+  STU_PRE_001: [
+    link("Confirmation of Acceptance for Studies (CAS) explained", "https://www.gov.uk/guidance/confirmation-of-acceptance-for-studies-cas-for-a-student-visa"),
+    UKCISA_PREP_LINK,
   ],
-  STU_PRE_005: [
-    link("MoneyHelper — travel and banking basics", "https://www.moneyhelper.org.uk/en/everyday-money/banking", "support"),
-    link("UKCISA — banking for international students", "https://www.ukcisa.org.uk/Information--Advice/Studying--living-in-the-UK/Opening-a-bank-account", "support"),
+  STU_D7_001: COUNCIL_TAX_LINKS,
+  STU_D7_002: BANK_COMPARE,
+  // STU_D7_003 gets a Google Maps directions link appended dynamically by getTaskLinks() below.
+  STU_D7_003: [STUDENT_VISA_LINK, UKCISA_LIVING_LINK],
+  STU_GRW_001: [
+    link("Graduate Route visa overview", "https://www.gov.uk/graduate-visa"),
+    UKCISA_LIVING_LINK,
   ],
-  STU_PRE_006: EVISA_LINKS,
-  STU_PRE_007: PHONE_LINKS,
-  STU_PRE_008: UNIVERSITY_PREP,
-  STU_D1_001: [
-    link("Emergency services guidance", "https://www.gov.uk/guidance/contact-the-emergency-services-and-urgent-help"),
-    link("Action Fraud — report scams", "https://www.actionfraud.police.uk/"),
-  ],
-  STU_D1_002: [link("WhatsApp Web", "https://web.whatsapp.com/", "commercial")],
-  STU_D1_003: [link("Shelter — moving into rented accommodation", "https://england.shelter.org.uk/housing_advice/private_renting/moving_into_private_rented_accommodation", "support")],
-  STU_D1_004: [link("Shelter — inventory and check-in advice", "https://england.shelter.org.uk/housing_advice/private_renting/inventory_and_check_in", "support")],
-  STU_D1_005: PHONE_LINKS,
-  STU_D1_006: UNIVERSITY_PORTAL,
-  STU_D7_001: [link("Google Maps route planner", "https://www.google.com/maps/", "support"), ...UNIVERSITY_PORTAL],
-  STU_D7_002: STUDENT_BANK,
-  STU_D7_003: GP_LINKS,
-  STU_D7_004: NHS_LINKS,
-  STU_D7_005: TRANSPORT_LINKS,
-  STU_D7_006: COUNCIL_TAX_LINKS,
-  STU_D7_007: COMMUNITY_LINKS,
-  STU_D7_008: SHOPPING_LINKS,
-  STU_D7_009: UTILITIES_LINKS,
-  STU_D7_010: DEPOSIT_LINKS,
-  STU_D30_001: STUDENT_BANK,
-  STU_D30_002: GP_LINKS,
-  STU_D30_003: NI_LINKS,
-  STU_D30_004: BUDGET_LINKS,
-  STU_D30_005: UNIVERSITY_PORTAL,
-  STU_D30_006: WORK_RIGHTS_LINKS,
-  STU_D30_007: TENANT_RIGHTS_LINKS,
-  STU_D30_008: COUNCIL_TAX_LINKS,
-  STU_D30_009: [
-    ...JOB_SEARCH_LINKS,
-    ...FLEX_WORK_LINKS,
-    link("Prospects student jobs", "https://www.prospects.ac.uk/jobs-and-work-experience/student-jobs", "commercial"),
-    link("Action Fraud — spot job scams", "https://www.actionfraud.police.uk/"),
-  ],
-  STU_D30_010: HEALTHCARE_EXTRAS_LINKS,
-  STU_D90_001: BUDGET_LINKS,
-  STU_D90_002: [
-    link("Current Account Switch Service", "https://www.currentaccountswitch.co.uk/"),
-    ...BANK_COMPARE.slice(0, 3),
-    link("MoneyHelper — comparing bank accounts", "https://www.moneyhelper.org.uk/en/everyday-money/banking/basic-bank-accounts", "support"),
-  ],
-  STU_D90_003: HOUSING_SEARCH,
-  STU_D90_004: UNIVERSITY_PORTAL,
-  STU_D90_005: [
-    ...JOB_SEARCH_LINKS,
-    ...FLEX_WORK_LINKS,
-    link("Prospects student jobs", "https://www.prospects.ac.uk/jobs-and-work-experience/student-jobs", "commercial"),
-    link("Gradcracker internships", "https://www.gradcracker.com/", "commercial"),
-    link("TargetJobs internships", "https://targetjobs.co.uk/careers-advice/internships", "commercial"),
-  ],
-  STU_D90_006: [link("UKCISA — living in the UK", "https://www.ukcisa.org.uk/Information--Advice/Studying--living-in-the-UK", "support"), ...BUDGET_LINKS],
-  STU_D90_007: HEALTHCARE_EXTRAS_LINKS,
-  STU_D90_008: SAVINGS_LINKS,
-  STU_D90_009: NETWORKING_LINKS,
-  STU_D90_010: [link("WhatsApp Web", "https://web.whatsapp.com/", "commercial")],
 
   // ══════════════════════════════════════════════════════════════════════════
   // SKW_ — Skilled Worker
@@ -366,11 +308,11 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("Acas — starting a new job", "https://www.acas.org.uk/starting-a-new-job"),
   ],
   SKW_PRE_004: HOUSING_SEARCH,
-  SKW_PRE_005: [
-    link("Skilled Worker visa — salary requirements", "https://www.gov.uk/skilled-worker-visa/your-salary"),
-    link("Eligible occupations and salary thresholds", "https://www.gov.uk/government/publications/skilled-worker-visa-eligible-occupations"),
+  SKW_PRE_005: SKILLED_WORKER_SALARY_LINKS,
+  SKW_D1_001: [
+    link("Prove your right to work to an employer", "https://www.gov.uk/prove-right-to-work"),
+    link("Employer right to work checks", "https://www.gov.uk/check-an-employees-right-to-work-documents"),
   ],
-  SKW_D1_001: RIGHT_TO_WORK_LINKS,
   SKW_D7_001: [
     link("Workplace pensions explained", "https://www.gov.uk/workplace-pensions"),
     link("MoneyHelper — auto enrolment", "https://www.moneyhelper.org.uk/en/pensions-and-retirement/auto-enrolment", "support"),
@@ -386,7 +328,7 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("Statutory Sick Pay (SSP)", "https://www.gov.uk/statutory-sick-pay"),
   ],
   SKW_D30_004: FAMILY_VISA_LINKS,
-  SKW_D90_001: SKILLED_WORKER_LINKS,
+  SKW_D90_001: SKILLED_WORKER_SALARY_LINKS,
   SKW_GRW_001: ILR_LINKS,
   SKW_GRW_002: [
     link("Skilled Worker visa — extend or switch", "https://www.gov.uk/skilled-worker-visa/extend-or-switch-to-this-visa"),
@@ -400,19 +342,28 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("CoS details for Health and Care Worker visa", "https://www.gov.uk/health-care-worker-visa/your-certificate-of-sponsorship"),
   ],
   HCW_PRE_002: DBS_LINKS,
-  HCW_PRE_003: RIGHT_TO_WORK_LINKS,
+  HCW_PRE_003: [
+    link("Prove your right to work to an employer", "https://www.gov.uk/prove-right-to-work"),
+    link("Employer right to work checks", "https://www.gov.uk/check-an-employees-right-to-work-documents"),
+  ],
   HCW_PRE_004: [
     link("NHS AfC pay scales", "https://www.nhsemployers.org/pay-conditions/national-pay-scales"),
-    link("NHS pay and benefits", "https://www.healthcareers.nhs.uk/working-health/working-nhs/nhs-pay-and-benefits"),
+    NHS_PAY_BENEFITS_LINK,
   ],
-  HCW_D1_001: RIGHT_TO_WORK_LINKS,
+  HCW_D1_001: [
+    link("Prove your right to work to an employer", "https://www.gov.uk/prove-right-to-work"),
+    link("Employer right to work checks", "https://www.gov.uk/check-an-employees-right-to-work-documents"),
+  ],
   HCW_D7_001: PROFESSIONAL_REG_LINKS,
   HCW_D7_002: DBS_LINKS,
   HCW_D7_003: [
     link("NHS occupational health — what to expect", "https://www.healthcareers.nhs.uk/working-health/working-nhs/nhs-pay-and-benefits/occupational-health"),
   ],
   HCW_D7_004: PROFESSIONAL_REG_LINKS,
-  HCW_D7_005: PAYE_LINKS,
+  HCW_D7_005: [
+    link("Check your income tax for the current year", "https://www.gov.uk/check-income-tax-current-year"),
+    NHS_PAY_BENEFITS_LINK,
+  ],
   HCW_D30_001: [
     link("e-Learning for Health — NHS mandatory training", "https://www.e-lfh.org.uk/"),
     link("NHS Learning Hub", "https://learninghub.nhs.uk/"),
@@ -423,14 +374,12 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("NHS Pension Scheme", "https://www.nhspensionscheme.nhs.uk/"),
     link("NHS pension member guides", "https://www.nhspensionscheme.nhs.uk/members/"),
   ],
-  HCW_D30_005: NHS_CAREER_LINKS,
+  HCW_D30_005: [NHS_PRECEPTORSHIP_LINK],
   HCW_D30_006: [
     link("NHS AfC pay scales and banding", "https://www.nhsemployers.org/pay-conditions/national-pay-scales"),
   ],
   HCW_D90_001: EVISA_LINKS,
-  HCW_D90_002: [
-    link("NHS preceptorship framework", "https://www.healthcareers.nhs.uk/working-health/working-nhs/career-progression/preceptorship"),
-  ],
+  HCW_D90_002: [NHS_PRECEPTORSHIP_LINK],
   HCW_D90_003: [
     link("NMC — revalidation", "https://www.nmc.org.uk/revalidation/"),
     link("GMC — revalidation", "https://www.gmc-uk.org/registration-and-licensing/managing-your-registration/revalidation"),
@@ -449,7 +398,10 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("Graduate Route visa overview", "https://www.gov.uk/graduate-visa"),
     link("Check your graduate visa status (eVisa)", "https://www.gov.uk/view-prove-immigration-status"),
   ],
-  GRD_PRE_002: EVISA_LINKS,
+  GRD_PRE_002: [
+    link("Graduate Route visa overview and duration", "https://www.gov.uk/graduate-visa"),
+    link("View and prove your immigration status (eVisa)", "https://www.gov.uk/view-prove-immigration-status"),
+  ],
   GRD_D7_001: [
     link("LinkedIn — edit your profile", "https://www.linkedin.com/in/", "commercial"),
     link("LinkedIn profile tips", "https://www.linkedin.com/help/linkedin/answer/a554351", "commercial"),
@@ -462,7 +414,6 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
   GRD_D7_004: NI_LINKS,
   GRD_D7_005: [
     link("LinkedIn — update your profile", "https://www.linkedin.com/in/", "commercial"),
-    link("GitHub — showcase your work", "https://github.com/", "commercial"),
   ],
   GRD_D30_001: [
     link("National Careers — CV sections guide", "https://nationalcareers.service.gov.uk/careers-advice/cv-sections"),
@@ -473,16 +424,13 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("Register of licensed sponsors (UK employers)", "https://www.gov.uk/government/publications/register-of-licensed-sponsors-workers"),
     link("Skilled Worker visa — sponsorship", "https://www.gov.uk/skilled-worker-visa/your-certificate-of-sponsorship"),
   ],
-  GRD_D30_004: [
-    link("Skilled Worker visa salary requirements", "https://www.gov.uk/skilled-worker-visa/your-salary"),
-    link("Glassdoor salary checker", "https://www.glassdoor.co.uk/Salaries/index.htm", "commercial"),
-  ],
+  GRD_D30_004: SKILLED_WORKER_SALARY_LINKS,
   GRD_D30_005: [
-    link("LinkedIn Skills assessment", "https://www.linkedin.com/learning/", "commercial"),
+    link("Eligible occupations and salary thresholds", "https://www.gov.uk/government/publications/skilled-worker-visa-eligible-occupations"),
     link("National Careers — skills assessment", "https://nationalcareers.service.gov.uk/skills-assessment"),
   ],
   GRD_D30_006: SELF_EMPLOYED_LINKS,
-  GRD_D90_001: [...JOB_SEARCH_LINKS, ...FLEX_WORK_LINKS],
+  GRD_D90_001: JOB_SEARCH_LINKS,
   GRD_GRW_001: SKILLED_WORKER_LINKS,
   GRD_GRW_002: [
     link("National Careers — interview advice", "https://nationalcareers.service.gov.uk/careers-advice/interview-advice"),
@@ -490,7 +438,7 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
   ],
   GRD_GRW_003: [
     link("Graduate Route visa details", "https://www.gov.uk/graduate-visa"),
-    link("Switch to Skilled Worker visa", "https://www.gov.uk/skilled-worker-visa"),
+    link("Skilled Worker visa overview", "https://www.gov.uk/skilled-worker-visa"),
   ],
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -498,20 +446,22 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
   // ══════════════════════════════════════════════════════════════════════════
   GTL_PRE_001: [
     link("Global Talent visa overview", "https://www.gov.uk/global-talent"),
-    link("Global Talent endorsement bodies", "https://www.gov.uk/global-talent/endorsement"),
+    GLOBAL_TALENT_ENDORSEMENT_LINK,
   ],
-  GTL_PRE_002: SELF_EMPLOYED_LINKS,
+  GTL_PRE_002: [
+    link("Employed or self-employed — how to tell", "https://www.gov.uk/employment-status/employed"),
+    link("Register as self-employed with HMRC", "https://www.gov.uk/set-up-self-employed"),
+  ],
   GTL_PRE_003: [
-    link("Global Talent visa eligibility", "https://www.gov.uk/global-talent/eligibility"),
-    link("LinkedIn — build your professional presence", "https://www.linkedin.com/", "commercial"),
+    link("LinkedIn — find groups in your field", "https://www.linkedin.com/", "commercial"),
+    link("Meetup — professional communities", "https://www.meetup.com/", "commercial"),
+    link("Eventbrite — professional events", "https://www.eventbrite.co.uk/", "commercial"),
   ],
   GTL_D7_001: [
     link("LinkedIn — update your profile", "https://www.linkedin.com/in/", "commercial"),
     link("GitHub — showcase your projects", "https://github.com/", "commercial"),
   ],
-  GTL_D7_002: [
-    link("Global Talent — endorsing bodies", "https://www.gov.uk/global-talent/endorsement"),
-  ],
+  GTL_D7_002: [GLOBAL_TALENT_ENDORSEMENT_LINK],
   GTL_D7_003: SELF_EMPLOYED_LINKS,
   GTL_D7_004: [
     link("Find your UTR number", "https://www.gov.uk/find-lost-utr-number"),
@@ -523,27 +473,24 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("HMRC — register for Self Assessment", "https://www.gov.uk/register-for-self-assessment"),
   ],
   GTL_D30_002: [
+    EVIDENCE_ROOM_LINK,
     link("LinkedIn — record your achievements", "https://www.linkedin.com/in/", "commercial"),
-    link("GitHub — maintain your portfolio", "https://github.com/", "commercial"),
   ],
   GTL_D30_003: [
-    link("Global Talent — endorsing body contacts", "https://www.gov.uk/global-talent/endorsement"),
+    link("See recognised organisations in your field (Global Talent)", "https://www.gov.uk/global-talent/endorsement"),
+    link("LinkedIn — search professional groups", "https://www.linkedin.com/", "commercial"),
   ],
   GTL_D30_004: [
     link("LinkedIn", "https://www.linkedin.com/", "commercial"),
     link("Eventbrite — professional events", "https://www.eventbrite.co.uk/", "commercial"),
     link("Meetup — tech and professional communities", "https://www.meetup.com/", "commercial"),
   ],
-  GTL_D90_001: [
-    link("Global Talent visa — settlement (ILR)", "https://www.gov.uk/indefinite-leave-to-remain/global-talent-route"),
-  ],
+  GTL_D90_001: [EVIDENCE_ROOM_LINK],
   GTL_GRW_001: [
-    link("Global Talent settlement (ILR)", "https://www.gov.uk/indefinite-leave-to-remain/global-talent-route"),
-    link("Endorsement requirements for settlement", "https://www.gov.uk/global-talent"),
+    link("Global Talent visa — settlement (ILR)", "https://www.gov.uk/indefinite-leave-to-remain/global-talent-route"),
+    link("Global Talent visa overview", "https://www.gov.uk/global-talent"),
   ],
-  GTL_GRW_002: [
-    link("Global Talent endorsing bodies", "https://www.gov.uk/global-talent/endorsement"),
-  ],
+  GTL_GRW_002: [GLOBAL_TALENT_ENDORSEMENT_LINK],
   GTL_GRW_003: [
     link("Self Assessment tax return", "https://www.gov.uk/self-assessment-tax-returns"),
     link("HMRC — file your return", "https://www.gov.uk/log-in-file-self-assessment-tax-return"),
@@ -552,14 +499,8 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
   // ══════════════════════════════════════════════════════════════════════════
   // FND_ — Innovator Founder
   // ══════════════════════════════════════════════════════════════════════════
-  FND_PRE_001: [
-    link("Innovator Founder visa overview", "https://www.gov.uk/innovator-founder-visa"),
-    link("Innovator Founder endorsement bodies", "https://www.gov.uk/innovator-founder-visa/endorse-your-business-idea"),
-  ],
-  FND_PRE_002: [
-    link("GOV.UK — write a business plan", "https://www.gov.uk/write-business-plan"),
-    link("Companies House — check company name availability", "https://find-and-update.company-information.service.gov.uk/"),
-  ],
+  FND_PRE_001: [INNOVATOR_FOUNDER_OVERVIEW_LINK, INNOVATOR_FOUNDER_ENDORSEMENT_LINK],
+  FND_PRE_002: [INNOVATOR_FOUNDER_OVERVIEW_LINK, INNOVATOR_FOUNDER_ENDORSEMENT_LINK],
   FND_PRE_003: COMPANIES_HOUSE_LINKS,
   FND_PRE_004: [
     link("Find a chartered accountant — ICAEW", "https://www.icaew.com/about-icaew/find-a-chartered-accountant"),
@@ -571,20 +512,16 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
   ],
   FND_D7_001: COMPANIES_HOUSE_LINKS,
   FND_D7_002: [
-    link("Corporation Tax overview", "https://www.gov.uk/corporation-tax"),
     link("Register for Corporation Tax", "https://www.gov.uk/register-for-corporation-tax"),
+    link("Register for Self Assessment", "https://www.gov.uk/register-for-self-assessment"),
   ],
-  FND_D7_003: [
-    link("Innovator Founder endorsing bodies", "https://www.gov.uk/innovator-founder-visa/endorse-your-business-idea"),
-  ],
+  FND_D7_003: [INNOVATOR_FOUNDER_ENDORSEMENT_LINK],
   FND_D30_001: BUSINESS_BANK,
   FND_D30_002: [
     link("Register for VAT", "https://www.gov.uk/register-for-vat"),
     link("VAT — when to register", "https://www.gov.uk/vat-registration/when-to-register"),
   ],
-  FND_D30_003: [
-    link("Beginly Evidence Room", "/evidence-room", "support"),
-  ],
+  FND_D30_003: [EVIDENCE_ROOM_LINK],
   FND_D30_004: [
     link("WeWork co-working spaces", "https://www.wework.com/l/coworking-space/london-GB", "commercial"),
     link("Regus workspace locator", "https://www.regus.com/en-gb/search?country=GB", "commercial"),
@@ -600,12 +537,11 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("Startups.co.uk — UK startup ecosystem", "https://startups.co.uk/", "commercial"),
     link("Beauhurst — UK startup news and data", "https://beauhurst.com/", "commercial"),
   ],
-  FND_D90_001: [
-    link("Beginly Evidence Room", "/evidence-room", "support"),
-  ],
+  FND_D90_001: [INNOVATOR_FOUNDER_ENDORSEMENT_LINK, EVIDENCE_ROOM_LINK],
   FND_D90_002: [
     link("Intellectual Property Office", "https://www.gov.uk/government/organisations/intellectual-property-office"),
     link("Apply for a patent", "https://www.gov.uk/patent-your-invention"),
+    link("Register a trade mark", "https://www.gov.uk/how-to-register-a-trade-mark"),
   ],
   FND_D90_003: [
     link("Companies House — confirmation statement", "https://www.gov.uk/confirmation-statement"),
@@ -618,7 +554,7 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("Enterprise Investment Scheme (EIS)", "https://www.gov.uk/guidance/venture-capital-schemes-apply-for-enterprise-investment-scheme"),
   ],
   FND_GRW_003: [
-    link("Acas — employment law for employers", "https://www.acas.org.uk/"),
+    link("Acas — employing people", "https://www.acas.org.uk/"),
     link("GOV.UK — employing people", "https://www.gov.uk/browse/employing-people"),
   ],
   FND_GRW_004: [
@@ -637,7 +573,10 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("School admissions — GOV.UK", "https://www.gov.uk/schools-admissions"),
     link("Find a school in England", "https://www.gov.uk/school-performance-tables"),
   ],
-  FAM_PRE_003: HOUSING_SEARCH,
+  FAM_PRE_003: [
+    link("Family visas overview — sponsor role and responsibilities", "https://www.gov.uk/uk-family-visa"),
+    link("View and prove your immigration status before travel", "https://www.gov.uk/view-prove-immigration-status"),
+  ],
   FAM_PRE_004: CHILDCARE_LINKS,
   FAM_D7_001: [
     link("Apply for a school place", "https://www.gov.uk/apply-for-primary-school-place"),
@@ -655,7 +594,8 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("British Council — English resources", "https://www.britishcouncil.org/english", "support"),
   ],
   FAM_D30_002: [
-    link("School admissions appeals", "https://www.gov.uk/appeal-school-admissions-decision"),
+    link("Complain about a school", "https://www.gov.uk/complain-about-school"),
+    link("School admissions — GOV.UK", "https://www.gov.uk/schools-admissions"),
   ],
   FAM_D30_003: [...JOB_SEARCH_LINKS, ...FLEX_WORK_LINKS],
   FAM_D30_004: [
@@ -669,7 +609,7 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
   ],
 
   // ══════════════════════════════════════════════════════════════════════════
-  // Journey Hub adaptive tasks (common-* and route-specific)
+  // Journey Hub adaptive tasks (common-* and route-specific, from lib/platform/journey.ts)
   // ══════════════════════════════════════════════════════════════════════════
   "common-identity": EVISA_LINKS,
   "common-gp": GP_LINKS,
@@ -683,14 +623,16 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("Find your local council", "https://www.gov.uk/find-local-council"),
     link("NHS services near you", "https://www.nhs.uk/nhs-services/"),
   ],
-  "student-enrolment": UNIVERSITY_PORTAL,
+  "student-enrolment": [
+    link("Confirmation of Acceptance for Studies (CAS) explained", "https://www.gov.uk/guidance/confirmation-of-acceptance-for-studies-cas-for-a-student-visa"),
+    UKCISA_LIVING_LINK,
+  ],
   "student-academic-plan": [
-    link("UKCISA — studying in the UK", "https://www.ukcisa.org.uk/Information--Advice/Studying--living-in-the-UK", "support"),
+    UKCISA_LIVING_LINK,
     link("National Careers Service", "https://nationalcareers.service.gov.uk/"),
   ],
   "student-experience": [
     ...FLEX_WORK_LINKS,
-    link("TargetJobs — internships and experience", "https://targetjobs.co.uk/careers-advice/internships", "commercial"),
     link("Prospects — student jobs and placements", "https://www.prospects.ac.uk/jobs-and-work-experience/student-jobs", "commercial"),
   ],
   "student-cv": [
@@ -709,9 +651,9 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     ...JOB_SEARCH_LINKS,
     link("National Careers — career planning", "https://nationalcareers.service.gov.uk/careers-advice"),
   ],
-  "graduate-applications": [...JOB_SEARCH_LINKS, ...FLEX_WORK_LINKS],
+  "graduate-applications": JOB_SEARCH_LINKS,
   "worker-employment-records": [
-    ...RIGHT_TO_WORK_LINKS,
+    link("Prove your right to work to an employer", "https://www.gov.uk/prove-right-to-work"),
     link("Skilled Worker visa details", "https://www.gov.uk/skilled-worker-visa"),
   ],
   "worker-progression": [
@@ -735,11 +677,8 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("GOV.UK — education and learning", "https://www.gov.uk/browse/education"),
   ],
   "family-career": [...JOB_SEARCH_LINKS, ...FLEX_WORK_LINKS],
-  "founder-thesis": [
-    link("Innovator Founder visa overview", "https://www.gov.uk/innovator-founder-visa"),
-    link("Beginly Evidence Room", "/evidence-room", "support"),
-  ],
-  "founder-evidence": [link("Beginly Evidence Room", "/evidence-room", "support")],
+  "founder-thesis": [INNOVATOR_FOUNDER_OVERVIEW_LINK, EVIDENCE_ROOM_LINK],
+  "founder-evidence": [EVIDENCE_ROOM_LINK],
   "founder-validation": [link("GOV.UK — write a business plan", "https://www.gov.uk/write-business-plan")],
   "founder-scale": COMPANIES_HOUSE_LINKS,
   "talent-evidence": [
@@ -762,8 +701,27 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
   ],
 };
 
-export function getTaskLinks(taskId: string): ResourceLink[] {
-  return TASK_LINKS[taskId] ?? [];
+/**
+ * Builds a Google Maps directions link with the user's known city pre-filled as the
+ * departure point, leaving the destination blank for the user to fill in (their
+ * specific university office, GP surgery, etc. — addresses we don't hold).
+ */
+function directionsFromCity(city: string | undefined, label: string): ResourceLink | null {
+  if (!city) return null;
+  const origin = encodeURIComponent(`${city}, UK`);
+  return link(label, `https://www.google.com/maps/dir/?api=1&origin=${origin}`, "official");
+}
+
+// Tasks where a "directions from home" link is genuinely useful because the user
+// has to physically travel somewhere whose exact address we don't know.
+const DIRECTIONS_TASKS = new Set(["STU_D7_003"]);
+
+export function getTaskLinks(taskId: string, originCity?: string): ResourceLink[] {
+  const base = TASK_LINKS[taskId] ?? [];
+  if (!DIRECTIONS_TASKS.has(taskId)) return base;
+
+  const directions = directionsFromCity(originCity, "Get directions from your city (add your destination)");
+  return directions ? [...base, directions] : base;
 }
 
 export function hasTaskLinks(taskId: string): boolean {
