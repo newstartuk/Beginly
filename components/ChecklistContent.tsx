@@ -59,7 +59,18 @@ export default function ChecklistContent() {
         const stored = getUserTasks();
         const tasks: UserTask[] = stored.length
           ? stored
-          : SEED_TASKS.map((task, index) => ({
+          : generateTasksForProfile({
+              arrivalType: "international_student",
+              arrivalStatus: "arrived",
+              arrivalDate: "2025-09-18",
+              city: "Leeds",
+              university: "University of Leeds",
+              accommodationType: "private_rental",
+              nationality: "Nigerian",
+              englishLevel: "advanced",
+              interestedInWork: true,
+              profileCompleted: true,
+            }).map((task, index) => ({
               taskId: task.taskId,
               status: index < 8 ? ("complete" as const) : ("not_started" as const),
               completedAt: index < 8 ? new Date().toISOString() : undefined,

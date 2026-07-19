@@ -17,7 +17,7 @@ import {
   ExternalLink,
   ArrowRight,
 } from "lucide-react";
-import Navigation from "@/components/Navigation";
+import PlatformShell from "@/components/platform/PlatformShell";
 import Disclaimer from "@/components/Disclaimer";
 
 export default function TaskDetailPage() {
@@ -54,12 +54,12 @@ export default function TaskDetailPage() {
 
   if (!task) {
     return (
-      <Navigation>
+      <PlatformShell title="Task not found" eyebrow="Task Library">
         <div className="text-center py-20">
           <p className="text-lg font-bold text-navy mb-2">Task not found</p>
           <Link href="/checklist" className="text-sm text-primary hover:underline">← Back to task library</Link>
         </div>
-      </Navigation>
+      </PlatformShell>
     );
   }
 
@@ -88,7 +88,7 @@ export default function TaskDetailPage() {
   const officialLinks = getTaskLinks(task.taskId);
 
   return (
-    <Navigation>
+    <PlatformShell title={task.title} eyebrow={`Task Library · ${task.stage} · ${task.category}`}>
       <div className="space-y-5 animate-fade-in max-w-3xl">
         {/* Back */}
         <Link href="/checklist" className="inline-flex items-center gap-1 text-sm text-muted hover:text-primary transition-colors">
@@ -261,6 +261,6 @@ export default function TaskDetailPage() {
 
         <Disclaimer text="Beginly provides general settlement guidance, checklist support, document explanation, and signposting. We do not provide legal, immigration, financial, tax, medical, or housing advice. For official or regulated matters, please use official sources or speak to a qualified professional." type="general" />
       </div>
-    </Navigation>
+    </PlatformShell>
   );
 }

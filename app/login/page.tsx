@@ -8,7 +8,7 @@ import { ensureBeginlyUser } from "@/lib/auth-client";
 import { setArrivalProfile, setUser, setUserTasks } from "@/lib/utils";
 import { resolvePostAuthRedirect } from "@/lib/navigation/post-auth";
 import { isClientDemoMode } from "@/lib/platform/runtime";
-import { SEED_TASKS } from "@/lib/seed-data";
+import { generateTasksForProfile } from "@/lib/task-generator";
 import { AlertCircle, CheckCircle } from "lucide-react";
 import Logo from "@/components/Logo";
 
@@ -56,9 +56,20 @@ export default function LoginPage() {
     });
 
     setUserTasks(
-      SEED_TASKS.map((task, index) => ({
+      generateTasksForProfile({
+        arrivalType: "international_student",
+        arrivalStatus: "arrived",
+        arrivalDate: "2025-09-18",
+        city: "Leeds",
+        university: "University of Leeds",
+        accommodationType: "private_rental",
+        nationality: "Nigerian",
+        englishLevel: "advanced",
+        interestedInWork: true,
+        profileCompleted: true,
+      }).map((task, index) => ({
         taskId: task.taskId,
-        status: index < 8 ? "complete" : "not_started",
+        status: index < 8 ? ("complete" as const) : ("not_started" as const),
         completedAt: index < 8 ? "2026-07-16T00:00:00.000Z" : undefined,
       })),
     );

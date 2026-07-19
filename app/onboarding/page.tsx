@@ -70,10 +70,11 @@ const CITY_UNIVERSITIES: Record<string, string[]> = {
   ],
 };
 
+// International student first
 const ROUTE_OPTIONS: { value: ArrivalType; label: string; desc: string }[] = [
+  { value: "international_student", label: "International Student", desc: "Coming to study at a UK university" },
   { value: "skilled_worker", label: "Skilled Worker", desc: "Working in the UK on a Skilled Worker visa" },
   { value: "health_and_care", label: "Health & Care Worker", desc: "Working for the NHS or UK adult social care" },
-  { value: "international_student", label: "International Student", desc: "Coming to study at a UK university" },
   { value: "graduate", label: "Graduate Route", desc: "Staying in the UK after completing a UK degree" },
   { value: "family_visa", label: "Family Visa", desc: "Joining family already in the UK" },
   { value: "global_talent", label: "Global Talent", desc: "Endorsed by Tech Nation, Royal Academy, or British Academy" },
@@ -126,6 +127,15 @@ const UK_SECTORS = [
   "Other",
 ];
 
+const DEPENDANT_RELATIONSHIPS = [
+  "Child (under 18)",
+  "Child (18+)",
+  "Spouse / Partner",
+  "Parent",
+  "Sibling",
+  "Other",
+];
+
 type OnboardingProfile = Partial<ArrivalProfile>;
 
 const STEPS = [
@@ -136,8 +146,8 @@ const STEPS = [
   { label: "Driving", icon: Car },       // 4
   { label: "Dependants", icon: Users },  // 5
   { label: "Focus", icon: Target },      // 6 — family_visa only; others skip
-  { label: "Sector", icon: Briefcase },  // 7 — skipped for family_visa non-workers
-  { label: "Employer", icon: Building2 },// 8
+  { label: "Sector", icon: Briefcase },  // 7 — skipped for students (already got in step 2) and FAM non-workers
+  { label: "Employer", icon: Building2 },// 8 — skipped for students
   { label: "Done", icon: CheckCircle },  // 9
 ];
 
@@ -172,16 +182,34 @@ function isFamilyVisa(profile: OnboardingProfile) {
   return profile.arrivalType === "family_visa";
 }
 
-// Smart navigation — skips step 6 (Focus) for non-FAM, skips step 7 (Sector) for FAM non-workers
+// Smart navigation:
+// - Step 6 (Focus) only for FAM
+// - Step 7 (Sector) skipped for students (already captured in step 2) and FAM non-workers
+// - Step 8 (Employer) skipped for students
 function getNextStep(s: number, profile: OnboardingProfile, totalSteps: number): number {
-  if (s === 5) return isFamilyVisa(profile) ? 6 : 7;
+  if (s === 5) {
+    if (isFamilyVisa(profile)) return 6;
+    if (isStudent(profile)) return 9; // skip 6, 7, 8 — students answered sector in step 2, no employer step
+    return 7;
+  }
   if (s === 6) return profile.interestedInWork ? 7 : 8;
+  if (s === 7) {
+    if (isStudent(profile)) return 9; // safety net
+    return 8;
+  }
   return Math.min(s + 1, totalSteps - 1);
 }
 
 function getPrevStep(s: number, profile: OnboardingProfile): number {
   if (s === 7) return isFamilyVisa(profile) ? 6 : 5;
-  if (s === 8 && isFamilyVisa(profile) && !profile.interestedInWork) return 6;
+  if (s === 8) {
+    if (isFamilyVisa(profile) && !profile.interestedInWork) return 6;
+    return 7;
+  }
+  if (s === 9) {
+    if (isStudent(profile)) return 5; // students skip 6, 7, 8
+    return 8;
+  }
   return Math.max(s - 1, 0);
 }
 
@@ -197,6 +225,16 @@ export default function OnboardingPage() {
     interestedInWork: false,
     profileCompleted: false,
   });
+
+  // "Other" text override state
+  const [customCity, setCustomCity] = useState("");
+  const [customUniversity, setCustomUniversity] = useState("");
+  const [customCourse, setCustomCourse] = useState("");
+  const [customSector, setCustomSector] = useState("");
+
+  // Dependants detail state
+  const [dependantCount, setDependantCount] = useState(1);
+  const [dependantRelationships, setDependantRelationships] = useState<string[]>(["Child (under 18)"]);
 
   useEffect(() => {
     async function checkAuth() {
@@ -233,10 +271,21 @@ export default function OnboardingPage() {
   const back = () => setStep((s) => getPrevStep(s, profile));
   const isLastStep = step === totalSteps - 1;
 
+  // Resolved city/university/course/sector with "Other" override
+  const resolvedCity = profile.city === "Other" && customCity.trim() ? customCity.trim() : (profile.city ?? "");
+  const resolvedUniversity = profile.university === "Other" && customUniversity.trim() ? customUniversity.trim() : (profile.university ?? "");
+  const resolvedSector = profile.sector === "Other" && customSector.trim() ? customSector.trim() : (profile.sector === "Other" && isStudent(profile) && customCourse.trim() ? customCourse.trim() : (profile.sector ?? ""));
+
   const canProceed = () => {
     if (step === 0) return Boolean(profile.arrivalType);
     if (step === 1) return Boolean(profile.arrivalStatus);
-    if (step === 2) return Boolean(profile.city) && (isStudent(profile) ? Boolean(profile.university) : true);
+    if (step === 2) {
+      const cityOk = Boolean(profile.city) && (profile.city !== "Other" || Boolean(customCity.trim()));
+      const uniOk = isStudent(profile)
+        ? Boolean(profile.university) && (profile.university !== "Other" || Boolean(customUniversity.trim()))
+        : true;
+      return cityOk && uniOk;
+    }
     return true;
   };
 
@@ -249,8 +298,8 @@ export default function OnboardingPage() {
       arrivalType: profile.arrivalType ?? "skilled_worker",
       arrivalStatus: profile.arrivalStatus ?? "not_arrived",
       arrivalDate: profile.arrivalDate ?? "",
-      city: profile.city ?? "",
-      university: profile.university ?? "",
+      city: resolvedCity,
+      university: resolvedUniversity,
       accommodationType: profile.accommodationType ?? "not_secured",
       nationality: profile.nationality,
       englishLevel: profile.englishLevel,
@@ -260,13 +309,12 @@ export default function OnboardingPage() {
       hasIDL: profile.hasIDL,
       wantsProvisionalLicence: profile.wantsProvisionalLicence,
       hasDependants: profile.hasDependants,
-      sector: profile.sector,
+      sector: resolvedSector || undefined,
       employerName: profile.employerName,
     };
 
     await ensureBeginlyUser();
 
-    // Try to save with new extended columns first, fall back to core columns
     const extendedPayload: Record<string, unknown> = {
       user_id: user.id,
       arrival_type: completeProfile.arrivalType,
@@ -303,7 +351,6 @@ export default function OnboardingPage() {
     }
 
     if (profileError) {
-      // New columns may not exist yet — fall back to core fields only
       const corePayload = {
         user_id: user.id,
         arrival_type: completeProfile.arrivalType,
@@ -466,7 +513,7 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 2 — City (+ university for students) */}
+          {/* Step 2 — City + university (students) + course of study (students) */}
           {step === 2 && (
             <div className="space-y-4">
               <div>
@@ -482,8 +529,18 @@ export default function OnboardingPage() {
                   <option value="">Select your city...</option>
                   {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
+                {profile.city === "Other" && (
+                  <input
+                    type="text"
+                    value={customCity}
+                    onChange={(e) => setCustomCity(e.target.value)}
+                    className="input-field mt-2"
+                    placeholder="Enter your city..."
+                    autoFocus
+                  />
+                )}
               </div>
-              {isStudent(profile) && (
+              {isStudent(profile) && profile.city && (
                 <div>
                   <label className="input-label">Which university?</label>
                   <select
@@ -498,6 +555,16 @@ export default function OnboardingPage() {
                     ))}
                     <option value="Other">Other</option>
                   </select>
+                  {profile.university === "Other" && (
+                    <input
+                      type="text"
+                      value={customUniversity}
+                      onChange={(e) => setCustomUniversity(e.target.value)}
+                      className="input-field mt-2"
+                      placeholder="Enter your university name..."
+                      autoFocus
+                    />
+                  )}
                 </div>
               )}
               {isStudent(profile) && profile.university && (
@@ -513,6 +580,16 @@ export default function OnboardingPage() {
                       <option key={f} value={f}>{f}</option>
                     ))}
                   </select>
+                  {profile.sector === "Other" && (
+                    <input
+                      type="text"
+                      value={customCourse}
+                      onChange={(e) => setCustomCourse(e.target.value)}
+                      className="input-field mt-2"
+                      placeholder="Enter your field of study..."
+                      autoFocus
+                    />
+                  )}
                   <p className="text-xs text-muted mt-1.5">
                     This helps us tailor career opportunities and growth tasks for your subject area.
                   </p>
@@ -535,7 +612,9 @@ export default function OnboardingPage() {
               </label>
               <p className="text-xs text-muted">This determines whether council tax applies to you.</p>
               {HOUSING_OPTIONS.filter((opt) =>
-                isStudent(profile) ? true : opt.value !== "university_accommodation"
+                isStudent(profile)
+                  ? opt.value !== "employer_provided"
+                  : opt.value !== "university_accommodation"
               ).map((opt) => (
                 <button
                   key={opt.value}
@@ -590,33 +669,17 @@ export default function OnboardingPage() {
                   type="button"
                   onClick={() => {
                     update("drivesFromOrigin", false);
-                    update("wantsProvisionalLicence", true);
-                    setProfile((p) => ({ ...p, hasIDL: undefined }));
-                  }}
-                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                    profile.drivesFromOrigin === false && profile.wantsProvisionalLicence === true
-                      ? "border-primary bg-teal-50"
-                      : "border-border hover:border-primary/40"
-                  }`}
-                >
-                  <p className="text-sm font-semibold text-navy">No, but I&apos;d like to learn to drive in the UK</p>
-                  <p className="text-xs text-muted">We&apos;ll add a provisional licence task to your roadmap</p>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    update("drivesFromOrigin", false);
                     update("wantsProvisionalLicence", false);
                     setProfile((p) => ({ ...p, hasIDL: undefined }));
                   }}
                   className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                    profile.drivesFromOrigin === false && profile.wantsProvisionalLicence === false
+                    profile.drivesFromOrigin === false
                       ? "border-primary bg-teal-50"
                       : "border-border hover:border-primary/40"
                   }`}
                 >
                   <p className="text-sm font-semibold text-navy">No, I don&apos;t drive</p>
-                  <p className="text-xs text-muted">No driving tasks will be added</p>
+                  <p className="text-xs text-muted">No driving tasks added. Nia can revisit this with you later if your plans change.</p>
                 </button>
               </div>
               {profile.drivesFromOrigin === true && (
@@ -657,7 +720,7 @@ export default function OnboardingPage() {
               </label>
               <p className="text-xs text-muted">This helps us add tasks like school enrolment to your roadmap where relevant.</p>
               {[
-                { value: true, label: "Yes, I have children or dependants coming with me", desc: "We'll add school enrolment and family settlement tasks" },
+                { value: true, label: "Yes, I have dependants coming with me", desc: "We'll add family settlement tasks" },
                 { value: false, label: "No dependants — just me (or adults only)", desc: "No dependant-specific tasks will be added" },
               ].map((opt) => (
                 <button
@@ -674,6 +737,55 @@ export default function OnboardingPage() {
                   <p className="text-xs text-muted">{opt.desc}</p>
                 </button>
               ))}
+
+              {/* Dependant detail — shown when yes selected */}
+              {profile.hasDependants === true && (
+                <div className="mt-4 space-y-4 border border-primary/20 bg-primary/5 rounded-xl p-4">
+                  <div>
+                    <label className="input-label">How many dependants are coming with you?</label>
+                    <select
+                      value={dependantCount}
+                      onChange={(e) => {
+                        const n = Number(e.target.value);
+                        setDependantCount(n);
+                        setDependantRelationships((prev) => {
+                          const updated = [...prev];
+                          while (updated.length < n) updated.push("Child (under 18)");
+                          return updated.slice(0, n);
+                        });
+                      }}
+                      className="select-field mt-1"
+                    >
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <option key={n} value={n}>{n}</option>
+                      ))}
+                      <option value={6}>6 or more</option>
+                    </select>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="input-label">What is their relationship to you?</label>
+                    {Array.from({ length: Math.min(dependantCount, 6) }).map((_, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <span className="text-xs text-muted w-24 shrink-0">Dependant {i + 1}</span>
+                        <select
+                          value={dependantRelationships[i] ?? "Child (under 18)"}
+                          onChange={(e) => {
+                            const updated = [...dependantRelationships];
+                            updated[i] = e.target.value;
+                            setDependantRelationships(updated);
+                          }}
+                          className="select-field flex-1"
+                        >
+                          {DEPENDANT_RELATIONSHIPS.map((r) => (
+                            <option key={r} value={r}>{r}</option>
+                          ))}
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <button type="button" onClick={next} className="btn-ghost text-xs text-muted w-full justify-center">
                 Skip this question
               </button>
@@ -720,38 +832,44 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 7 — Sector */}
+          {/* Step 7 — Sector (non-students only; students skip) */}
           {step === 7 && (
             <div className="space-y-4">
               <label className="input-label">
                 <Briefcase className="w-3 h-3 inline mr-1" />
-                {isStudent(profile) ? "What are you studying? (optional)" : "What sector are you working in? (optional)"}
+                What sector are you working in? (optional)
               </label>
               <select
                 value={profile.sector || ""}
                 onChange={(e) => update("sector", e.target.value)}
                 className="select-field"
               >
-                <option value="">
-                  {isStudent(profile) ? "Select your field of study..." : "Select your sector..."}
-                </option>
+                <option value="">Select your sector...</option>
                 {UK_SECTORS.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
+              {profile.sector === "Other" && (
+                <input
+                  type="text"
+                  value={customSector}
+                  onChange={(e) => setCustomSector(e.target.value)}
+                  className="input-field"
+                  placeholder="Enter your sector..."
+                  autoFocus
+                />
+              )}
               <button type="button" onClick={next} className="btn-ghost text-xs text-muted w-full justify-center">
                 Skip this question
               </button>
             </div>
           )}
 
-          {/* Step 8 — Employer / company name */}
+          {/* Step 8 — Employer / company name (non-students only) */}
           {step === 8 && (
             <div className="space-y-4">
               <label className="input-label">
                 <Building2 className="w-3 h-3 inline mr-1" />
                 {isFounder(profile)
                   ? "What is your company name? (optional)"
-                  : isStudent(profile)
-                  ? "Which university are you attending? (optional)"
                   : "What is your employer's name? (optional)"}
               </label>
               <input
@@ -762,8 +880,6 @@ export default function OnboardingPage() {
                 placeholder={
                   isFounder(profile)
                     ? "e.g. Acme Technologies Ltd"
-                    : isStudent(profile)
-                    ? "e.g. University of Manchester"
                     : "e.g. NHS Greater Manchester"
                 }
               />
@@ -806,18 +922,30 @@ export default function OnboardingPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted">City</span>
-                  <span className="font-medium text-navy">{profile.city || "—"}</span>
+                  <span className="font-medium text-navy">{resolvedCity || "—"}</span>
                 </div>
+                {isStudent(profile) && resolvedUniversity && (
+                  <div className="flex justify-between">
+                    <span className="text-muted">University</span>
+                    <span className="font-medium text-navy">{resolvedUniversity}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-muted">Housing</span>
                   <span className="font-medium text-navy capitalize">
                     {HOUSING_OPTIONS.find((h) => h.value === profile.accommodationType)?.label ?? "—"}
                   </span>
                 </div>
-                {profile.sector && (
+                {resolvedSector && (
                   <div className="flex justify-between">
-                    <span className="text-muted">Sector</span>
-                    <span className="font-medium text-navy">{profile.sector}</span>
+                    <span className="text-muted">{isStudent(profile) ? "Course" : "Sector"}</span>
+                    <span className="font-medium text-navy">{resolvedSector}</span>
+                  </div>
+                )}
+                {profile.hasDependants && (
+                  <div className="flex justify-between">
+                    <span className="text-muted">Dependants</span>
+                    <span className="font-medium text-navy">{dependantCount} — {dependantRelationships.slice(0, dependantCount).join(", ")}</span>
                   </div>
                 )}
               </div>

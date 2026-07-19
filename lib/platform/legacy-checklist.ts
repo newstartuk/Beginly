@@ -44,7 +44,10 @@ export function getLegacyChecklistTask(taskId: string) {
 export function buildLegacyChecklistJourneyTasks(context: UserContext): JourneyTask[] {
   if (context.route !== "student") return [];
 
-  return SEED_TASKS.filter((task) => task.active).map((task) => ({
+  return SEED_TASKS
+    .filter((task) => task.active)
+    .filter((task) => !task.routes || task.routes === "all" || (task.routes as string[]).includes("international_student"))
+    .map((task) => ({
     id: task.taskId,
     title: task.title,
     summary: task.summary,
