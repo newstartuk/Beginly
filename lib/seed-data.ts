@@ -2469,7 +2469,6 @@ export const SEED_TASKS: Task[] = [
     aiHelperAllowed: true,
     estimatedMinutes: 30,
     routes: ["graduate"],
-    conditional: "work",
     whyItMatters:
       "Graduate Route visa holders have full right to work, including self-employment. If you earn money from freelance work, consulting, or any self-employed activity, you must register with HMRC. Failing to do so means you are trading illegally and risk penalties.",
     whatToPrepare: [
@@ -2767,7 +2766,6 @@ export const SEED_TASKS: Task[] = [
     aiHelperAllowed: true,
     estimatedMinutes: 30,
     routes: ["global_talent"],
-    conditional: "Only if you are self-employed or freelancing",
     whyItMatters:
       "Any self-employment income in the UK must be declared through Self Assessment. You must register with HMRC by 5 October in the tax year after you started self-employment — but the earlier you register, the earlier you receive your Unique Taxpayer Reference (UTR), which clients and accountants will ask for. Failing to register is a criminal offence.",
     whatToPrepare: [
@@ -2801,7 +2799,6 @@ export const SEED_TASKS: Task[] = [
     aiHelperAllowed: false,
     estimatedMinutes: 10,
     routes: ["global_talent"],
-    conditional: "Only if you are self-employed or freelancing",
     whyItMatters:
       "Your UTR (Unique Taxpayer Reference) is a 10-digit number that uniquely identifies you for tax purposes. It is issued by HMRC after you register for Self Assessment. Without it, you cannot file a tax return, and some clients may require it before paying invoices.",
     whatToPrepare: [
@@ -2831,7 +2828,6 @@ export const SEED_TASKS: Task[] = [
     aiHelperAllowed: true,
     estimatedMinutes: 45,
     routes: ["global_talent"],
-    conditional: "Only if you are self-employed or freelancing",
     whyItMatters:
       "Mixing personal and business finances makes your Self Assessment tax return complicated and error-prone. A dedicated business account lets you clearly separate business income from personal spending, making it easy to calculate profit, expenses, and tax owed.",
     whatToPrepare: [

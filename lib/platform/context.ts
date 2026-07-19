@@ -54,6 +54,7 @@ export async function loadPlatformContext(userId?: string, suppliedClient?: Supa
       if (t === "graduate") return "graduate";
       if (t === "global_talent") return "global_talent";
       if (t === "health_and_care") return "health_care";
+      if (t === "founder") return "founder";
       return "student";
     };
     const arrivalToStage = (s: string): UserContext["stage"] => {
