@@ -85,10 +85,17 @@ const readinessDimensions = (tasks: JourneyTask[], completed: Set<string>): Read
 export function buildJourney(context: UserContext): JourneyResult {
   const completed = new Set(context.completedTaskIds);
   const legacyChecklistTasks = buildLegacyChecklistJourneyTasks(context);
-  const studentAdaptiveTasks = routeTasks.student.filter((task) => task.id !== "student-enrolment");
+  // "student-enrolment" duplicates the seed-data task STU_PRE_001 ("Confirm your
+  // university enrolment") almost word for word, so it's dropped once the real
+  // checklist task is present. No other route's adaptive tasks overlap this closely
+  // with their seed-data equivalents.
+  const routeAdaptiveTasks =
+    context.route === "student"
+      ? routeTasks.student.filter((task) => task.id !== "student-enrolment")
+      : routeTasks[context.route];
   const baseTasks =
-    context.route === "student" && legacyChecklistTasks.length > 0
-      ? [...legacyChecklistTasks, ...studentAdaptiveTasks]
+    legacyChecklistTasks.length > 0
+      ? [...legacyChecklistTasks, ...routeAdaptiveTasks]
       : [...commonTasks, ...routeTasks[context.route]];
   const tasks = baseTasks
     .filter((task) => taskApplies(task, context))

@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { DEMO_CONTEXT } from "./demo";
+import { arrivalTypeToRoute } from "./route-mapping";
 import { isExplicitDemoMode, PlatformContextUnavailableError } from "./runtime";
 import type { EntitlementGrant, Goal, HouseholdMember, ProfileFact, UserContext, UserTaskState } from "./types";
 
@@ -66,23 +67,13 @@ export async function loadPlatformContext(userId?: string, suppliedClient?: Supa
       .select("task_id,status,completed_at")
       .eq("user_id", userId);
     if (!arrival) throw new PlatformContextUnavailableError("Complete onboarding before opening the adaptive platform.");
-    const arrivalToRoute = (t: string): UserContext["route"] => {
-      if (t === "international_student") return "student";
-      if (t === "skilled_worker") return "skilled_worker";
-      if (t === "family_visa") return "family_dependant";
-      if (t === "graduate") return "graduate";
-      if (t === "global_talent") return "global_talent";
-      if (t === "health_and_care") return "health_care";
-      if (t === "founder") return "founder";
-      return "student";
-    };
     const arrivalToStage = (s: string): UserContext["stage"] => {
       if (s === "not_arrived") return "pre_arrival";
       if (s === "arriving_soon") return "arrival";
       return "settling";
     };
     const displayName = resolvedDisplayName;
-    const route = arrivalToRoute(String((arrival as Record<string, unknown>).arrival_type ?? ""));
+    const route = arrivalTypeToRoute(String((arrival as Record<string, unknown>).arrival_type ?? ""));
     const stage = arrivalToStage(String((arrival as Record<string, unknown>).status ?? ""));
     // Settlement checklist tasks (STU_/UNI_ seed IDs) live in the legacy `user_tasks` table.
     // Journey Hub's adaptive tasks (common-*, student-*, worker-*, etc.) are never written

@@ -88,47 +88,47 @@ export default function ChecklistContent() {
         return;
       }
 
+      const { data: profileRow } = await supabase
+        .from("arrival_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!profileRow) {
+        router.push("/onboarding");
+        return;
+      }
+
       let { data: taskData } = await supabase
         .from("user_tasks")
         .select("task_id,status,completed_at")
         .eq("user_id", user.id);
 
-      // If all stored tasks are from the old student schema (STU_ prefix) and no longer
-      // in SEED_TASKS, clear them so the profile-based regeneration below can run.
-      const validTaskIds = new Set(SEED_TASKS.map((task) => task.taskId));
-      if (taskData?.length && !taskData.some((t) => validTaskIds.has(t.task_id))) {
-        await supabase.from("user_tasks").delete().eq("user_id", user.id);
-        taskData = [];
-      }
+      // Top up any settlement tasks the account is missing rather than only regenerating
+      // when the whole set is stale. Accounts created before a seed-data change (a task
+      // renamed, split, or the route's task list extended) can have a stored set that's
+      // partially valid — some old ids still match, most don't — and a "regenerate only
+      // if nothing matches" check silently leaves them stuck with a truncated task list
+      // forever, since it never fires once even one old id happens to survive. This never
+      // deletes anything, so existing completion state is always preserved.
+      const existingIds = new Set((taskData ?? []).map((row) => row.task_id));
+      const generated = generateTasksForProfile(dbProfileToArrivalProfile(profileRow));
+      const missing = generated.filter((task) => !existingIds.has(task.taskId));
 
-      if (!taskData?.length) {
-        const { data: profileRow } = await supabase
-          .from("arrival_profiles")
-          .select("*")
-          .eq("user_id", user.id)
-          .maybeSingle();
-
-        if (profileRow) {
-          const generated = generateTasksForProfile(dbProfileToArrivalProfile(profileRow));
-          if (generated.length) {
-            await supabase.from("user_tasks").insert(
-              generated.map((task) => ({
-                user_id: user.id,
-                task_id: task.taskId,
-                status: task.status,
-                completed_at: null,
-              })),
-            );
-            const refreshed = await supabase
-              .from("user_tasks")
-              .select("task_id,status,completed_at")
-              .eq("user_id", user.id);
-            taskData = refreshed.data ?? [];
-          }
-        } else {
-          router.push("/onboarding");
-          return;
-        }
+      if (missing.length) {
+        await supabase.from("user_tasks").insert(
+          missing.map((task) => ({
+            user_id: user.id,
+            task_id: task.taskId,
+            status: task.status,
+            completed_at: null,
+          })),
+        );
+        const refreshed = await supabase
+          .from("user_tasks")
+          .select("task_id,status,completed_at")
+          .eq("user_id", user.id);
+        taskData = refreshed.data ?? [];
       }
 
       setTasks(
