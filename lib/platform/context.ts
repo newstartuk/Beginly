@@ -111,10 +111,19 @@ export async function loadPlatformContext(userId?: string, suppliedClient?: Supa
   const activeHousehold = householdRows[0];
   const householdId = String((activeHousehold?.households as { id?: unknown } | undefined)?.id ?? profile.household_id ?? "");
 
-  const [membersResult, factsResult] = await Promise.all([
+  const [membersResult, factsResult, arrivalProfileResult] = await Promise.all([
     householdId ? supabase.from("household_members").select("*").eq("household_id", householdId) : Promise.resolve({ data: [], error: null }),
     supabase.from("profile_facts").select("*").eq("profile_id", String(profile.id)).is("superseded_at", null),
+    // Some accounts carry both a migration_profiles row (this branch) and a legacy
+    // arrival_profiles row from before the migration. When present, it's the only place
+    // the driving/dependants/accommodation/work-interest answers used by Task Library's
+    // conditionMatches filter live, so Journey Hub needs it too for the settlement count
+    // to agree with Task Library instead of silently showing the unconditioned set.
+    supabase.from("arrival_profiles").select("*").eq("user_id", userId).maybeSingle(),
   ]);
+  const arrivalProfile = arrivalProfileResult.data
+    ? dbProfileToArrivalProfile(arrivalProfileResult.data as DbArrivalProfile)
+    : undefined;
 
   const displayName = resolvedDisplayName;
   let householdMembers: HouseholdMember[] = (membersResult.data ?? []).map((row: Record<string, unknown>) => ({
@@ -166,6 +175,7 @@ export async function loadPlatformContext(userId?: string, suppliedClient?: Supa
     occupation: profileFacts.find((fact) => fact.key === "occupation")?.value as string | undefined,
     goals,
     profileFacts,
+    arrivalProfile,
     householdMembers,
     grants: grants.length ? grants : [freeGrant(userId)],
     completedTaskIds,
