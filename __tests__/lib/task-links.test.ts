@@ -10,7 +10,6 @@ describe("task-links", () => {
 
   it("covers critical newcomer tasks with structured links", () => {
     const criticalTaskIds = [
-      "STU_D7_002",
       "STU_D7_003",
       "UNI_D7_001",
       "UNI_D7_002",

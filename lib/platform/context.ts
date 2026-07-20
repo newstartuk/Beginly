@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { dbProfileToArrivalProfile, type DbArrivalProfile } from "@/lib/task-generator";
 import { DEMO_CONTEXT } from "./demo";
 import { arrivalTypeToRoute } from "./route-mapping";
 import { isExplicitDemoMode, PlatformContextUnavailableError } from "./runtime";
@@ -75,6 +76,7 @@ export async function loadPlatformContext(userId?: string, suppliedClient?: Supa
     const displayName = resolvedDisplayName;
     const route = arrivalTypeToRoute(String((arrival as Record<string, unknown>).arrival_type ?? ""));
     const stage = arrivalToStage(String((arrival as Record<string, unknown>).status ?? ""));
+    const arrivalProfile = dbProfileToArrivalProfile(arrival as DbArrivalProfile);
     // Settlement checklist tasks (STU_/UNI_ seed IDs) live in the legacy `user_tasks` table.
     // Journey Hub's adaptive tasks (common-*, student-*, worker-*, etc.) are never written
     // there — TaskActions always posts to the newer `user_task_states` table, which this
@@ -98,7 +100,7 @@ export async function loadPlatformContext(userId?: string, suppliedClient?: Supa
       actorId: userId, displayName, householdId: `personal-${userId}`, activeMemberId: userId,
       route, stage, city: String((arrival as Record<string, unknown>).city ?? ""),
       arrivalDate: (arrival as Record<string, unknown>).arrival_date ? String((arrival as Record<string, unknown>).arrival_date) : undefined,
-      goals: [], profileFacts: [],
+      goals: [], profileFacts: [], arrivalProfile,
       householdMembers: [{ id: userId, displayName, role: "primary", ageBand: "adult", route, privateWorkspace: true, isActor: true }],
       grants: [freeGrant(userId)], completedTaskIds, taskStates, dismissedRecommendationIds: [],
       proofPoints: 0, promotionPreference: "contextual", aiConsent: true, locationConsent: false,

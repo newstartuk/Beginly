@@ -856,37 +856,6 @@ export const SEED_TASKS: Task[] = [
     sourceSignpost: "Your university's student finance or registry office.",
   },
   {
-    taskId: "STU_D7_002",
-    title: "Open a student bank account",
-    summary: "Open a UK student bank account to receive any bursary or stipend payments and manage your money.",
-    stage: "D7",
-    category: "Money",
-    priority: "High",
-    required: false,
-    active: true,
-    aiHelperAllowed: true,
-    estimatedMinutes: 60,
-    routes: ["international_student"],
-    whyItMatters:
-      "A student bank account often includes an interest-free overdraft — a useful financial buffer. It is also needed for receiving scholarship or bursary payments from your university.",
-    whatToPrepare: [
-      "Passport",
-      "Proof of UK address",
-      "Student enrolment confirmation or university letter",
-    ],
-    stepsToTake: [
-      "Compare student accounts from HSBC, Barclays, NatWest, Santander, and Lloyds.",
-      "Check which bank your university recommends — some have partnerships.",
-      "Apply online or visit a branch with your passport and enrolment letter.",
-      "Consider a digital account (Monzo, Starling) as a quick alternative while waiting for your student account to open.",
-    ],
-    commonMistakes: [
-      "Picking the account with the biggest overdraft — choose the one that suits your lifestyle.",
-      "Not applying early — accounts take time to open and you may need it for first rent payment.",
-    ],
-    sourceSignpost: "MoneySavingExpert.com — 'Best student bank accounts'",
-  },
-  {
     taskId: "STU_D7_003",
     title: "Check in with your university international student office",
     summary: "Register your arrival with your university's international student support office.",

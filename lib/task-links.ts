@@ -47,8 +47,11 @@ const BANK_COMPARE = [
   link("NatWest current account", "https://www.natwest.com/current-accounts.html", "bank"),
 ];
 
-// Business bank accounts (for Global Talent and Founder routes)
+// Business bank accounts (for Global Talent and Founder routes). The referral links are
+// for personal accounts, but many founders/freelancers open one alongside their business
+// account, so they lead first, followed by the dedicated business-account products.
 const BUSINESS_BANK = [
+  ...BANK_COMPARE,
   link("Open a Revolut Business account", "https://www.revolut.com/business/", "bank"),
   link("Open a Monzo Business account", "https://monzo.com/business/", "bank"),
   link("Starling Business account", "https://www.starlingbank.com/business-account/", "bank"),
@@ -288,7 +291,6 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     UKCISA_PREP_LINK,
   ],
   STU_D7_001: COUNCIL_TAX_LINKS,
-  STU_D7_002: BANK_COMPARE,
   // STU_D7_003 gets a Google Maps directions link appended dynamically by getTaskLinks() below.
   STU_D7_003: [STUDENT_VISA_LINK, UKCISA_LIVING_LINK],
   STU_GRW_001: [

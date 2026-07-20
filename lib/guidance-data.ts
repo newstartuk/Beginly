@@ -187,7 +187,7 @@ export const GUIDANCE_PAGES: GuidanceArticle[] = [
     disclaimer:
       "Beginly provides general financial guidance. This is not financial advice. Compare products carefully before choosing a bank account.",
     lastReviewed: "May 2026",
-    relatedTaskIds: ["STU_PRE_005", "STU_D7_002", "STU_D30_001"],
+    relatedTaskIds: ["UNI_D7_003"],
   },
   {
     slug: "how-to-register-with-a-gp",

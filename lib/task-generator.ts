@@ -1,7 +1,7 @@
 import { SEED_TASKS } from "@/lib/seed-data";
 import type { ArrivalProfile, Task, UserTask } from "@/types";
 
-type DbArrivalProfile = {
+export type DbArrivalProfile = {
   arrival_type?: string | null;
   status?: string | null;
   arrival_date?: string | null;
@@ -45,7 +45,7 @@ function routeMatches(task: Task, profile: ArrivalProfile): boolean {
   return (task.routes as string[]).includes(profile.arrivalType);
 }
 
-function conditionMatches(task: Task, profile: ArrivalProfile): boolean {
+export function conditionMatches(task: Task, profile: ArrivalProfile): boolean {
   const condition = task.conditional?.toLowerCase() ?? "";
   if (!condition) return true;
 

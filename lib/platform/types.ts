@@ -112,6 +112,13 @@ export interface UserContext {
   occupation?: string;
   goals: Goal[];
   profileFacts: ProfileFact[];
+  // Populated for legacy/arrival_profiles-based users so Journey Hub can apply the same
+  // condition-based task filtering (driving, dependants, accommodation, work interest)
+  // that Task Library already applies via generateTasksForProfile — without it, Journey
+  // Hub's settlement count silently over-reports tasks that don't actually apply to the
+  // user. Undefined for the newer migration_profiles-based context, which has no
+  // equivalent fixed-shape profile.
+  arrivalProfile?: import("@/types").ArrivalProfile;
   householdMembers: HouseholdMember[];
   grants: EntitlementGrant[];
   completedTaskIds: string[];
