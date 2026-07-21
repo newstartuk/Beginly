@@ -219,6 +219,41 @@ const GLOBAL_TALENT_ENDORSEMENT_LINK = link(
 
 const STUDENT_VISA_LINK = link("Student visa overview and your responsibilities", "https://www.gov.uk/student-visa");
 
+const RAILCARD_LINK = link("16-25 Railcard — 1/3 off most rail fares", "https://www.16-25railcard.co.uk/");
+
+const STUDENT_DISCOUNT_LINKS = [
+  link("TOTUM — official NUS student discount card", "https://totum.com/", "commercial"),
+  link("UNiDAYS — student discounts", "https://www.myunidays.com/GB/en-GB", "commercial"),
+];
+
+const VOTING_LINKS = [
+  link("Register to vote — gov.uk", "https://www.gov.uk/register-to-vote"),
+  link("Can I vote? — NUS eligibility checker for international students", "https://www.nus.org.uk/can-i-vote", "support"),
+];
+
+const STUDENT_SCAM_AWARENESS_LINKS = [
+  link("Action Fraud — report a scam", "https://www.actionfraud.police.uk/"),
+  link("UKCISA — scams targeting international students", "https://www.ukcisa.org.uk/Information--Advice/Fees-and-Money/Money-and-fraud", "support"),
+];
+
+const CAREERS_WELLBEING_LINKS = [
+  link("National Careers Service", "https://nationalcareers.service.gov.uk/"),
+  MENTAL_HEALTH_LINKS[0],
+];
+
+const EXTENUATING_CIRCUMSTANCES_LINK = link(
+  "UKCISA — studying and living in the UK",
+  "https://www.ukcisa.org.uk/Information--Advice/Studying--living-in-the-UK",
+  "support",
+);
+
+const STUDENTS_UNION_LINK = link("National Union of Students (NUS)", "https://www.nus.org.uk/", "support");
+
+const SWITCH_TO_SKILLED_WORKER_LINKS = [
+  link("Skilled Worker visa — switching from a Student visa", "https://www.gov.uk/skilled-worker-visa/switching-to-this-visa"),
+  ...SKILLED_WORKER_SALARY_LINKS,
+];
+
 const UKCISA_LIVING_LINK = link(
   "UKCISA — studying and living in the UK",
   "https://www.ukcisa.org.uk/Information--Advice/Studying--living-in-the-UK",
@@ -297,6 +332,18 @@ const TASK_LINKS: Record<string, ResourceLink[]> = {
     link("Graduate Route visa overview", "https://www.gov.uk/graduate-visa"),
     UKCISA_LIVING_LINK,
   ],
+  STU_PRE_002: [STUDENT_VISA_LINK, UKCISA_PREP_LINK],
+  STU_D7_004: DEPOSIT_LINKS,
+  STU_D7_005: STUDENT_SCAM_AWARENESS_LINKS,
+  STU_D7_006: STUDENT_DISCOUNT_LINKS,
+  STU_D7_007: [RAILCARD_LINK],
+  STU_D30_001: HEALTHCARE_EXTRAS_LINKS,
+  STU_D30_002: VOTING_LINKS,
+  STU_D30_003: CAREERS_WELLBEING_LINKS,
+  STU_D90_001: [EXTENUATING_CIRCUMSTANCES_LINK],
+  STU_D90_002: [STUDENTS_UNION_LINK],
+  STU_GRW_002: JOB_SEARCH_LINKS,
+  STU_GRW_003: SWITCH_TO_SKILLED_WORKER_LINKS,
 
   // ══════════════════════════════════════════════════════════════════════════
   // SKW_ — Skilled Worker
