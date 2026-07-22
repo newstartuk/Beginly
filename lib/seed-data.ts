@@ -1354,6 +1354,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["skilled_worker"],
     whyItMatters:
       "Missing your confirmed start date can trigger visa compliance issues — your employer is legally required to report to the Home Office if a sponsored worker does not start as expected. Knowing the exact location also means you can plan travel and accommodation.",
+    riskWarning:
+      "Your employer has 'sponsor duties' under your Skilled Worker visa and must report to UKVI (the Home Office) if you don't start work as agreed — this can put your sponsorship, and your visa, at risk. Check gov.uk's sponsor compliance guidance if you're ever unsure of your reporting obligations.",
     whatToPrepare: [
       "Your offer letter or employment contract",
       "Your employer's HR contact name and email",
@@ -1508,6 +1510,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["skilled_worker"],
     whyItMatters:
       "HR registration activates your employment record — it is what triggers your payroll, your benefits, and your pension auto-enrolment. Without it, your first salary may be delayed or incorrect. Getting your access pass and system logins on day one also means you can start productive work quickly rather than spending weeks chasing IT.",
+    riskWarning:
+      "By law, your employer must complete a right-to-work check using your eVisa share code (generated at gov.uk/view-prove-immigration-status) before you start, or on your first day at the latest — without it, they cannot legally let you begin working. Generate your share code in advance so there's no delay to your start date.",
     whatToPrepare: [
       "Your passport",
       "Your National Insurance number (if you have it already)",
@@ -1572,6 +1576,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["skilled_worker"],
     whyItMatters:
       "UK employment law provides strong protections, but these depend on what is in your contract. Understanding your notice period, holiday allowance, sick pay, and any non-compete clauses protects you if things go wrong.",
+    riskWarning:
+      "If your employment with this sponsor ends for any reason, your Skilled Worker visa is normally curtailed and you'll usually have 60 days to find a new sponsor, switch to another visa, or leave the UK — check gov.uk before assuming a notice period or probation issue won't affect your visa status.",
     whatToPrepare: [
       "Your signed employment contract",
       "Any staff handbook your employer has provided",
@@ -1895,6 +1901,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["health_and_care"],
     whyItMatters:
       "NHS pay is set by the Agenda for Change (AfC) framework — a banded scale from Band 1 to Band 9. Your specific band and pay point determine your exact salary. International recruits are sometimes placed on the wrong pay point, especially if their overseas experience is not accounted for. Verifying this before you start prevents months of underpayment that can be difficult to reclaim.",
+    riskWarning:
+      "Your Certificate of Sponsorship for your Health and Care Worker visa records a specific salary — if your actual pay doesn't match it, raise the discrepancy with HR straightaway. See gov.uk for Health and Care Worker visa salary requirements.",
     whatToPrepare: [
       "Your offer letter (should state your AfC band and pay point)",
       "Evidence of your years of relevant clinical experience",
@@ -1955,6 +1963,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["health_and_care"],
     whyItMatters:
       "You cannot legally practice in the UK without registration with your professional regulatory body. NMC (nurses), GMC (doctors), HCPC (allied health professionals), and Social Work England all have specific requirements for international applicants.",
+    riskWarning:
+      "Starting clinical duties before registration is confirmed isn't just a professional conduct issue — it can also breach the conditions your Health and Care Worker visa was sponsored under. If registration is delayed, tell your employer and check gov.uk rather than starting early.",
     whatToPrepare: [
       "Proof of your qualifications (certified translations if not in English)",
       "Certificate of Good Standing from your home country regulatory body",
@@ -2051,6 +2061,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["health_and_care"],
     whyItMatters:
       "You cannot legally practise as a nurse, allied health professional, or doctor in the UK without your professional registration number being held on file by your employer. Without it, your employer cannot authorise you to undertake clinical duties. This must be done before you start patient-facing work.",
+    riskWarning:
+      "Your employer must hold evidence of your active registration to justify the sponsored role on your Health and Care Worker visa — an unrecorded or lapsed registration can raise compliance questions with UKVI, so get written confirmation from HR, not just a verbal note.",
     whatToPrepare: [
       "Your NMC PIN, HCPC registration number, or GMC number",
       "Your professional body account login (to verify the number and expiry date)",
@@ -2081,6 +2093,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["health_and_care"],
     whyItMatters:
       "The NHS uses the Electronic Staff Record (ESR) for payroll, contracts, and training records. If your payroll record is not set up correctly — wrong bank details, missing NI number, wrong pay band — your first pay date may be delayed or incorrect. ESR also holds your mandatory training record, which your manager will check.",
+    riskWarning:
+      "Your Certificate of Sponsorship recorded a specific salary for your Health and Care Worker visa — if your ESR record or payslip shows a different figure, flag it immediately. See gov.uk for Health and Care Worker visa guidance if the mismatch isn't resolved quickly.",
     whatToPrepare: [
       "Your bank account sort code and account number",
       "Your National Insurance number",
@@ -2112,6 +2126,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["health_and_care"],
     whyItMatters:
       "Mandatory training — including moving and handling, infection control, safeguarding, and fire safety — is legally required. Incomplete training can prevent you from working certain shifts or with certain patient groups.",
+    riskWarning:
+      "This isn't a visa requirement itself, but your Health and Care Worker visa is tied to actually doing the sponsored role — persistent gaps in required training can stop you working the shifts your job needs. Check gov.uk's sponsor guidance if you're ever unsure how this connects to your visa.",
     whatToPrepare: [
       "Your employer's e-learning system login",
       "Your staff ID number",
@@ -2174,6 +2190,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["health_and_care"],
     whyItMatters:
       "Even if you registered with the NMC, HCPC, or GMC before arrival, your registration status can be delayed or placed under conditions. Confirming it is fully active within your first month ensures there are no gaps in your authority to practise. An expired or lapsed registration is a conduct matter.",
+    riskWarning:
+      "A lapsed or conditioned registration doesn't just affect your ability to practise — it undermines the basis of your Health and Care Worker visa sponsorship. Resolve any issue with your professional body immediately, and check gov.uk if you're unsure how it affects your visa.",
     whatToPrepare: [
       "Your professional body login",
     ],
@@ -2230,6 +2248,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["health_and_care"],
     whyItMatters:
       "The NHS offers a preceptorship period for newly registered or internationally trained clinicians. This is a structured period of support, usually 12 months, with a named preceptor who helps you adapt to UK practice. Identifying your preceptor early means you can schedule regular meetings and log your progress — both for your own development and for any future revalidation evidence.",
+    riskWarning:
+      "This isn't a visa requirement, but your Health and Care Worker visa is tied to working the specific role your employer sponsored — a named supervisor helps confirm you're being supported to do exactly that job. See gov.uk if your day-to-day duties change significantly.",
     whatToPrepare: [],
     stepsToTake: [
       "Ask your ward manager or department lead who your named preceptor or clinical supervisor is.",
@@ -2319,6 +2339,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["health_and_care"],
     whyItMatters:
       "Your first 90 days in NHS practice are the period when most professional adaptation happens. Regular documented supervision sessions are the evidence of this development. They also form part of your revalidation portfolio. Making supervision a habit now, rather than something you chase later, sets a strong professional baseline.",
+    riskWarning:
+      "This isn't a visa requirement, but the role your employer sponsors you for is stated on your Certificate of Sponsorship — regular documented supervision helps confirm you're practising within that sponsored role. Check gov.uk if your duties change significantly from what was sponsored.",
     whatToPrepare: [
       "Any notes or reflections from your first supervision session",
       "Your employer's preceptorship framework or portfolio booklet",
@@ -2377,6 +2399,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["health_and_care"],
     whyItMatters:
       "The NHS has structured career bands and progression routes. CPD is required to maintain professional registration. Planning your development early helps you progress faster and build a stronger case for a pay increase.",
+    riskWarning:
+      "Moving to a materially different role or employer later can require a new Certificate of Sponsorship for your Health and Care Worker visa — check gov.uk before accepting any change of role or employer, even an internal move.",
     whatToPrepare: [
       "Your current band or grade",
       "Your professional registration revalidation requirements",
@@ -2407,6 +2431,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["health_and_care"],
     whyItMatters:
       "The NHS offers clear career progression pathways — from Band 5 to Band 6, 7, and beyond — but progression is not automatic. A formal development plan, agreed with your line manager and reviewed regularly, is the most direct route to salary band progression. It also feeds your revalidation portfolio.",
+    riskWarning:
+      "A significant change of duties or band can affect the terms your Health and Care Worker visa was sponsored under — check gov.uk's sponsor guidance, or ask HR, before a major role change goes ahead.",
     whatToPrepare: [
       "Your current AfC band and a clear target (e.g., Band 6 within 18 months)",
       "Any CPD or training already completed since arrival",
@@ -2503,6 +2529,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["graduate"],
     whyItMatters:
       "LinkedIn is the main professional networking platform in the UK. Recruiters actively search it. A complete, well-written profile dramatically increases the chances of being found for relevant opportunities.",
+    riskWarning:
+      "Your Graduate Route visa runs for a fixed 2 years (3 for PhD graduates) with no extension — check gov.uk for your exact expiry and pace your job search against it.",
     whatToPrepare: [
       "Your degree certificate or academic transcript",
       "A professional photo",
@@ -2535,6 +2563,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["graduate"],
     whyItMatters:
       "Most UK universities offer careers support to graduates for at least 2 years after finishing. This includes CV reviews, mock interviews, job boards, and employer events — all free. Use it before the access expires.",
+    riskWarning:
+      "Your Graduate Route visa runs for a fixed 2 years (3 for PhD graduates) with no extension — check gov.uk for your exact expiry and use this support while your job search clock is running.",
     whatToPrepare: [
       "Your university login details (they usually remain active for a period post-graduation)",
     ],
@@ -2647,6 +2677,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["graduate"],
     whyItMatters:
       "UK CVs follow specific conventions that differ from résumés in the US, India, Nigeria, and many other countries. A CV in the wrong format can result in rejection before you are even considered.",
+    riskWarning:
+      "Your Graduate Route visa runs for a fixed 2 years (3 for PhD graduates) with no extension — check gov.uk for your exact expiry so your CV and applications go out with enough runway left to actually get hired.",
     whatToPrepare: [
       "A list of your academic achievements, projects, and any work experience",
       "Your skills, languages, and relevant tools or software",
@@ -2825,6 +2857,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["graduate"],
     whyItMatters:
       "A job search without a tracking system quickly becomes chaotic — you forget follow-up deadlines, cannot remember which version of your CV you sent, and lose sight of patterns in rejections. A simple pipeline (even a spreadsheet) gives you visibility and accountability. It also reveals if your strategy is not working early enough to change it.",
+    riskWarning:
+      "Your Graduate Route visa runs for a fixed 2 years (3 for PhD graduates) with no extension — check gov.uk for your exact expiry and track your pipeline's pace against it, not just against application volume.",
     whatToPrepare: [],
     stepsToTake: [
       "Create a simple tracker: columns for Company, Role, Applied Date, Status, Next Step, Notes.",
@@ -2883,6 +2917,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["graduate"],
     whyItMatters:
       "Graduates from non-UK education systems often underperform in UK interviews not because of their ability but because they are unfamiliar with the formats expected. UK employers use competency-based questions ('Tell me about a time when...') and expect structured answers. Practising these with UK-specific expectations is one of the highest-ROI activities in your job search.",
+    riskWarning:
+      "Your Graduate Route visa runs for a fixed 2 years (3 for PhD graduates) with no extension — check gov.uk for your exact expiry so interview prep translates into an offer with enough time left to act on it.",
     whatToPrepare: [
       "5–8 strong examples from your studies, part-time work, or projects that demonstrate key competencies",
     ],
@@ -3003,6 +3039,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["global_talent"],
     whyItMatters:
       "Global Talent visa holders often move to the UK with strong international reputations but limited UK networks. The UK's professional and creative ecosystems are relationship-driven. Researching key organisations, clubs, accelerators, and events in your field before arrival means you can attend events and make introductions in your first weeks rather than starting blind.",
+    riskWarning:
+      "This isn't a formal endorsement requirement, but your Global Talent visa is renewed based on evidence of continued activity in your field — building a UK network early gives you real material for that evidence log. Check gov.uk and your endorsing body's published criteria for what counts.",
     whatToPrepare: [],
     stepsToTake: [
       "Search for the top 5–10 organisations in your field based in your target UK city.",
@@ -3060,6 +3098,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["global_talent"],
     whyItMatters:
       "Your Global Talent endorsement is an active relationship, not a one-time approval. Your endorsing body needs to know you are in the UK and operating in your field. This notification starts your ongoing evidence obligations and ensures your contact details are current for milestone check-ins.",
+    riskWarning:
+      "Missing this notification doesn't just delay admin — your endorsing body's ongoing engagement with you is part of what your Global Talent visa renewal depends on. Check gov.uk for Global Talent visa renewal requirements if you're ever unsure what counts as staying active.",
     whatToPrepare: [
       "Your endorsement letter (with reference number and endorsing body contact details)",
       "Your UK address and phone number",
@@ -3247,6 +3287,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["global_talent"],
     whyItMatters:
       "Professional associations in the UK are how sectors self-organise — they run events, publish industry standards, and connect practitioners. Membership demonstrates commitment to UK professional norms and often features in endorsing body renewal evidence. For some disciplines, membership in specific bodies is a prerequisite for endorsement renewal.",
+    riskWarning:
+      "For some disciplines, this kind of professional membership is part of what your endorsing body checks at Global Talent visa renewal — check gov.uk and your endorsing body's criteria rather than assuming it's optional.",
     whatToPrepare: [],
     stepsToTake: [
       "Identify the top 2–3 professional associations in your specific discipline.",
@@ -3274,6 +3316,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["global_talent"],
     whyItMatters:
       "In the UK, professional opportunities often come through networks before they are publicly advertised. As a Global Talent visa holder, your earning potential and endorsement renewal depend on the work and collaborations you can access. A deliberately built UK network is one of your most important professional assets — and it takes time to develop.",
+    riskWarning:
+      "This isn't a formal visa requirement, but your Global Talent visa is renewed based on evidence of continued activity in your field — a genuine UK network is often where that evidence comes from. Check gov.uk and your endorsing body's criteria for what they look for at renewal.",
     whatToPrepare: [],
     stepsToTake: [
       "Identify 10 people in your UK sector you would genuinely like to connect with.",
@@ -3302,6 +3346,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["global_talent"],
     whyItMatters:
       "Your endorsing body will assess your progress at renewal based on a portfolio of evidence. The first 90 days often contain meaningful achievements — a significant project, a speaking engagement, a publication, a collaboration. Logging these at the time they happen is far more accurate and complete than reconstructing them months later.",
+    riskWarning:
+      "This isn't a requirement in itself, but your Global Talent visa renewal is assessed against exactly this kind of evidence — check gov.uk and your endorsing body's published criteria for what they expect to see logged.",
     whatToPrepare: [
       "Your evidence log (started at GTL_D30_002)",
       "Details of your first notable UK professional output or contribution",
@@ -3457,6 +3503,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["founder"],
     whyItMatters:
       "The endorsing body assessed your visa application against a specific business plan. If your business pivots significantly without their knowledge and approval, your endorsement may be withdrawn at a milestone review. Knowing exactly what you committed to means you can demonstrate continuity — or flag a planned pivot early.",
+    riskWarning:
+      "If your business pivots significantly without telling your endorsing body, your endorsement — and your Innovator Founder visa — can be withdrawn at the next milestone review. Check gov.uk's Innovator Founder guidance before making any material change to your business model.",
     whatToPrepare: [
       "Your endorsed business plan",
       "Your endorsement letter (which may reference specific commitments or milestones)",
@@ -3736,6 +3784,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["founder"],
     whyItMatters:
       "The Innovator Founder route is assessed against three pillars: innovation (your idea is genuinely new), viability (you can build a sustainable business), and scalability (you have growth potential). Your endorsing body reviews evidence at milestone checks. A log started now and updated continuously is far stronger than a document assembled in the week before your review.",
+    riskWarning:
+      "Falling behind on this evidence log is what typically causes problems at an Innovator Founder milestone review — your endorsement, and your visa, are assessed against exactly these three pillars. Check gov.uk's Innovator Founder guidance for what your specific milestone review expects.",
     whatToPrepare: [
       "Your original business plan (as approved by the endorsing body)",
       "Your first month's business records — contracts, client contacts, product development, financial activity",
@@ -3769,6 +3819,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["founder"],
     whyItMatters:
       "Working from a consistent, professional space helps maintain productivity, enables client meetings, and provides a legitimate business address. For early-stage founders, co-working spaces also provide networking opportunities and access to startup ecosystems. Some endorsing bodies view a dedicated professional workspace favourably as evidence of business seriousness.",
+    riskWarning:
+      "This isn't a formal Innovator Founder visa requirement, but some endorsing bodies view a consistent workspace as evidence of business seriousness at milestone review — check gov.uk and your endorsement conditions if you're unsure what's expected.",
     whatToPrepare: [],
     stepsToTake: [
       "Research co-working options in your area: major chains (WeWork, Regus, Second Home), local independents, startup hubs, or sector-specific spaces.",
@@ -3855,6 +3907,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["founder"],
     whyItMatters:
       "The UK has one of the world's strongest startup ecosystems, particularly in London, Manchester, Bristol, Cambridge, and Edinburgh. Access to this ecosystem — investors, mentors, potential customers, co-founders, advisers — depends almost entirely on showing up and being visible. The founders who get the most from it are those who engage within their first few months, not years.",
+    riskWarning:
+      "This isn't a formal visa requirement, but visible engagement with the UK startup ecosystem is often exactly what endorsing bodies look for as evidence of a genuinely active business — check gov.uk and your endorsement conditions for what your milestone review expects.",
     whatToPrepare: [],
     stepsToTake: [
       "Search Eventbrite, Meetup, and LinkedIn Events for startup and founder events in your city.",
@@ -3882,6 +3936,8 @@ export const SEED_TASKS: Task[] = [
     routes: ["founder"],
     whyItMatters:
       "The Innovator Founder visa requires regular milestone check-ins with your endorsing body. Missing these or failing to show progress against your business plan can result in your endorsement being withdrawn — which affects your visa.",
+    riskWarning:
+      "Missing this milestone review, or failing to show real progress against your endorsed business plan, can lead to your endorsement being withdrawn — which directly affects your Innovator Founder visa. Check gov.uk's Innovator Founder guidance if a review is ever delayed or unclear.",
     whatToPrepare: [
       "Evidence of business progress (company registration, financial records, contracts, product development updates)",
       "Your original business plan",
