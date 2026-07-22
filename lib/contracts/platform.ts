@@ -91,6 +91,18 @@ export function parsePreferencesInput(value: unknown): PreferencesInput {
   };
 }
 
+const checkInChangeValues = ["new_job", "moved_home", "family_change", "visa_change", "health", "urgent", "all_good"] as const;
+export type CheckInChange = (typeof checkInChangeValues)[number];
+export interface CheckInInput { changes: CheckInChange[]; idempotencyKey: string }
+export function parseCheckInInput(value: unknown): CheckInInput {
+  const body = asObject(value);
+  if (!Array.isArray(body.changes) || body.changes.length === 0) throw new ContractError("invalid_changes", "At least one change must be selected.");
+  const changes = body.changes.map((change) => asString(change, "changes", 40) as CheckInChange);
+  const invalid = changes.find((change) => !checkInChangeValues.includes(change));
+  if (invalid) throw new ContractError("invalid_change", `Unsupported change: ${invalid}.`);
+  return { changes: [...new Set(changes)], idempotencyKey: asString(body.idempotencyKey, "idempotencyKey", 160) };
+}
+
 export interface SupportCaseInput { caseType: "support" | "account" | "opportunity_feedback" | "safety" | "professional_escalation"; subject: string; description: string; severity: "low" | "normal" | "high" | "urgent"; opportunityId?: string; idempotencyKey: string }
 export function parseSupportCaseInput(value: unknown): SupportCaseInput {
   const body = asObject(value);

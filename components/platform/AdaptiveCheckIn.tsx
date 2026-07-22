@@ -1,11 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Heart, X, ChevronRight, CheckCircle } from "lucide-react";
+import Link from "next/link";
+import { Heart, X, ChevronRight, CheckCircle, ArrowRight } from "lucide-react";
+import type { CheckInChange } from "@/lib/contracts/platform";
 
 const CHECK_IN_KEY = "beginly_checkin_last";
 const INTERVAL_DAYS = 7;
 
-const CHANGES = [
+const CHANGES: { id: CheckInChange; label: string }[] = [
   { id: "new_job", label: "I've started a new job or changed employer" },
   { id: "moved_home", label: "I've moved to a new address or area" },
   { id: "family_change", label: "My family or household situation has changed" },
@@ -15,10 +17,19 @@ const CHANGES = [
   { id: "all_good", label: "Everything is going well — no changes" },
 ];
 
+interface FollowUp {
+  change: CheckInChange;
+  message: string;
+  href?: string;
+  linkLabel?: string;
+}
+
 export default function AdaptiveCheckIn() {
   const [show, setShow] = useState(false);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [done, setDone] = useState(false);
+  const [selected, setSelected] = useState<CheckInChange[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [followUps, setFollowUps] = useState<FollowUp[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -34,25 +45,54 @@ export default function AdaptiveCheckIn() {
     setShow(false);
   };
 
-  const toggle = (id: string) =>
+  const toggle = (id: CheckInChange) =>
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
-  const submit = () => {
-    setDone(true);
-    try { localStorage.setItem(CHECK_IN_KEY, new Date().toISOString()); } catch {}
-    setTimeout(dismiss, 2200);
+  const submit = async () => {
+    setSubmitting(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/platform/check-in", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ changes: selected, idempotencyKey: crypto.randomUUID() }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error?.message ?? "Could not save your update.");
+      try { localStorage.setItem(CHECK_IN_KEY, new Date().toISOString()); } catch {}
+      setFollowUps(data.followUps as FollowUp[]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save your update.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (!show) return null;
 
-  if (done) {
+  if (followUps) {
     return (
-      <div className="card border-primary/20 bg-teal-50 flex items-center gap-3 py-4">
-        <CheckCircle className="w-5 h-5 text-primary shrink-0" />
-        <div>
-          <p className="text-sm font-semibold text-navy">Thank you for the update.</p>
-          <p className="text-xs text-civic-600 mt-0.5">We'll keep your roadmap relevant to where you are now.</p>
+      <div className="card border-primary/20 space-y-3">
+        <div className="flex items-center gap-3">
+          <CheckCircle className="w-5 h-5 text-primary shrink-0" />
+          <p className="text-sm font-semibold text-navy">Thanks — here's what to do next.</p>
         </div>
+        {followUps.map((followUp) => (
+          <div key={followUp.change} className="bg-teal-50 rounded-xl p-3">
+            <p className="text-sm text-civic-600">{followUp.message}</p>
+            {followUp.href && (
+              <Link
+                href={followUp.href}
+                className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+              >
+                {followUp.linkLabel ?? "Take me there"} <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            )}
+          </div>
+        ))}
+        <button type="button" onClick={dismiss} className="text-xs text-muted hover:text-navy">
+          Dismiss
+        </button>
       </div>
     );
   }
@@ -97,13 +137,16 @@ export default function AdaptiveCheckIn() {
         ))}
       </div>
 
+      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+
       {selected.length > 0 && (
         <button
           type="button"
           onClick={submit}
-          className="btn-primary mt-3 w-full justify-center"
+          disabled={submitting}
+          className="btn-primary mt-3 w-full justify-center disabled:opacity-60"
         >
-          Share this update <ChevronRight className="w-4 h-4" />
+          {submitting ? "Sharing…" : "Share this update"} <ChevronRight className="w-4 h-4" />
         </button>
       )}
     </div>
