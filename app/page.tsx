@@ -1,11 +1,9 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring,
 } from "framer-motion";
-import { getUser } from "@/lib/utils";
 import {
   CheckCircle, Bell, AlertTriangle, BookOpen, ArrowRight, Scale,
   Target, Shield, Quote, GraduationCap, Briefcase, Heart, XCircle, MapPin,
@@ -902,12 +900,9 @@ function NiaLandingSection() {
    MAIN PAGE
 ═══════════════════════════════════════════════════════════════════ */
 export default function LandingPage() {
-  const router = useRouter();
   const [persona, setPersona] = useState<Persona>("student");
   const [cityInput, setCityInput] = useState("");
   const heroRef = useRef<HTMLElement>(null);
-
-  useEffect(() => { if (getUser()) router.push("/platform"); }, [router]);
 
   // TIER 2 #9 — Scroll parallax in hero
   const { scrollYProgress: heroScroll } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
