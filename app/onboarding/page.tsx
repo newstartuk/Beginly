@@ -239,7 +239,7 @@ export default function OnboardingPage() {
   useEffect(() => {
     async function checkAuth() {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push("/signup"); return; }
+      if (!user) { router.push("/login"); return; }
       setAuthChecked(true);
 
       const { data: profileData } = await supabase
