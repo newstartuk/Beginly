@@ -40,7 +40,7 @@ function safeSet<T>(key: string, value: T): void {
 // non-sensitive display data for offline UI fallback; they do not create auth
 // cookies, admin cookies, or session authority.
 
-export function getUser(): User | null {
+export function getCachedDisplayUser(): User | null {
   return safeGet<User | null>(KEYS.USER, null);
 }
 
