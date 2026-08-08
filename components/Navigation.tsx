@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { clearUser, getUser } from "@/lib/utils";
+import { clearUser, getCachedDisplayUser } from "@/lib/utils";
 import { isClientDemoMode } from "@/lib/platform/runtime";
 import {
   LayoutDashboard,
@@ -64,7 +64,7 @@ export default function Navigation({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     if (isClientDemoMode()) {
-      const stored = getUser();
+      const stored = getCachedDisplayUser();
       setSession({
         user: {
           id: stored?.id ?? "demo-user",
