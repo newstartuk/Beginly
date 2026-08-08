@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { getUser } from "@/lib/utils";
+import { getCachedDisplayUser } from "@/lib/utils";
 import { isClientDemoMode } from "@/lib/platform/runtime";
 import type { SupportCategory } from "@/types";
 import { MessageSquare, Send, CheckCircle, AlertTriangle } from "lucide-react";
@@ -33,7 +33,7 @@ export default function SupportPage() {
 
   useEffect(() => {
     if (isClientDemoMode()) {
-      const storedUser = getUser();
+      const storedUser = getCachedDisplayUser();
       setEmail(storedUser?.email ?? "demo@beginly.app");
       return;
     }
