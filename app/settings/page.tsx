@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabase, supabase } from "@/lib/supabase";
-import { clearUser, getUser, getArrivalProfile } from "@/lib/utils";
+import { clearUser, getCachedDisplayUser, getArrivalProfile } from "@/lib/utils";
 import { isClientDemoMode } from "@/lib/platform/runtime";
 import type { ReminderPrefs } from "@/types";
 import { User, Bell, Trash2, CheckCircle, BellRing } from "lucide-react";
@@ -41,7 +41,7 @@ export default function SettingsPage() {
   useEffect(() => {
     async function loadSession() {
       if (isClientDemoMode()) {
-        const storedUser = getUser();
+        const storedUser = getCachedDisplayUser();
         const storedProfile = getArrivalProfile();
         setUser({
           id: storedUser?.id ?? "demo",
