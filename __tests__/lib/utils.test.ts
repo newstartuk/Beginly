@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
 import {
-  getUser,
+  getCachedDisplayUser,
   setUser,
   getArrivalProfile,
   setArrivalProfile,
@@ -10,12 +10,12 @@ import {
 } from "@/lib/utils";
 import type { User, ArrivalProfile } from "@/types";
 
-describe("utils — getUser / setUser", () => {
+describe("utils — getCachedDisplayUser / setUser", () => {
   afterEach(() => clearAllData());
 
   it("returns null when no user is stored", () => {
     clearAllData();
-    expect(getUser()).toBe(null);
+    expect(getCachedDisplayUser()).toBe(null);
   });
 
   it("stores and retrieves a user correctly", () => {
@@ -28,7 +28,7 @@ describe("utils — getUser / setUser", () => {
       profileCompleted: false,
     };
     setUser(user);
-    const retrieved = getUser();
+    const retrieved = getCachedDisplayUser();
     expect(retrieved).toEqual(user);
     expect(retrieved?.name).toBe("Test User");
   });
@@ -83,9 +83,9 @@ describe("utils — getReminderPrefs / setReminderPrefs", () => {
 describe("utils — localStorage corruption handling", () => {
   afterEach(() => clearAllData());
 
-  it("getUser returns null for corrupted localStorage", () => {
+  it("getCachedDisplayUser returns null for corrupted localStorage", () => {
     localStorage.setItem("beginly_user", "not valid json {{{");
-    expect(getUser()).toBe(null);
+    expect(getCachedDisplayUser()).toBe(null);
     localStorage.removeItem("beginly_user");
   });
 
