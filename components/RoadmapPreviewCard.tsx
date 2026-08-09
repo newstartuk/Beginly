@@ -43,6 +43,7 @@ export default function RoadmapPreviewCard({ location = "Manchester · Arrived 2
   }, [shouldReduceMotion]);
 
   const step = STEPS[stepIndex];
+  const completedOutOf40 = Math.round((step.readiness / 100) * 40);
   const entranceTransition = shouldReduceMotion ? { duration: 0 } : undefined;
 
   return (
@@ -86,7 +87,7 @@ export default function RoadmapPreviewCard({ location = "Manchester · Arrived 2
             <span className="text-white text-xs font-semibold">Beginly Roadmap</span>
           </div>
           <span className="text-[11px] font-medium" style={{ color: "#46C8F1" }}>
-            12 / 40 complete
+            {completedOutOf40} / 40 complete
           </span>
         </div>
 
