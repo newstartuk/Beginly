@@ -487,7 +487,7 @@ function EditorialQuote() {
 ═══════════════════════════════════════════════════════════════════ */
 function TimelineSection() {
   return (
-    <section className="py-20 px-6" style={{ background: "var(--color-warm-neutral)" }}>
+    <section className="py-14 px-6" style={{ background: "var(--color-warm-neutral)" }}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--color-coral)" }}>
@@ -497,7 +497,7 @@ function TimelineSection() {
             Everything, in the right order.
           </h2>
         </div>
-        <div className="flex gap-5 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
+        <div className="flex gap-5 overflow-x-auto pb-4 justify-start sm:justify-center" style={{ scrollbarWidth: "none" }}>
           {TIMELINE_PHASES.map((phase, i) => (
             <motion.div key={phase.period}
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
@@ -531,14 +531,22 @@ function TimelineSection() {
 function CityTicker() {
   const doubled = [...JOURNEYS, ...JOURNEYS];
   return (
-    <div className="overflow-hidden py-3 border-y" style={{ borderColor: "rgba(22,179,166,0.15)" }} aria-hidden>
-      <div style={{ display: "flex", width: "max-content", animation: "ticker-scroll 38s linear infinite" }}>
-        {doubled.map((j, i) => (
-          <span key={i} className="text-xs font-medium"
-            style={{ padding: "0 2.25rem", whiteSpace: "nowrap", color: "var(--color-muted)" }}>
-            {j}
-          </span>
-        ))}
+    <div className="relative z-10">
+      <p
+        className="text-center text-[11px] font-bold uppercase tracking-widest mb-3"
+        style={{ color: "var(--color-teal)" }}
+      >
+        Wherever you&apos;re coming from, we can help you settle...
+      </p>
+      <div className="overflow-hidden py-3 border-y" style={{ borderColor: "rgba(22,179,166,0.15)" }} aria-hidden>
+        <div style={{ display: "flex", width: "max-content", animation: "ticker-scroll 38s linear infinite" }}>
+          {doubled.map((j, i) => (
+            <span key={i} className="text-xs font-medium"
+              style={{ padding: "0 2.25rem", whiteSpace: "nowrap", color: "var(--color-muted)" }}>
+              {j}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -553,7 +561,7 @@ function OpenDoorSection() {
   const taglineOpacity = useTransform(scrollYProgress, [0.45, 0.75], [0, 1]);
   const taglineY = useTransform(scrollYProgress, [0.45, 0.75], [18, 0]);
   return (
-    <section ref={ref} className="py-28 px-6 flex flex-col items-center justify-center"
+    <section ref={ref} className="py-14 px-6 flex flex-col items-center justify-center"
       style={{ background: "var(--color-warm-neutral)", minHeight: "55vh" }}>
       <p className="text-xs font-bold uppercase tracking-widest mb-14" style={{ color: "var(--color-muted)" }}>
         Open Door, Wider World
@@ -958,14 +966,15 @@ export default function LandingPage() {
           <motion.div className="text-center lg:text-left min-w-0" variants={heroContainer} initial="hidden" animate="show">
 
             {/* TIER 1 #4 — Live social proof badge */}
-            <motion.div variants={heroItem} className="inline-flex items-center gap-2 mb-3 text-xs font-semibold px-4 py-2 rounded-full"
+            {/* Disabled: Live social proof badge. Re-enable when real-time user stats are ready for launch. */}
+            {/* <motion.div variants={heroItem} className="inline-flex items-center gap-2 mb-3 text-xs font-semibold px-4 py-2 rounded-full"
               style={{ background: "rgba(31,163,106,0.07)", border: "1px solid rgba(31,163,106,0.2)", color: "#166534" }}>
               <span className="relative inline-flex h-2 w-2 shrink-0">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ background: "var(--color-green)" }} />
                 <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "var(--color-green)" }} />
               </span>
               1,200+ newcomers settled this month
-            </motion.div>
+            </motion.div> */}
 
             {/* Trust badge */}
             <motion.div variants={heroItem} className="inline-flex items-center gap-1.5 mb-5 text-xs font-semibold px-4 py-1.5 rounded-full border"
@@ -1252,9 +1261,12 @@ export default function LandingPage() {
 
       {/* ── Open Door ─────────────────────────────────────────────── */}
       <OpenDoorSection />
-
       {/* TIER 2 #6 — Editorial pull quote */}
-      <EditorialQuote />
+      {/* 
+        Feature flag: Set to true to enable the EditorialQuote section.
+        Remove this flag when the section is ready for production.
+      */}
+      {false && <EditorialQuote />}
 
       {/* TIER 3 #13 — Timeline */}
       <TimelineSection />
@@ -1295,7 +1307,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── Testimonials ──────────────────────────────────────────── */}
-      <section className="py-20 px-6" style={{ background: "var(--color-mist)" }}>
+      {/* Commented out for now. Re-enable when we have real testimonials to show. */}
+      {/* <section className="py-20 px-6" style={{ background: "var(--color-mist)" }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--color-teal)" }}>From our community</p>
@@ -1320,7 +1333,7 @@ export default function LandingPage() {
             ))}
           </motion.div>
         </div>
-      </section>
+      </section> */}
 
       {/* ── Nia demo ──────────────────────────────────────────────── */}
       <NiaLandingSection />
