@@ -2,7 +2,7 @@
 
 /* ─── Badge — design system v2.0 ────────────────────────────────
    Category colours follow the brand palette.
-   Violet is reserved exclusively for Nia/AI labels.
+   Violet is reserved exclusively for Nia labels.
 ──────────────────────────────────────────────────────────────── */
 
 const CATEGORY_STYLES: Record<string, string> = {

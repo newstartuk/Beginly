@@ -155,9 +155,9 @@ export default function PrivacyPolicyPage() {
                 governed by their privacy policy.
               </li>
               <li>
-                <strong className="text-navy">Nia AI:</strong> When you use the Nia chatbot,
+                <strong className="text-navy">Nia:</strong> When you use the Nia chatbot,
                 your messages are processed to provide relevant guidance. Nia is disclosed
-                as an AI tool and does not receive your personal account data.
+                as an automated tool and does not receive your personal account data.
               </li>
               <li>
                 <strong className="text-navy">Legal obligations:</strong> We may disclose data
@@ -232,8 +232,8 @@ export default function PrivacyPolicyPage() {
               <li>
                 <strong className="text-navy">Rights related to automated decision-making</strong>{" "}
                 — You have the right not to be subject to solely automated decisions that
-                significantly affect you. Our Nia chatbot is disclosed as AI and does not
-                make automated decisions with legal effects.
+                significantly affect you. Our Nia chatbot uses automated, rule-based logic and does not
+                make automated decisions with legal or similarly significant effects.
               </li>
             </ul>
             <p className="text-sm text-muted leading-relaxed mt-3">

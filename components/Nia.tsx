@@ -4,7 +4,7 @@ import { Send, X, Bot, RefreshCw, ExternalLink, AlertTriangle } from "lucide-rea
 
 /* ──────────────────────────────────────────────────────────────
    Nia — The Beginly Navigator
-   "Nia" is Beginly's AI-assisted guide. She is:
+   "Nia" is Beginly's automated orientation guide. She is:
    - NOT a real adviser or immigration/legal professional
    - NOT affiliated with any government body
    - NOT a substitute for professional advice
@@ -27,7 +27,7 @@ interface NiaMessage {
 
 const NIA_DISCLAIMER = `👋 Hi, I'm **Nia** — The Beginly Navigator.
 
-I'm your AI-assisted guide, here to help you find your way around settling in the UK. I can help with:
+I'm your automated guide, here to help you find your way around settling in the UK. I can help with:
 • Explaining your checklist tasks
 • Pointing you to official UK government sources
 • Tips for navigating UK daily life
@@ -241,7 +241,7 @@ export default function Nia({ autoOpen = false }: { autoOpen?: boolean }) {
               <div className="bg-amber-50 border-b border-amber-200 px-3 py-2 flex items-start gap-2 shrink-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
                 <p className="text-xs text-amber-800">
-                  <strong>Transparency note:</strong> Nia is an AI orientation tool — not a regulated adviser. For immigration, legal, or financial advice, contact a qualified professional.
+                  <strong>Transparency note:</strong> Nia is an automated orientation tool — not a regulated adviser. For immigration, legal, or financial advice, contact a qualified professional.
                 </p>
               </div>
 
