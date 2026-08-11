@@ -8,6 +8,10 @@ import StatusPill from "@/components/platform/StatusPill";
 import { getAvailableDocTypes, getDocHelperResponse } from "@/lib/doc-helper-responses";
 import type { DocType } from "@/types";
 
+/**
+ *  Commented out for now, to reflect Nia's current capabilities in the MVP. This will be revisited in future updates when Nia can read and explain user-pasted text.
+ */ 
+
 // const NIA_INTRO =
 //   "Hi, I'm Nia. For this MVP, Document Helper is paste-text-only. Paste a short non-sensitive extract and I'll explain the general meaning in plain English. Do not paste passport numbers, bank details, passwords, full tenancy contracts, or sensitive personal documents.";
 
@@ -39,6 +43,10 @@ export default function DocumentHelperPage() {
   return (
     <PlatformShell
       title="Doc Helper"
+      /**
+       *  Commented out for now, to reflect Nia's current capabilities in the MVP. This will be revisited in future updates when Nia can read and explain user-pasted text.
+       */ 
+
       // eyebrow="Paste-text guidance inside the main platform"
       action={<StatusPill tone="info">Other document type included</StatusPill>}
     >
@@ -98,6 +106,9 @@ export default function DocumentHelperPage() {
             ))}
           </div>
 
+          {/*
+            Commented out for now, to reflect Nia's current capabilities in the MVP. This will be revisited in future updates when Nia can read and explain user-pasted text.
+          */}
           {/* <div className="mt-4 pt-4 border-t border-border">
             <label className="block text-xs font-medium text-navy mb-1.5">
               Paste a short non-sensitive extract only
