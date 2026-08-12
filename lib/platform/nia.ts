@@ -43,7 +43,7 @@ export function askNia(message: string, context: UserContext): NiaResponse {
   const lower = message.toLowerCase();
   if (!context.aiConsent) {
     return {
-      message: "Your AI-context consent is currently off. I can show manual journeys and product comparisons without using your wider profile, or you can review consent settings.",
+      message: "Your personalisation consent is currently off. I can show manual journeys and product comparisons without using your wider profile, or you can review consent settings.",
       mode: "safety",
       reasonCodes: ["ai_consent_disabled"],
       sourceIds: [],

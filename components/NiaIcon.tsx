@@ -4,8 +4,8 @@
  * NiaIcon — Beginly's Document Helper mark
  *
  * A chat-bubble form with a 4-point sparkle inside:
- * - Bubble = conversational, approachable AI assistant
- * - Sparkle = intelligence, clarity, the "aha" moment
+ * - Bubble = conversational, approachable assistant
+ * - Sparkle = clarity, the "aha" moment
  *
  * Uses currentColor — works on any background.
  */

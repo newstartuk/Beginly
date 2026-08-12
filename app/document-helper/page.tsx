@@ -8,8 +8,15 @@ import StatusPill from "@/components/platform/StatusPill";
 import { getAvailableDocTypes, getDocHelperResponse } from "@/lib/doc-helper-responses";
 import type { DocType } from "@/types";
 
+/**
+ *  Commented out for now, to reflect Nia's current capabilities in the MVP. This will be revisited in future updates when Nia can read and explain user-pasted text.
+ */ 
+
+// const NIA_INTRO =
+//   "Hi, I'm Nia. For this MVP, Document Helper is paste-text-only. Paste a short non-sensitive extract and I'll explain the general meaning in plain English. Do not paste passport numbers, bank details, passwords, full tenancy contracts, or sensitive personal documents.";
+
 const NIA_INTRO =
-  "Hi, I'm Nia. For this MVP, Document Helper is paste-text-only. Paste a short non-sensitive extract and I'll explain the general meaning in plain English. Do not paste passport numbers, bank details, passwords, full tenancy contracts, or sensitive personal documents.";
+  "Hi, I'm Nia. Choose a document type below and I'll explain what that type of document generally means, in plain English.";
 
 export default function DocumentHelperPage() {
   const [selectedType, setSelectedType] = useState<DocType | "">("");
@@ -36,7 +43,11 @@ export default function DocumentHelperPage() {
   return (
     <PlatformShell
       title="Doc Helper"
-      eyebrow="Paste-text guidance inside the main platform"
+      /**
+       *  Commented out for now, to reflect Nia's current capabilities in the MVP. This will be revisited in future updates when Nia can read and explain user-pasted text.
+       */ 
+
+      // eyebrow="Paste-text guidance inside the main platform"
       action={<StatusPill tone="info">Other document type included</StatusPill>}
     >
       <div className="max-w-3xl mx-auto space-y-5 animate-fade-in">
@@ -47,9 +58,9 @@ export default function DocumentHelperPage() {
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold text-navy">Document Helper</h1>
-              <span className="text-[10px] font-mono bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded">
+              {/* <span className="text-[10px] font-mono bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded">
                 MVP paste-text only
-              </span>
+              </span> */}
             </div>
             <p className="text-xs text-muted">Powered by Nia - your Beginly guide</p>
           </div>
@@ -95,7 +106,10 @@ export default function DocumentHelperPage() {
             ))}
           </div>
 
-          <div className="mt-4 pt-4 border-t border-border">
+          {/*
+            Commented out for now, to reflect Nia's current capabilities in the MVP. This will be revisited in future updates when Nia can read and explain user-pasted text.
+          */}
+          {/* <div className="mt-4 pt-4 border-t border-border">
             <label className="block text-xs font-medium text-navy mb-1.5">
               Paste a short non-sensitive extract only
             </label>
@@ -109,7 +123,11 @@ export default function DocumentHelperPage() {
             <p className="text-xs text-muted mt-1">
               Maximum 5,000 characters. File upload and OCR will be added only after stronger privacy and extraction controls are implemented.
             </p>
-          </div>
+          </div> */}
+
+          <p className="text-xs text-muted mt-4 pt-4 border-t border-border">
+            Reading your own document text is coming in a future update. For now, choose the closest category above and Nia will explain what that type of document generally means.
+          </p>
 
           <button
             onClick={handleExplain}

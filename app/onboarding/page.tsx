@@ -903,13 +903,13 @@ export default function OnboardingPage() {
                   <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center shrink-0">
                     <span className="text-white text-sm">🤖</span>
                   </div>
-                  <p className="text-sm font-semibold text-navy">Meet Nia — your AI settlement guide</p>
+                  <p className="text-sm font-semibold text-navy">Meet Nia — your settlement guide</p>
                 </div>
                 <p className="text-xs text-civic-600 leading-relaxed">
                   As you work through your roadmap, you can chat with <strong>Nia</strong> — she can explain tasks, point you to official sources, and help you navigate UK daily life.
                 </p>
                 <p className="text-xs text-civic-500 leading-relaxed">
-                  <strong className="text-amber-600">Note:</strong> Nia is an AI orientation tool, not a regulated adviser. For immigration, legal, or financial advice, speak to a qualified professional.
+                  <strong className="text-amber-600">Note:</strong> Nia is an automated orientation tool, not a regulated adviser. For immigration, legal, or financial advice, speak to a qualified professional.
                 </p>
               </div>
               <button type="button" onClick={next} className="btn-ghost text-xs text-muted w-full justify-center">

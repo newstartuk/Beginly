@@ -179,7 +179,7 @@ const FEATURES = [
   {
     icon: NiaIcon,
     title: "Nia — Document Helper",
-    desc: "Your AI guide explains tenancy agreements, NHS letters, and council tax forms in plain English.",
+    desc: "Nia explains tenancy agreements, NHS letters, and council tax forms in plain English.",
     iconColor: "var(--color-coral)",
     iconBg: "rgba(255,115,88,0.1)",
     wide: true,
@@ -784,7 +784,7 @@ function NiaLandingSection() {
           initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }} transition={{ duration: 0.45 }}>
           <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--color-coral)" }}>
-            AI Document Helper
+            Document Helper
           </p>
           <h2 className="font-display text-2xl sm:text-3xl mb-3" style={{ color: "var(--color-navy)" }}>
             Meet Nia — plain English for every UK document.

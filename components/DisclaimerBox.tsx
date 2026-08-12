@@ -34,7 +34,7 @@ const DISCLAIMER_CONTENT: Record<
   ai: {
     title: "Nia is not a professional adviser",
     body:
-      "Nia is an AI-assisted orientation tool created by Beginly. She is not a regulated immigration adviser, lawyer, doctor, or financial adviser. She helps you understand information — she does not make decisions for you. Always verify important matters with a qualified professional.",
+      "Nia is an automated orientation tool created by Beginly. She is not a regulated immigration adviser, lawyer, doctor, or financial adviser. She helps you understand information — she does not make decisions for you. Always verify important matters with a qualified professional.",
   },
 };
 
