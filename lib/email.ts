@@ -259,7 +259,7 @@ export async function sendPasswordResetEmail({
                     <p style="margin:0 0 28px;color:#64748B;font-size:15px;line-height:1.7;">
                       Use the button below to choose a new password and get back to your roadmap.
                     </p>
-                    ${ctaButton({ url: escapeHtml(resetUrl), text: "Reset my password →" })}
+                    ${ctaButton({ url: resetUrl, text: "Reset my password →" })}
                     <p style="margin:0 0 18px;color:#64748B;font-size:13px;line-height:1.6;text-align:center;">
                       This password reset link will expire in 24 hours.
                       If it expires, you can
