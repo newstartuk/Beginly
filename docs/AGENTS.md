@@ -123,6 +123,7 @@ RESEND_API_KEY=                   # SDK installed, no live key
 STRIPE_SECRET_KEY=                # SDK installed, no live key
 STRIPE_WEBHOOK_SECRET=
 BEGINLY_WEBHOOK_SECRET=           # guards /api/webhooks/resend
+SEND_EMAIL_HOOK_SECRET=           # guards /api/auth/send-email-hook (Supabase Send Email Hook), see docs/AUTH_EMAIL_TEMPLATES.md
 ```
 
 Mobile (`mobile/.env` or shell env):
