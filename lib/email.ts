@@ -125,7 +125,7 @@ function getResendClient(): Resend {
   return new Resend(process.env.RESEND_API_KEY);
 }
 
-const FROM = "Beginly <noreply@mail.beginly.app>";
+const FROM = `Beginly <${process.env.FROM_EMAIL}>`;
 
 /**
  * Sends a welcome email to a newly registered user.
