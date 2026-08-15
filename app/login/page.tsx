@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { ensureBeginlyUser } from "@/lib/auth-client";
 import { setArrivalProfile, setUser, setUserTasks } from "@/lib/utils";
-import { resolvePostAuthRedirect } from "@/lib/navigation/post-auth";
+import { resolvePostAuthRedirect, withPostAuthIntent } from "@/lib/navigation/post-auth";
 import { isClientDemoMode } from "@/lib/platform/runtime";
 import { generateTasksForProfile } from "@/lib/task-generator";
 import { AlertCircle, CheckCircle } from "lucide-react";
@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [reset, setReset] = useState(false);
   const [postAuthRedirect, setPostAuthRedirect] = useState<string>();
   const demoMode = isClientDemoMode();
   const demoEmail = "demo@beginly.local";
@@ -28,6 +29,7 @@ export default function LoginPage() {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       setConfirmed(params.get("confirmed") === "true");
+      setReset(params.get("reset") === "true");
       setPostAuthRedirect(resolvePostAuthRedirect({ redirect: params.get("redirect"), product: params.get("product") }));
     }
   }, []);
@@ -151,6 +153,13 @@ export default function LoginPage() {
             </div>
           )}
 
+          {reset && !error && (
+            <div className="flex items-center gap-2 text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 text-sm">
+              <CheckCircle className="w-4 h-4 shrink-0" />
+              Password updated. You can now sign in with your new password.
+            </div>
+          )}
+
           {error && (
             <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-lg p-3 text-sm">
               <AlertCircle className="w-4 h-4 shrink-0" />
@@ -183,7 +192,10 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="input-label">Password</label>
+            <div className="flex items-center justify-between">
+              <label className="input-label">Password</label>
+            </div>
+
             <input
               type="password"
               value={password}
@@ -193,6 +205,15 @@ export default function LoginPage() {
               autoComplete="current-password"
               required
             />
+
+            <div className="mt-1 flex justify-end">
+              <Link
+                href={withPostAuthIntent("/forgot-password", postAuthRedirect)}
+                className="text-xs text-primary hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
           </div>
 
           <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-2.5">

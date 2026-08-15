@@ -22,7 +22,7 @@ export function resolvePostAuthRedirect(input: { redirect?: string | null; produ
   return safeInternalRedirect(input.redirect) ?? productEntryRedirect(input.product);
 }
 
-export function withPostAuthIntent(pathname: "/login" | "/signup", redirect?: string): string {
+export function withPostAuthIntent(pathname: "/login" | "/signup" | "/forgot-password", redirect?: string): string {
   const safe = safeInternalRedirect(redirect);
   return safe ? `${pathname}?redirect=${encodeURIComponent(safe)}` : pathname;
 }
