@@ -30,25 +30,29 @@ User gets our branded email
 
 To avoid silently breaking those other flows the moment this hook is turned on, `app/api/auth/send-email-hook/route.ts` handles `email_action_type === "recovery"` with the dedicated template, and falls back to a generic-but-branded `sendAuthActionEmail()` for everything else (signup, magiclink, invite, email_change, reauthentication). Those fallback emails are functional but not custom-designed — only the two this branch cares about (reset link, password-changed) got a dedicated pass. If/when another flow (e.g. registration) gets its own polished template, add it to `AUTH_ACTION_COPY` in `lib/email.ts` or give it a dedicated `send*Email()` function and branch to it in the route.
 
-## The two emails (plus the fallback)
+## The emails
+
+Every email `lib/email.ts` sends now shares one visual template — this started as just the two forgot-password emails, but was later extended to cover the whole file:
 
 | Email | Trigger | Function |
 |---|---|---|
-| Reset password (the link) | Supabase Send Email Hook, `email_action_type === "recovery"` | `sendPasswordResetEmail()` in [lib/email.ts](../lib/email.ts) |
-| Password changed (security notice) | `app/reset-password/page.tsx`, right after `supabase.auth.updateUser()` succeeds | `sendPasswordChangedEmail()` in [lib/email.ts](../lib/email.ts), via [app/api/auth/password-changed/route.ts](../app/api/auth/password-changed/route.ts) |
-| Generic fallback (signup, magiclink, invite, email_change, reauthentication) | Supabase Send Email Hook, any non-recovery `email_action_type` | `sendAuthActionEmail()` in [lib/email.ts](../lib/email.ts) |
+| Welcome | `app/api/webhooks/resend/route.ts`, on a Database Webhook firing when `auth.users.confirmed_at` transitions to set | `sendWelcomeEmail()` |
+| Reset password (the link) | Supabase Send Email Hook, `email_action_type === "recovery"` | `sendPasswordResetEmail()` |
+| Password changed (security notice) | `app/reset-password/page.tsx`, right after `supabase.auth.updateUser()` succeeds | `sendPasswordChangedEmail()`, via [app/api/auth/password-changed/route.ts](../app/api/auth/password-changed/route.ts) |
+| Generic auth-action fallback (signup, magiclink, invite, email_change, reauthentication) | Supabase Send Email Hook, any non-recovery `email_action_type` | `sendAuthActionEmail()` |
+| Task reminder (daily/weekly/biweekly/monthly) | Vercel Cron, `GET /api/cron/task-reminders` — see [TASK_REMINDER_EMAILS.md](TASK_REMINDER_EMAILS.md) | `sendTaskReminderEmail()` |
 
-These three now share their own table-based visual system, separate from `sendWelcomeEmail()`'s original gradient-header design (which is unchanged): a cream page background (`#EAF8F7`), a white card with a `#DCE9EA` border and `18px` radius, navy body text (`#0D223D`), Georgia-serif headings, a coral (`#FF6B57`) CTA button, a tan security-notice callout box, and a three-colour brand stripe (`#18B7B5` / `#FF6B57` / `#F2B544`) along the bottom edge. Each also sets a plain-text `text:` body alongside `html:` in the Resend call (not just `html:`, unlike `sendWelcomeEmail`/`sendTaskReminderEmail`). Table-based markup (`<table role="presentation">`) rather than `<div>`s, for better rendering in Outlook's Word engine.
+All five (all in [lib/email.ts](../lib/email.ts)) share: a cream page background (`#EAF8F7`), a white card with a `#DCE9EA` border and `18px` radius, navy body text (`#0D223D`), Georgia-serif headings, a coral (`#FF6B57`) CTA button, a tan security/callout box, a footer sign-off ("Beginly" / "Open what comes next.", above the "reason" line and the copyright/Privacy/Terms line), and a three-colour brand stripe (`#18B7B5` / `#FF6B57` / `#F2B544`) along the bottom edge. Each also sets a plain-text `text:` body alongside `html:` in the Resend call. Table-based markup (`<table role="presentation">`) rather than `<div>`s, for better rendering in Outlook's Word engine.
+
+None of them set an HTML `<title>` tag — an earlier revision did, and some email clients (notably Outlook.com and other webmail renderers) don't hide `<title>` content properly, rendering it as a visible line at the very top of the message body, before the actual header. Since `<title>` was set to the same string as the `subject:` field, this showed up as literally the same text appearing twice — once as the subject, once as the first visible line in the body. The `subject:` field alone controls what an inbox shows; `<title>` serves no purpose in email and was removed from all five templates.
 
 The header shows the actual Beginly mark (see "Logo asset" below) next to hand-coded "Beginly" / "Open what comes next." text — not the wordmark as a single image.
 
-The "password changed" email has no action link to the reset flow itself (it's a notice, not an action), just a "Sign in →" CTA and a "Wasn't you?" callout linking to `/forgot-password`.
-
-**HTML fallback links differ between the two, worth knowing if you're editing either:** `sendAuthActionEmail()` still shows the raw action URL as visible, clickable text below the CTA button (for clients that strip button styling). `sendPasswordResetEmail()` doesn't — it replaced that with an expiry notice instead ("This password reset link will expire in 24 hours... click here to request a new one," linking to `/forgot-password`, not the reset link itself). Both still include the actual link in their plain-text `text:` alternative body regardless.
+The "password changed" email has no action link to the reset flow itself (it's a notice, not an action), just a "Sign in →" CTA and a "Wasn't you?" callout linking to `/forgot-password`. None of the five currently show a raw fallback URL as visible text in their HTML (an early revision of `sendAuthActionEmail()` did, but that block had been accidentally written with `//`-style line comments — invalid inside an HTML string, so it would have rendered as literal visible garbage text in the sent email; it was removed rather than fixed, since the CTA button already covers the same need). The actual links are still present in every email's plain-text `text:` alternative body.
 
 ## Shared layout helpers & HTML escaping
 
-`lib/email.ts` now has a small set of shared builder functions at the top of the file — `emailHeader()`, `emailDivider()`, `emailFooter()`, `brandStripe()`, `ctaButton()`, `securityBox()` — each returning a string of `<tr>`/`<table>` markup for the shared cream/navy/coral design. All three of `sendPasswordResetEmail()`, `sendPasswordChangedEmail()`, and `sendAuthActionEmail()` are now built from these (in an earlier revision, `sendPasswordResetEmail()` had its own fully-inlined markup instead — that's been folded into the shared helpers too, so all three stay in sync automatically if the shared look changes).
+`lib/email.ts` has a small set of shared builder functions at the top of the file — `emailHeader()`, `emailDivider()`, `emailFooter()`, `brandStripe()`, `ctaButton()`, `securityBox()` — each returning a string of `<tr>`/`<table>` markup for the shared cream/navy/coral design. All five email functions are built from these (in earlier revisions, `sendPasswordResetEmail()`, `sendWelcomeEmail()`, and `sendTaskReminderEmail()` each had their own fully-inlined markup instead — all three were folded into the shared helpers, so every email now stays in sync automatically if the shared look changes). `emailFooter()` takes an optional `reason` string (e.g. "You received this email because you created a Beginly account.") since a single hardcoded "authentication action" line didn't make sense for a welcome or task-reminder email.
 
 There's also a new `escapeHtml()` helper, applied to dynamic values interpolated into HTML bodies (`name`, `email`, action/reset URLs) to prevent HTML injection — e.g. a Supabase `user_metadata.name` containing markup can't break out of the template. It's deliberately *not* applied inside any `text:` (plain-text) body, since HTML-escaping plain text would show literal `&amp;`-style artifacts instead of the intended characters.
 
@@ -59,7 +63,7 @@ The header `<img>` in all three needs an absolute, publicly-hosted URL — email
 - [public/beginly-mark.svg](../public/beginly-mark.svg) — geometry copied from `Logo.tsx`'s `variant="mark"` output, with `useId()`'s dynamic gradient/filter ids replaced by static ones (`beginlyMarkBeam`, `beginlyMarkGlow`).
 - [public/beginly-mark.png](../public/beginly-mark.png) — a 240×245 rasterization of the same SVG, generated with `sharp` (already present in `node_modules` transitively, not added as a project dependency since nothing imports it — it was only run once as a one-off `node -e` script, not checked in as a build step).
 
-**Client support caveat:** SVG in `<img src>` is inconsistently supported — Apple Mail and Chromium-based clients (new Outlook, Outlook on the web) render it fine, but Gmail (web and app) does not render SVG images at all, and classic Outlook desktop (Word engine) doesn't either. The logo `src` is now a single `LOGO_SRC` constant near the top of `lib/email.ts` (`` `${DEFAULT_SITE_URL}/beginly-mark.png` ``), read once by `emailHeader()` and reused by all three emails — currently pointed at the PNG. Swapping to the SVG (or back) only means changing that one constant, not three separate `<img>` tags.
+**Client support caveat:** SVG in `<img src>` is inconsistently supported — Apple Mail and Chromium-based clients (new Outlook, Outlook on the web) render it fine, but Gmail (web and app) does not render SVG images at all, and classic Outlook desktop (Word engine) doesn't either. The logo `src` is a single `LOGO_SRC` constant near the top of `lib/email.ts` (`` `${DEFAULT_SITE_URL}/beginly-mark.png` ``), read once by `emailHeader()` and reused by all five emails — currently pointed at the PNG. Swapping to the SVG (or back) only means changing that one constant, not separate `<img>` tags per email.
 
 ## Why "password changed" can't use the hook
 
@@ -70,6 +74,14 @@ Supabase's Send Email Hook only fires for its own auth email types (signup, invi
 `app/api/auth/send-email-hook/route.ts` builds the verify URL (`${supabaseUrl}/auth/v1/verify?token=...&type=...&redirect_to=...`) with `URL`/`URLSearchParams` rather than raw string concatenation, so `token_hash` and `redirect_to` are properly URL-encoded.
 
 The route also computes a `safeRedirectTo` by validating the hook's `redirect_to` against an allowlist of trusted origins (`https://beginly.app`, `http://localhost:3456`), logging a warning for anything else. **This check doesn't currently do anything** — the actual verify URL is still built from the raw, unvalidated `emailData.redirect_to`, not `safeRedirectTo`. Worth fixing before relying on it as a real guard against an untrusted `redirect_to`.
+
+## The welcome email's actual trigger
+
+Unlike the Send Email Hook (an Auth Hook), the welcome email is triggered by a separate, pre-existing **Database Webhook** on the `auth.users` table, configured independently in Supabase Dashboard → Database → Webhooks, pointed at `app/api/webhooks/resend/route.ts`. That route watches for `confirmed_at` transitioning from null to set, then calls `sendWelcomeEmail()`.
+
+This route pre-dates the forgot-password work but had a real, previously-undiscovered bug: it wrote to `webhook_events` columns (`payload_fingerprint`, `status`, `event_type`, `error_code`) that don't exist on the table — the actual schema (`supabase/migrations/00000000000000_baseline_snapshot.sql`) has `payload_hash` and `state` (CHECK-constrained to `'received' | 'processed' | 'failed'`), and no `event_type`/`error_code` columns at all. Every ledger insert failed with a genuine Postgres error, silently blocking the welcome email — silently, because the route also had zero logging anywhere. Both are now fixed: the insert/update calls use the real column names and allowed `state` values, and every failure branch (missing `BEGINLY_WEBHOOK_SECRET`, bad bearer token, missing Supabase env vars, ledger insert failure, `sendWelcomeEmail` failure) now logs via `console.error`.
+
+Separately, the route originally required an `x-beginly-event-id` or `x-supabase-event-id` header to dedupe deliveries — but Supabase's native Database Webhooks don't send either automatically (that's a no-code dashboard feature, not a custom `pg_net` trigger you write yourself), so this always evaluated to nothing and 400'd every single delivery. Fixed by using a content hash of the payload (already computed for the `payload_hash` audit column) as the idempotency key directly — a real confirmation event is naturally unique on its own (distinct user id + `confirmed_at` timestamp), so no header was ever needed.
 
 ## Setup (Supabase dashboard)
 
@@ -89,7 +101,7 @@ No dashboard email template editing is needed — once the hook is enabled, Supa
 
 ## Not done
 
-- `sendTaskReminderEmail()` in `lib/email.ts` is untouched and still on the original gradient palette — it now visually diverges from the three password/auth-action emails' newer table-based design.
+- `sendTaskReminderEmail()` is now triggered by a real Vercel Cron job (`app/api/cron/task-reminders/route.ts`) — see [TASK_REMINDER_EMAILS.md](TASK_REMINDER_EMAILS.md) for that flow, its kill switch, and its own "Not done" list.
 - The `email_change` fallback only links the primary `token_hash` — Supabase actually issues two tokens for an email change (old + new address); the new-address confirmation isn't separately handled. Not a concern for this branch's scope (forgot password), but worth knowing if email-change ever gets its own dedicated template.
 - `public/beginly-mark.svg` is currently unused (`LOGO_SRC` points at the PNG) — left in place rather than deleted, since it's a one-line swap back if SVG client support ever becomes viable.
 - The `redirect_to` allowlist in `app/api/auth/send-email-hook/route.ts` is computed but not applied (see "Building the action link" above) — the raw value is used regardless of whether it passed validation.

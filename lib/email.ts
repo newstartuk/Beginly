@@ -39,12 +39,18 @@ function emailDivider() {
   `;
 }
 
-function emailFooter({ siteUrl = DEFAULT_SITE_URL }: { siteUrl?: string } = {}) {
+function emailFooter({ siteUrl = DEFAULT_SITE_URL, reason = "You received this email because an authentication action was requested for your Beginly account.", }: { siteUrl?: string; reason?: string } = {}) {
   return `
     <tr>
       <td style="background:#F8FBFB;border-top:1px solid #DCE9EA;padding:18px 40px;">
+        <p style="margin:0 0 6px;color:#0D223D;font-size:13px;font-weight:700;text-align:center;line-height:1.5;">
+          Beginly
+        </p>
+        <p style="margin:0 0 14px;color:#64748B;font-size:12px;text-align:center;line-height:1.6;">
+          Open what comes next.
+        </p>
         <p style="margin:0 0 10px;color:#94A3B8;font-size:11px;text-align:center;line-height:1.6;">
-          You received this email because an authentication action was requested for your Beginly account.
+          ${reason}
         </p>
         <p style="margin:0;color:#94A3B8;font-size:11px;text-align:center;line-height:1.6;">
           © 2026 Beginly
@@ -129,7 +135,7 @@ const FROM = `Beginly <${process.env.FROM_EMAIL}>`;
 
 /**
  * Sends a welcome email to a newly registered user.
- * Call this after email confirmation — e.g. via a Supabase webhook on
+ * Call this after email confirmation - e.g. via a Supabase webhook on
  * `user.confirmed_at` change, or after first login with a confirmed email.
  */
 export async function sendWelcomeEmail({
@@ -140,64 +146,81 @@ export async function sendWelcomeEmail({
   email: string;
 }) {
   const resend = getResendClient();
+  const siteUrl = DEFAULT_SITE_URL;
+
   const { error } = await resend.emails.send({
     from: FROM,
     to: email,
-    subject: "Welcome to Beginly — your adaptive UK path is ready",
+    subject: "Welcome to Beginly - Your adaptive UK path is ready",
     html: `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to Beginly</title>
-</head>
-<body style="margin:0;padding:0;background:#F0FAFC;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <div style="max-width:600px;margin:40px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-    <!-- Header -->
-    <div style="background:linear-gradient(135deg,#0B7285,#2563EB);padding:32px 40px;">
-      <div style="display:inline-block;background:#ffffff;border-radius:10px;width:40px;height:40px;text-align:center;line-height:40px;font-weight:700;color:#0B7285;font-size:18px;">B</div>
-      <h1 style="margin:16px 0 0;color:#ffffff;font-size:24px;font-weight:800;">Welcome to Beginly${name ? `, ${escapeHtml(name)}` : ""}</h1>
-    </div>
-
-    <!-- Body -->
-    <div style="padding:40px;">
-      <p style="font-size:16px;color:#1a2740;margin:0 0 20px;line-height:1.6;">
-        Your account is confirmed and ready to go. 🎉
-      </p>
-      <p style="font-size:15px;color:#4b5563;margin:0 0 24px;line-height:1.6;">
-        Beginly is your adaptive UK transition and opportunity companion. It connects the actions that matter now with future settlement, study, career, family and progression horizons.
-      </p>
-
-      <!-- CTA -->
-      <div style="text-align:center;margin:32px 0;">
-        <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? "https://beginly.app"}/onboarding"
-           style="display:inline-block;background:#0B7285;color:#ffffff;font-size:15px;font-weight:700;padding:14px 32px;border-radius:10px;text-decoration:none;box-shadow:0 4px 16px rgba(11,114,133,0.35);">
-          Build your living path →
-        </a>
-      </div>
-
-      <p style="font-size:14px;color:#4b5563;margin:0 0 20px;line-height:1.6;">
-        Start with your current route, city and goal. You can add household context progressively, and your journey will continue evolving rather than reset at each transition.
-      </p>
-
-      <hr style="border:none;border-top:1px solid #e5e7eb;margin:28px 0;" />
-
-      <p style="font-size:13px;color:#9ca3af;line-height:1.6;">
-        <strong style="color:#4b5563;">Important:</strong> Beginly provides general settlement guidance only — not legal, immigration, financial, or medical advice. Always check your personal circumstances against official UK government guidance or speak to a qualified professional.
-      </p>
-    </div>
-
-    <!-- Footer -->
-    <div style="background:#f9fafb;padding:20px 40px;border-top:1px solid #e5e7eb;">
-      <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">
-        © 2026 Beginly · <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? "https://beginly.app"}/privacy-policy" style="color:#0B7285;text-decoration:none;">Privacy Policy</a> · <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? "https://beginly.app"}/terms-of-service" style="color:#0B7285;text-decoration:none;">Terms of Service</a>
-      </p>
-    </div>
-  </div>
-</body>
-</html>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
+      <body style="margin:0;padding:0;background:#EAF8F7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0D223D;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#EAF8F7;">
+          <tr>
+            <td align="center" style="padding:48px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#FFFFFF;border:1px solid #DCE9EA;border-radius:18px;overflow:hidden;">
+                ${emailHeader()}
+                ${emailDivider()}
+                <tr>
+                  <td style="padding:40px;">
+                    <h1 style="margin:0 0 24px;color:#0D223D;font-family:Georgia,'Times New Roman',serif;font-size:32px;line-height:1.18;font-weight:700;text-align:center;">
+                      Welcome to Beginly${name ? `, ${escapeHtml(name)}` : ""}
+                    </h1>
+                    <div style="text-align:left;">
+                      <p style="margin:0 0 18px;color:#0D223D;font-size:16px;line-height:1.7;">
+                        Your account is confirmed and ready to go. 🎉
+                      </p>
+                      <p style="margin:0 0 28px;color:#64748B;font-size:15px;line-height:1.7;">
+                        Beginly is your adaptive UK transition and opportunity companion. It connects the actions that matter now with future settlement, study, career, family and progression horizons.
+                      </p>
+                    </div>
+                    ${ctaButton({ url: `${siteUrl}/onboarding`, text: "Build your living path →" })}
+                    <p style="margin:0 0 28px;color:#64748B;font-size:14px;line-height:1.7;">
+                      Start with your current route, city and goal. You can add household context progressively, and your journey will continue evolving rather than reset at each transition.
+                    </p>
+                    ${securityBox({
+                      children: `
+                        <p style="margin:0;color:#64748B;font-size:13px;line-height:1.65;">
+                          <strong style="color:#0D223D;">Important:</strong> Beginly provides general settlement guidance only - not legal, immigration, financial, or medical advice. Always check your personal circumstances against official UK government guidance or speak to a qualified professional.
+                        </p>
+                      `,
+                    })}
+                  </td>
+                </tr>
+                ${emailFooter({ siteUrl, reason: "You received this email because you created a Beginly account." })}
+                ${brandStripe()}
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
     `,
+    text: `
+      Welcome to Beginly${name ? `, ${name}` : ""}
+
+      Your account is confirmed and ready to go.
+
+      Beginly is your adaptive UK transition and opportunity companion. It connects the actions that matter now with future settlement, study, career, family and progression horizons.
+
+      Build your living path:
+      ${siteUrl}/onboarding
+
+      Start with your current route, city and goal. You can add household context progressively, and your journey will continue evolving rather than reset at each transition.
+
+      Important: Beginly provides general settlement guidance only - not legal, immigration, financial, or medical advice. Always check your personal circumstances against official UK government guidance or speak to a qualified professional.
+
+      Beginly
+      Open what comes next.
+
+      Privacy: ${siteUrl}/privacy-policy
+      Terms: ${siteUrl}/terms-of-service
+    `.trim(),
   });
 
   if (error) {
@@ -210,7 +233,7 @@ export async function sendWelcomeEmail({
 /**
  * Sends the "reset your password" email, with the secure link to complete the reset.
  * Called from the Supabase Send Email Hook (app/api/auth/send-email-hook/route.ts) in
- * place of Supabase's built-in recovery email — resetUrl is built from the hook payload.
+ * place of Supabase's built-in recovery email - resetUrl is built from the hook payload.
  */
 export async function sendPasswordResetEmail({
   name,
@@ -235,7 +258,6 @@ export async function sendPasswordResetEmail({
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Reset your Beginly password</title>
       </head>
       <body style="margin:0;padding:0;background:#EAF8F7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0D223D;">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#EAF8F7;">
@@ -339,7 +361,6 @@ export async function sendPasswordChangedEmail({
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Your Beginly password was changed</title>
       </head>
       <body style="margin:0;padding:0;background:#EAF8F7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0D223D;">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#EAF8F7;">
@@ -474,7 +495,7 @@ const AUTH_ACTION_COPY: Record<
  * Generic fallback for any Supabase auth email type that doesn't have a dedicated
  * template (everything except "recovery", which uses sendPasswordResetEmail).
  * Exists so enabling the Send Email Hook doesn't silently stop signup/magic-link/
- * invite/email-change emails from going out — see app/api/auth/send-email-hook/route.ts.
+ * invite/email-change emails from going out - see app/api/auth/send-email-hook/route.ts.
  */
 export async function sendAuthActionEmail({
   name,
@@ -508,7 +529,6 @@ export async function sendAuthActionEmail({
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>${copy.subject}</title>
       </head>
       <body style="margin:0;padding:0;background:#EAF8F7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0D223D;">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#EAF8F7;">
@@ -526,12 +546,11 @@ export async function sendAuthActionEmail({
                       <p style="margin:0 0 18px;color:#0D223D;font-size:16px;line-height:1.7;">
                         ${name ? `Hi ${escapeHtml(name)},` : "Hi there,"}
                       </p>
-                      <p style="margin:0 0 28px;color:#64748B;font-size:15px;line-height:1.7;">
+                      <p style="margin:0 0 16px;color:#64748B;font-size:15px;line-height:1.7;">
                         ${copy.intro}
                       </p>
                       <p style="margin:0 0 28px;color:#64748B;font-size:15px;line-height:1.7;">
-                        This request is for the Beginly account associated with
-                        <strong style="color:#0D223D;">${escapeHtml(email)}</strong>.
+                        This request is for the Beginly account associated with <strong style="color:#0D223D;">${escapeHtml(email)}</strong>.
                       </p>
                     </div>
                     ${ctaButton({ url: actionUrl, text: copy.cta })}
@@ -543,14 +562,6 @@ export async function sendAuthActionEmail({
                         </p>
                       `,
                     })}
-                    <p style="margin:0 0 8px;color:#94A3B8;font-size:12px;line-height:1.6;">
-                      If the button doesn't work, copy and paste this link into your browser:
-                    </p>
-                    <p style="margin:0;color:#18A7A5;font-size:12px;line-height:1.6;word-break:break-all;">
-                      <a href="${escapeHtml(actionUrl)}" style="color:#18A7A5;text-decoration:none;">
-                        ${escapeHtml(actionUrl)}
-                      </a>
-                    </p>
                   </td>
                 </tr>
                 ${emailFooter({ siteUrl })}
@@ -599,73 +610,107 @@ export async function sendAuthActionEmail({
  * Sends a task reminder email.
  * Call this from a cron job or Supabase scheduled function.
  */
+export type ReminderFrequency = "daily" | "weekly" | "biweekly" | "monthly";
+
+const FREQUENCY_LABELS: Record<ReminderFrequency, string> = { daily: "daily", weekly: "weekly", biweekly: "fortnightly", monthly: "monthly" };
+const FREQUENCY_PERIOD_PHRASES: Record<ReminderFrequency, string> = { daily: "today", weekly: "this week", biweekly: "over the next couple of weeks", monthly: "this month" };
+
 export async function sendTaskReminderEmail({
   email,
   name,
   taskCount,
   incompleteTasks,
+  frequency = "weekly",
+  unsubscribeUrl,
 }: {
   email: string;
   name: string;
   taskCount: number;
   incompleteTasks: string[];
+  frequency?: ReminderFrequency;
+  unsubscribeUrl?: string;
 }) {
   const resend = getResendClient();
+  const siteUrl = DEFAULT_SITE_URL;
+  const frequencyLabel = FREQUENCY_LABELS[frequency] ?? FREQUENCY_LABELS.weekly;
+  const periodPhrase = FREQUENCY_PERIOD_PHRASES[frequency] ?? FREQUENCY_PERIOD_PHRASES.weekly;
   const taskList = incompleteTasks
     .slice(0, 5)
-    .map((t) => `<li style="margin-bottom:6px;">${t}</li>`)
+    .map((t) => `<li style="margin-bottom:6px;">${escapeHtml(t)}</li>`)
     .join("");
+  const preferencesLine = unsubscribeUrl
+    ? `To update your email preferences, visit your <a href="${siteUrl}/settings" style="color:#18A7A5;text-decoration:none;font-weight:600;">account settings</a>, or <a href="${escapeHtml(unsubscribeUrl)}" style="color:#18A7A5;text-decoration:none;font-weight:600;">unsubscribe from these emails</a>.`
+    : `To update your email preferences, visit your <a href="${siteUrl}/settings" style="color:#18A7A5;text-decoration:none;font-weight:600;">account settings</a>.`;
+  const preferencesLineText = unsubscribeUrl
+    ? `To update your email preferences, visit your account settings:\n${siteUrl}/settings\n\nOr unsubscribe from these emails:\n${unsubscribeUrl}`
+    : `To update your email preferences, visit your account settings:\n${siteUrl}/settings`;
 
   const { error } = await resend.emails.send({
     from: FROM,
     to: email,
-    subject: "Your Beginly weekly check-in — let's keep going 🇬🇧",
+    subject: `Your Beginly ${frequencyLabel} check-in - let's keep going 🇬🇧`,
     html: `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Your Beginly Weekly Check-In</title>
-</head>
-<body style="margin:0;padding:0;background:#F0FAFC;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <div style="max-width:600px;margin:40px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-    <div style="background:linear-gradient(135deg,#0B7285,#2563EB);padding:32px 40px;">
-      <div style="display:inline-block;background:#ffffff;border-radius:10px;width:40px;height:40px;text-align:center;line-height:40px;font-weight:700;color:#0B7285;font-size:18px;">B</div>
-      <h1 style="margin:16px 0 0;color:#ffffff;font-size:22px;font-weight:800;">Your Beginly weekly check-in${name ? `, ${escapeHtml(name)}` : ""}</h1>
-    </div>
-
-    <div style="padding:40px;">
-      <p style="font-size:16px;color:#1a2740;margin:0 0 20px;line-height:1.6;">
-        You have <strong style="color:#0B7285;">${taskCount} task${taskCount === 1 ? "" : "s"}</strong> on your roadmap. Here are a few to look at this week:
-      </p>
-
-      <ul style="background:#f9fafb;border-radius:10px;padding:16px 20px 16px 36px;margin:0 0 24px;color:#374151;font-size:14px;line-height:1.8;">
-        ${taskList}
-        ${incompleteTasks.length > 5 ? `<li style="margin-bottom:6px;color:#9ca3af;">...and ${incompleteTasks.length - 5} more</li>` : ""}
-      </ul>
-
-      <div style="text-align:center;margin:28px 0;">
-        <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? "https://beginly.app"}/platform"
-           style="display:inline-block;background:#0B7285;color:#ffffff;font-size:15px;font-weight:700;padding:14px 32px;border-radius:10px;text-decoration:none;">
-          View your roadmap →
-        </a>
-      </div>
-
-      <p style="font-size:13px;color:#9ca3af;text-align:center;margin:0;">
-        To update your email preferences, visit your <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? "https://beginly.app"}/settings" style="color:#0B7285;text-decoration:none;">account settings</a>.
-      </p>
-    </div>
-
-    <div style="background:#f9fafb;padding:20px 40px;border-top:1px solid #e5e7eb;">
-      <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">
-        © 2026 Beginly · You&apos;re receiving this because you enabled weekly email reminders.
-      </p>
-    </div>
-  </div>
-</body>
-</html>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
+      <body style="margin:0;padding:0;background:#EAF8F7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0D223D;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#EAF8F7;">
+          <tr>
+            <td align="center" style="padding:48px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#FFFFFF;border:1px solid #DCE9EA;border-radius:18px;overflow:hidden;">
+                ${emailHeader()}
+                ${emailDivider()}
+                <tr>
+                  <td style="padding:40px;">
+                    <h1 style="margin:0 0 24px;color:#0D223D;font-family:Georgia,'Times New Roman',serif;font-size:32px;line-height:1.18;font-weight:700;text-align:center;">
+                      Your ${frequencyLabel} check-in${name ? `, ${escapeHtml(name)}` : ""}
+                    </h1>
+                    <div style="text-align:left;">
+                      <p style="margin:0 0 18px;color:#0D223D;font-size:16px;line-height:1.7;">
+                        You have <strong style="color:#0D223D;">${taskCount} task${taskCount === 1 ? "" : "s"}</strong> on your roadmap. Here are a few to look at ${periodPhrase}:
+                      </p>
+                      <ul style="background:#F8FBFB;border-radius:10px;padding:16px 20px 16px 36px;margin:0 0 28px;color:#64748B;font-size:14px;line-height:1.8;">
+                        ${taskList}
+                        ${incompleteTasks.length > 5 ? `<li style="margin-bottom:6px;color:#94A3B8;">...and ${incompleteTasks.length - 5} more</li>` : ""}
+                      </ul>
+                    </div>
+                    ${ctaButton({ url: `${siteUrl}/platform`, text: "View your roadmap →" })}
+                    <p style="margin:0;color:#94A3B8;font-size:13px;line-height:1.6;text-align:center;">
+                      ${preferencesLine}
+                    </p>
+                  </td>
+                </tr>
+                ${emailFooter({ siteUrl, reason: `You received this email because you enabled ${frequencyLabel} email reminders.` })}
+                ${brandStripe()}
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
     `,
+    text: `
+      Your ${frequencyLabel} check-in${name ? `, ${name}` : ""}
+
+      You have ${taskCount} task${taskCount === 1 ? "" : "s"} on your roadmap. Here are a few to look at ${periodPhrase}:
+
+      ${incompleteTasks.slice(0, 5).map((t) => `- ${t}`).join("\n")}
+      ${incompleteTasks.length > 5 ? `...and ${incompleteTasks.length - 5} more` : ""}
+
+      View your roadmap:
+      ${siteUrl}/platform
+
+      ${preferencesLineText}
+
+      Beginly
+      Open what comes next.
+
+      Privacy: ${siteUrl}/privacy-policy
+      Terms: ${siteUrl}/terms-of-service
+    `.trim(),
   });
 
   if (error) {

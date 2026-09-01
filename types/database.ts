@@ -126,6 +126,7 @@ export interface Database {
           user_id: string;
           email_reminders: boolean;
           frequency: string;
+          last_sent_at: string | null;
           created_at: string;
           updated_at: string;
         },
@@ -134,6 +135,7 @@ export interface Database {
           user_id: string;
           email_reminders?: boolean;
           frequency?: string;
+          last_sent_at?: string | null;
           created_at?: string;
           updated_at?: string;
         },
@@ -142,6 +144,7 @@ export interface Database {
           user_id?: string;
           email_reminders?: boolean;
           frequency?: string;
+          last_sent_at?: string | null;
           created_at?: string;
           updated_at?: string;
         }
