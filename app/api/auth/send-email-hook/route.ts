@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Webhook, WebhookVerificationError } from "standardwebhooks";
-import { sendPasswordResetEmail, sendAuthActionEmail } from "@/lib/email";
+import { sendPasswordResetEmail, sendSignupConfirmationEmail, sendAuthActionEmail } from "@/lib/email";
 
 type SendEmailHookPayload = {
   user: {
@@ -22,8 +22,9 @@ function hookError(status: number, message: string) {
 /**
  * Receives Supabase's Auth "Send Email" hook, which fires in place of Supabase's own
  * mailer for every auth email (signup, magic link, invite, email change, recovery)
- * once the hook is enabled in the dashboard. We take over sending recovery emails
- * ourselves via Resend, and fall back to a generic branded email for the other types
+ * once the hook is enabled in the dashboard. We take over sending recovery and signup
+ * confirmation emails ourselves via Resend (dedicated templates), and fall back to a
+ * generic branded email for the rest (magic link, invite, email change, reauthentication)
  * so enabling the hook doesn't silently stop those from being delivered.
  *
  * Configure in Supabase Dashboard → Authentication → Hooks → Send Email hook,
@@ -55,17 +56,23 @@ export async function POST(request: NextRequest) {
       return hookError(400, "Missing required fields in webhook payload.");
     }
 
-    // Allowlist of trusted redirect origins
-    const allowedRedirectOrigins = [
-      "https://beginly.app",
+    // Allowlist of trusted redirect origins — derived from NEXT_PUBLIC_SITE_URL
+    // (the same env var used everywhere else) rather than a second hardcoded
+    // "https://beginly.app" that could silently drift out of sync with it.
+    const allowedRedirectOrigins = new Set([
+      new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://beginly.app").origin,
       "http://localhost:3456",
-    ];
+    ]);
 
+    // Empty on anything untrusted/malformed — Supabase falls back to its own
+    // configured Site URL when redirect_to is blank, which is the correct
+    // fail-safe behavior for an open-redirect guard (never redirect somewhere
+    // unvetted; worst case is landing on the app's own default page instead).
     let safeRedirectTo = "";
     if (emailData.redirect_to) {
       try {
         const redirectUrl = new URL(emailData.redirect_to, supabaseUrl);
-        if (allowedRedirectOrigins.some(origin => redirectUrl.origin === origin)) {
+        if (allowedRedirectOrigins.has(redirectUrl.origin)) {
           safeRedirectTo = redirectUrl.toString();
         } else {
           console.warn(`[send-email-hook] Blocked untrusted redirect_to: ${emailData.redirect_to}`);
@@ -79,7 +86,7 @@ export async function POST(request: NextRequest) {
     actionUrlObj.search = new URLSearchParams({
       token: emailData.token_hash,
       type: emailData.email_action_type,
-      redirect_to: emailData.redirect_to ?? "",
+      redirect_to: safeRedirectTo,
     }).toString();
     const actionUrl = actionUrlObj.toString();
     const name = user.user_metadata?.name;
@@ -87,7 +94,9 @@ export async function POST(request: NextRequest) {
     const { error } =
       emailData.email_action_type === "recovery"
         ? await sendPasswordResetEmail({ email: user.email, name, resetUrl: actionUrl })
-        : await sendAuthActionEmail({ email: user.email, name, actionUrl, actionType: emailData.email_action_type });
+        : emailData.email_action_type === "signup"
+          ? await sendSignupConfirmationEmail({ email: user.email, name, confirmUrl: actionUrl })
+          : await sendAuthActionEmail({ email: user.email, name, actionUrl, actionType: emailData.email_action_type });
 
     if (error) return hookError(500, `Email delivery failed: ${error.message}`);
     return NextResponse.json({});

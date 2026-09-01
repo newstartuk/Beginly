@@ -336,6 +336,102 @@ export async function sendPasswordResetEmail({
 }
 
 /**
+ * Sends the signup confirmation email, with the link to activate a new account.
+ * Called from the Supabase Send Email Hook (app/api/auth/send-email-hook/route.ts)
+ * for email_action_type === "signup" — confirmUrl is built from the hook payload.
+ */
+export async function sendSignupConfirmationEmail({
+  name,
+  email,
+  confirmUrl,
+}: {
+  name?: string;
+  email: string;
+  confirmUrl: string;
+}) {
+  const resend = getResendClient();
+  const siteUrl = DEFAULT_SITE_URL;
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: email,
+    subject: "Confirm your Beginly account",
+    html: `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
+      <body style="margin:0;padding:0;background:#EAF8F7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0D223D;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#EAF8F7;">
+          <tr>
+            <td align="center" style="padding:48px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#FFFFFF;border:1px solid #DCE9EA;border-radius:18px;overflow:hidden;">
+                ${emailHeader()}
+                ${emailDivider()}
+                <tr>
+                  <td style="padding:40px;">
+                    <h1 style="margin:0 0 24px;color:#0D223D;font-family:Georgia,'Times New Roman',serif;font-size:32px;line-height:1.18;font-weight:700;text-align:center;">
+                      Confirm your email
+                    </h1>
+                    <div style="text-align:left;">
+                      <p style="margin:0 0 18px;color:#0D223D;font-size:16px;line-height:1.7;">
+                        ${name ? `Hi ${escapeHtml(name)},` : "Hi there,"}
+                      </p>
+                      <p style="margin:0 0 28px;color:#64748B;font-size:15px;line-height:1.7;">
+                        Thanks for creating a Beginly account. Confirm the email address associated with
+                        <strong style="color:#0D223D;">${escapeHtml(email)}</strong> to activate it and start building your adaptive UK path.
+                      </p>
+                    </div>
+                    ${ctaButton({ url: confirmUrl, text: "Confirm email address →" })}
+                    ${securityBox({
+                      children: `
+                        <p style="margin:0;color:#64748B;font-size:13px;line-height:1.65;">
+                          <strong style="color:#0D223D;">Didn't create this account?</strong>
+                          You can safely ignore this email. No account will be activated unless you confirm.
+                        </p>
+                      `,
+                    })}
+                  </td>
+                </tr>
+                ${emailFooter({ siteUrl, reason: "You received this email because a Beginly account was created with this address." })}
+                ${brandStripe()}
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `,
+    text: `
+      Confirm your email
+
+      ${name ? `Hi ${name},` : "Hi there,"}
+
+      Thanks for creating a Beginly account. Confirm the email address associated with ${email} to activate it and start building your adaptive UK path.
+
+      Confirm email address:
+      ${confirmUrl}
+
+      If you didn't create this account, you can safely ignore this email. No account will be activated unless you confirm.
+
+      Beginly
+      Open what comes next.
+
+      Privacy: ${siteUrl}/privacy-policy
+      Terms: ${siteUrl}/terms-of-service
+    `.trim(),
+  });
+
+  if (error) {
+    console.error("[Beginly] Signup confirmation email send failed:", error.message);
+  }
+
+  return { error };
+}
+
+/**
  * Sends a security notice confirming a password change just happened.
  * Called directly from app/api/auth/password-changed/route.ts right after
  * supabase.auth.updateUser({ password }) succeeds on /reset-password.
@@ -455,13 +551,6 @@ const AUTH_ACTION_COPY: Record<
   string,
   { subject: string; heading: string; intro: string; cta: string }
 > = {
-  signup: {
-    subject: "Confirm your Beginly account",
-    heading: "Confirm your account",
-    intro:
-      "Thanks for creating a Beginly account. Confirm your email address to activate it.",
-    cta: "Confirm email address →",
-  },
   magiclink: {
     subject: "Your Beginly sign-in link",
     heading: "Sign in to Beginly",
@@ -493,9 +582,10 @@ const AUTH_ACTION_COPY: Record<
 
 /**
  * Generic fallback for any Supabase auth email type that doesn't have a dedicated
- * template (everything except "recovery", which uses sendPasswordResetEmail).
- * Exists so enabling the Send Email Hook doesn't silently stop signup/magic-link/
- * invite/email-change emails from going out - see app/api/auth/send-email-hook/route.ts.
+ * template — everything except "recovery" (sendPasswordResetEmail) and "signup"
+ * (sendSignupConfirmationEmail). Exists so enabling the Send Email Hook doesn't
+ * silently stop magic-link/invite/email-change emails from going out entirely —
+ * see app/api/auth/send-email-hook/route.ts.
  */
 export async function sendAuthActionEmail({
   name,

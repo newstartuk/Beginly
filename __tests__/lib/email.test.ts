@@ -63,12 +63,31 @@ describe("lib/email — password reset & changed emails", () => {
   it("sendAuthActionEmail uses dedicated copy for known action types and a generic fallback for unknown ones", async () => {
     const { sendAuthActionEmail } = await import("@/lib/email");
 
-    await sendAuthActionEmail({ email: "user@example.com", actionUrl: "https://beginly.app/verify", actionType: "signup" });
-    expect(send.mock.calls[0][0].subject).toBe("Confirm your Beginly account");
+    await sendAuthActionEmail({ email: "user@example.com", actionUrl: "https://beginly.app/verify", actionType: "magiclink" });
+    expect(send.mock.calls[0][0].subject).toBe("Your Beginly sign-in link");
 
     send.mockClear();
     await sendAuthActionEmail({ email: "user@example.com", actionUrl: "https://beginly.app/verify", actionType: "some_future_type" });
     expect(send.mock.calls[0][0].subject).toBe("Confirm your Beginly request");
+  });
+
+  it("sendSignupConfirmationEmail has its own dedicated template, not the generic fallback", async () => {
+    const { sendSignupConfirmationEmail } = await import("@/lib/email");
+
+    const { error } = await sendSignupConfirmationEmail({
+      email: "user@example.com",
+      name: "Tunde",
+      confirmUrl: "https://test.supabase.co/auth/v1/verify?token=abc&type=signup",
+    });
+
+    expect(error).toBeNull();
+    const call = send.mock.calls[0][0];
+    expect(call.subject).toBe("Confirm your Beginly account");
+    expect(call.html).toContain("Confirm your email");
+    expect(call.html).toContain("Hi Tunde,");
+    expect(call.html).toContain("https://test.supabase.co/auth/v1/verify?token=abc&amp;type=signup");
+    expect(call.text).toContain("https://test.supabase.co/auth/v1/verify?token=abc&type=signup");
+    expect(call.html).toContain("Didn't create this account?");
   });
 
   it("sendTaskReminderEmail defaults to weekly copy and no unsubscribe link", async () => {
