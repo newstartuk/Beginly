@@ -120,10 +120,15 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 NEXT_PUBLIC_SITE_URL=
 SUPABASE_SERVICE_ROLE_KEY=        # server-only, never expose client-side
 RESEND_API_KEY=                   # SDK installed, no live key
+FROM_EMAIL=                       # sender address used by lib/email.ts's FROM constant (e.g. noreply@mail.beginly.app)
 STRIPE_SECRET_KEY=                # SDK installed, no live key
 STRIPE_WEBHOOK_SECRET=
 BEGINLY_WEBHOOK_SECRET=           # guards /api/webhooks/resend
 SEND_EMAIL_HOOK_SECRET=           # guards /api/auth/send-email-hook (Supabase Send Email Hook), see docs/AUTH_EMAIL_TEMPLATES.md
+CRON_SECRET=                      # guards /api/cron/task-reminders; Vercel sends this automatically as the request's Bearer token when set, see docs/TASK_REMINDER_EMAILS.md
+TASK_REMINDER_UNSUBSCRIBE_SECRET= # signs the one-click unsubscribe link in task reminder emails, verified in /api/unsubscribe; omit and the link is just left out (logged as a warning), not a hard failure
+TASK_REMINDER_EMAILS_ENABLED=     # kill switch for /api/cron/task-reminders — must be exactly "true" to actually send; unset/anything else = no-op
+TASK_REMINDER_MAX_PER_RUN=        # optional cap on emails sent per cron invocation, default 50
 ```
 
 Mobile (`mobile/.env` or shell env):
