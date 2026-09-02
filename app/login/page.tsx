@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [alreadyConfirmed, setAlreadyConfirmed] = useState(false);
   const [reset, setReset] = useState(false);
   const [postAuthRedirect, setPostAuthRedirect] = useState<string>();
   const demoMode = isClientDemoMode();
@@ -28,9 +29,21 @@ export default function LoginPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      setConfirmed(params.get("confirmed") === "true");
+      // Supabase redirects here on both success and failure of the confirmation
+      // link — on failure (already used, or genuinely expired) it doesn't touch
+      // our `?confirmed=true`, it just adds its own error to the hash fragment
+      // instead, since GoTrue mirrors OAuth implicit-flow error conventions.
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      const verifyFailed = hashParams.has("error") || hashParams.has("error_code");
+
+      setConfirmed(params.get("confirmed") === "true" && !verifyFailed);
+      setAlreadyConfirmed(params.get("confirmed") === "true" && verifyFailed);
       setReset(params.get("reset") === "true");
       setPostAuthRedirect(resolvePostAuthRedirect({ redirect: params.get("redirect"), product: params.get("product") }));
+
+      if (hashParams.toString()) {
+        window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      }
     }
   }, []);
 
@@ -141,8 +154,10 @@ export default function LoginPage() {
             <Logo size={32} className="rounded-lg" />
             <span className="font-bold text-navy">Beginly</span>
           </Link>
-          <h1 className="text-2xl font-bold text-navy">Welcome back</h1>
-          <p className="text-sm text-muted mt-1">Sign in to continue your roadmap</p>
+          <h1 className="text-2xl font-bold text-navy">{confirmed ? "You're all set" : "Welcome back"}</h1>
+          <p className="text-sm text-muted mt-1">
+            {confirmed ? "Sign in to start your roadmap" : "Sign in to continue your roadmap"}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="card space-y-4">
@@ -150,6 +165,13 @@ export default function LoginPage() {
             <div className="flex items-center gap-2 text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 text-sm">
               <CheckCircle className="w-4 h-4 shrink-0" />
               Email confirmed. You can now sign in.
+            </div>
+          )}
+
+          {alreadyConfirmed && !error && (
+            <div className="flex items-center gap-2 text-blue-700 bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
+              <CheckCircle className="w-4 h-4 shrink-0" />
+              Your email is already confirmed. Sign in to continue.
             </div>
           )}
 
