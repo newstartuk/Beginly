@@ -1,7 +1,7 @@
-"use client";
-import { useEffect, useState } from "react";
+
+
 import Link from "next/link";
-import { useParams } from "next/navigation";
+
 import { GUIDANCE_PAGES } from "@/lib/guidance-data";
 import { SEED_TASKS } from "@/lib/seed-data";
 import { ChevronLeft, AlertTriangle, ArrowRight } from "lucide-react";
@@ -10,15 +10,15 @@ import PlatformShell from "@/components/platform/PlatformShell";
 import InfoCard from "@/components/InfoCard";
 import StepList from "@/components/StepList";
 
-export default function GuideArticlePage() {
-  const params = useParams();
-  const slug = params.slug as string;
+export default async function GuideArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  
   const guide = GUIDANCE_PAGES.find((g) => g.slug === slug);
-  const [mounted, setMounted] = useState(false);
+  
 
-  useEffect(() => { setMounted(true); }, []);
+  
 
-  if (!mounted) return null;
+  
 
   if (!guide) {
     return (
