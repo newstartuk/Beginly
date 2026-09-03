@@ -87,7 +87,7 @@ export default function BankPage() {
                       <p className="text-sm font-bold text-navy">{bank.name}</p>
                       <div className="flex items-center gap-1 mt-0.5">
                         {[...Array(5)].map((_, index) => (
-                          <span key={index} className={`text-xs ${index < Math.floor(bank.score / 2) ? "text-amber-400" : "text-civic-200"}`}>*</span>
+                          <span key={index} className={`text-xs ${index < Math.round(bank.score / 2) ? "text-amber-400" : "text-civic-200"}`}>*</span>
                         ))}
                       </div>
                     </div>

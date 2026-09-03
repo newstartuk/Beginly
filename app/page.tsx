@@ -7,7 +7,7 @@ import {
 import {
   CheckCircle, Bell, AlertTriangle, BookOpen, ArrowRight, Scale,
   Target, Shield, Quote, GraduationCap, Briefcase, Heart, XCircle, MapPin,
-  Award, Star, Stethoscope,
+  Award, Rocket, Stethoscope,
 } from "lucide-react";
 import Disclaimer from "@/components/Disclaimer";
 import Logo from "@/components/Logo";
@@ -30,7 +30,7 @@ const revealItem = {
 };
 
 /* ─── Persona data ───────────────────────────────────────────────── */
-type Persona = "student" | "worker" | "family" | "graduate" | "talent" | "health";
+type Persona = "student" | "worker" | "family" | "graduate" | "founder" | "health";
 const PERSONAS: Record<Persona, {
   label: string;
   Icon: React.ComponentType<{ className?: string }>;
@@ -67,7 +67,7 @@ const PERSONAS: Record<Persona, {
     cardLocation: "London · Skilled Worker · Tier 2",
   },
   family: {
-    label: "Family Visa",
+    label: "Family and Dependant",
     Icon: Heart,
     headline: "Settling your family in the UK, without the guesswork.",
     accent: "family in the UK,",
@@ -92,18 +92,18 @@ const PERSONAS: Record<Persona, {
     ],
     cardLocation: "London · Graduate visa · 2 years",
   },
-  talent: {
-    label: "Global Talent",
-    Icon: Star,
-    headline: "Your Global Talent visa — exceptional people, clear path.",
-    accent: "Global Talent visa —",
-    sub: "Endorsed by Tech Nation, the Royal Academy, or the British Academy? Your roadmap covers endorsement conditions, flexible working rights, and your route to settlement.",
+  founder: {
+    label: "Founder",
+    Icon: Rocket,
+    headline: "Your Innovator Founder visa — evidence-led, one step at a time.",
+    accent: "Innovator Founder visa —",
+    sub: "Endorsing-body evidence, viability and scalability criteria, business bank setup, and the record-keeping your endorsement depends on — your roadmap for building in the UK.",
     stats: [
-      { value: 30, suffix: "+", label: "Talent tasks" },
-      { value: 14, suffix: "+", label: "Visa guides" },
+      { value: 24, suffix: "+", label: "Founder tasks" },
+      { value: 10, suffix: "+", label: "Route guides" },
       { value: 90, suffix: "", label: "Day roadmap" },
     ],
-    cardLocation: "London · Global Talent · Tech Nation",
+    cardLocation: "London · Founder visa · Endorsed",
   },
   health: {
     label: "Health & Care",
@@ -987,7 +987,7 @@ export default function LandingPage() {
             <motion.div variants={heroItem}
               className="flex gap-1.5 flex-nowrap mb-6 overflow-x-auto justify-start lg:justify-start"
               style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch", paddingBottom: 2 }}>
-              {(["student", "worker", "family", "graduate", "talent", "health"] as Persona[]).map((key) => {
+              {(["student", "worker", "family", "graduate", "founder", "health"] as Persona[]).map((key) => {
                 const { label, Icon } = PERSONAS[key];
                 const active = persona === key;
                 return (

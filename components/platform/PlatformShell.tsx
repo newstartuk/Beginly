@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { Bell, BookOpenCheck, BriefcaseBusiness, CheckSquare, Compass, FileCheck2, HeartPulse, House, Landmark, LifeBuoy, LogOut, Menu, MessageCircle, Package, Settings, ShieldCheck, Sparkles, TrendingUp, UserRound, Users, X } from "lucide-react";
-import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { Bell, BookOpenCheck, BriefcaseBusiness, CheckSquare, Compass, FileCheck2, HeartPulse, House, Landmark, LifeBuoy, LogIn, LogOut, Menu, MessageCircle, Package, Settings, ShieldCheck, Sparkles, TrendingUp, UserRound, Users, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";import { isClientDemoMode } from "@/lib/platform/runtime";
 
 const links = [
   { href: "/platform", label: "Today", icon: Compass },
@@ -30,7 +30,7 @@ const links = [
 export default function PlatformShell({ children, title, eyebrow, action }: { children: ReactNode; title: string; eyebrow?: string; action?: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false); const [signedIn, setSignedIn] = useState(false); useEffect(() => { if (isClientDemoMode()) { setSignedIn(true); return; } supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session)); const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setSignedIn(!!session)); return () => subscription.unsubscribe(); }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -50,7 +50,7 @@ export default function PlatformShell({ children, title, eyebrow, action }: { ch
             return <Link key={href} href={href} className={active ? "active" : ""} onClick={() => setOpen(false)}><Icon size={18} /><span>{label}</span>{active && <i />}</Link>;
           })}
         </nav>
-        <button onClick={handleSignOut} className="platform-signout"><LogOut size={16} /><span>Sign out</span></button>
+        {signedIn ? (<button onClick={handleSignOut} className="platform-signout"><LogOut size={16} /><span>Sign out</span></button>) : (<Link href="/login" className="platform-signout" onClick={() => setOpen(false)}><LogIn size={16} /><span>Sign in</span></Link>)}
         <div className="platform-trust-card"><ShieldCheck size={18} /><div><strong>Trust-first</strong><span>Free, owned and sponsored access is checked before any paid suggestion.</span></div></div>
       </aside>
       {open && <button aria-label="Close navigation overlay" className="platform-overlay" onClick={() => setOpen(false)} />}
