@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { Bell, BookOpenCheck, BriefcaseBusiness, CheckSquare, Compass, FileCheck2, HeartPulse, House, Landmark, LifeBuoy, LogIn, LogOut, Menu, MessageCircle, Package, Settings, ShieldCheck, Sparkles, TrendingUp, UserRound, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";import { isClientDemoMode } from "@/lib/platform/runtime";import { isClientDemoMode } from "@/lib/platform/runtime";
+import { supabase } from "@/lib/supabase";import { isClientDemoMode } from "@/lib/platform/runtime";
 
 const links = [
   { href: "/platform", label: "Today", icon: Compass },
@@ -30,7 +30,7 @@ const links = [
 export default function PlatformShell({ children, title, eyebrow, action }: { children: ReactNode; title: string; eyebrow?: string; action?: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [open, setOpen] = useState(false); const [signedIn, setSignedIn] = useState(false); useEffect(() => { if (isClientDemoMode()) { setSignedIn(true); return; } supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session)); const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setSignedIn(!!session)); return () => subscription.unsubscribe(); }, []); const [signedIn, setSignedIn] = useState(false); useEffect(() => { if (isClientDemoMode()) { setSignedIn(true); return; } supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session)); const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setSignedIn(!!session)); return () => subscription.unsubscribe(); }, []);
+  const [open, setOpen] = useState(false); const [signedIn, setSignedIn] = useState(false); useEffect(() => { if (isClientDemoMode()) { setSignedIn(true); return; } supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session)); const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setSignedIn(!!session)); return () => subscription.unsubscribe(); }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
