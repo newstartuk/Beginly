@@ -927,6 +927,20 @@ export default function LandingPage() {
       {/* TIER 3 #15 — Scroll progress */}
       <ScrollProgress />
 
+      {/* ── Adviser announcement bar ─────────────────────────────────
+          Invites advisers to become design partners. Remove this block once
+          recruitment ends; the "For advisers" link in the header can stay. */}
+      <div className="px-6 py-2.5 text-center text-xs sm:text-sm"
+        style={{ background: "var(--color-navy)", color: "rgba(255,255,255,0.8)" }}>
+        <span>Are you an immigration consultant or adviser?</span>{" "}
+        <Link href="/adviser-partners"
+          className="inline-flex items-center gap-1 font-semibold underline underline-offset-4 whitespace-nowrap hover:opacity-90"
+          style={{ color: "var(--color-gold)" }}>
+          Help us build Beginly
+          <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+
       {/* ── Header ───────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 border-b"
         style={{ background: "rgba(255,255,255,0.95)", backdropFilter: "blur(8px)", borderColor: "var(--color-border)" }}>
@@ -934,6 +948,10 @@ export default function LandingPage() {
           <span className="block sm:hidden"><Logo variant="lockup" size={38} /></span>
           <span className="hidden sm:block"><Logo variant="lockup" size={52} tagline /></span>
           <div className="flex items-center gap-2">
+            <Link href="/adviser-partners"
+              className="hidden md:inline-block text-sm font-medium px-3 py-1.5 text-muted hover:text-primary transition-colors">
+              For advisers
+            </Link>
             <div className="hidden sm:block">
               <Link href="/login" className="btn-ghost text-sm py-1.5 px-4">Sign in</Link>
             </div>
@@ -1444,6 +1462,7 @@ export default function LandingPage() {
               <div className="space-y-3.5">
                 {[
                   ["How we work",    "/trust/methodology"],
+                  ["For advisers",   "/adviser-partners"],
                   ["Sign in",        "/login"],
                   ["Create account", "/signup"],
                 ].map(([label, href]) => (
