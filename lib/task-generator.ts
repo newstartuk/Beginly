@@ -1,5 +1,5 @@
 import { SEED_TASKS } from "@/lib/seed-data";
-import type { ArrivalProfile, Task, UserTask } from "@/types";
+import type { ArrivalProfile, ArrivalType, Task, UserTask } from "@/types";
 
 export type DbArrivalProfile = {
   arrival_type?: string | null;
@@ -40,9 +40,20 @@ export function dbProfileToArrivalProfile(row: DbArrivalProfile): ArrivalProfile
   };
 }
 
-function routeMatches(task: Task, profile: ArrivalProfile): boolean {
+/**
+ * Whether a task belongs on this route's checklist. A task applies when its
+ * `routes` is "all" (or missing) or names the route, unless the route is in
+ * `excludeRoutes`. The Task Library and the platform journey both use this,
+ * so they always agree.
+ */
+export function taskAppliesToRoute(task: Task, arrivalType: ArrivalType): boolean {
+  if (task.excludeRoutes?.includes(arrivalType)) return false;
   if (!task.routes || task.routes === "all") return true;
-  return (task.routes as string[]).includes(profile.arrivalType);
+  return task.routes.includes(arrivalType);
+}
+
+function routeMatches(task: Task, profile: ArrivalProfile): boolean {
+  return taskAppliesToRoute(task, profile.arrivalType);
 }
 
 export function conditionMatches(task: Task, profile: ArrivalProfile): boolean {

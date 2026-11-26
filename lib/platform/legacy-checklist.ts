@@ -1,6 +1,6 @@
 import { SEED_TASKS } from "@/lib/seed-data";
 import { getTaskLinks } from "@/lib/task-links";
-import { conditionMatches } from "@/lib/task-generator";
+import { conditionMatches, taskAppliesToRoute } from "@/lib/task-generator";
 import { routeToArrivalType } from "./route-mapping";
 import type { TaskCategory, TaskPriority } from "@/types";
 import type { JourneyStage, JourneyTask, UserContext } from "./types";
@@ -58,7 +58,7 @@ export function buildLegacyChecklistJourneyTasks(context: UserContext): JourneyT
 
   return SEED_TASKS
     .filter((task) => task.active)
-    .filter((task) => !task.routes || task.routes === "all" || (task.routes as string[]).includes(arrivalType))
+    .filter((task) => taskAppliesToRoute(task, arrivalType))
     // Apply the same condition-based filtering Task Library uses (driving, dependants,
     // accommodation, work interest), so the settlement count matches exactly between the
     // two pages. Skipped when arrivalProfile isn't available (migration_profiles-based
