@@ -101,6 +101,7 @@ export interface Task {
   sourceSignpost?: string;
   officialLinks?: ResourceLink[];
   routes?: ArrivalType[] | "all"; // which routes this task applies to; omit = "all"
+  excludeRoutes?: ArrivalType[];   // routes to leave out even when `routes` is "all" (e.g. arrival tasks for graduates already in the UK)
   conditional?: string; // e.g. "Only if renting privately"
   // v1.2 new fields
   dependencies?: string[];          // taskIds that should be complete first

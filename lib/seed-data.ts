@@ -19,6 +19,7 @@ export const SEED_TASKS: Task[] = [
     aiHelperAllowed: true,
     estimatedMinutes: 20,
     routes: "all",
+    excludeRoutes: ["graduate"], // graduates are already in the UK; GRD_PRE_001 covers their visa
     whyItMatters:
       "Since December 2024 the UK has replaced physical BRPs with a digital eVisa. You must be able to prove your immigration status online. If your eVisa is not linked to your passport, you may be refused boarding or entry.",
     whatToPrepare: [
@@ -52,6 +53,7 @@ export const SEED_TASKS: Task[] = [
     aiHelperAllowed: true,
     estimatedMinutes: 30,
     routes: "all",
+    excludeRoutes: ["graduate"], // about travelling to the UK
     whyItMatters:
       "If your documents are lost or stolen in transit, having digital copies dramatically speeds up the replacement process. UK authorities and your employer or university will also want copies.",
     whatToPrepare: [
@@ -87,6 +89,7 @@ export const SEED_TASKS: Task[] = [
     aiHelperAllowed: true,
     estimatedMinutes: 30,
     routes: "all",
+    excludeRoutes: ["graduate"], // about travelling to the UK
     whyItMatters:
       "Arriving without confirmed accommodation is stressful and expensive. Hotel prices near city centres can be very high. Having a confirmed address also means you can start admin tasks (like NI number and GP registration) straight away.",
     whatToPrepare: [
@@ -123,6 +126,7 @@ export const SEED_TASKS: Task[] = [
     aiHelperAllowed: true,
     estimatedMinutes: 30,
     routes: "all",
+    excludeRoutes: ["graduate"], // about arriving in the UK
     whyItMatters:
       "The first month in the UK typically involves a cluster of one-off costs that do not recur: SIM card, travel from the airport, first food shop, a deposit (if renting), and possible short-term accommodation. Running out of money in week one before your salary or stipend arrives is a common and stressful mistake.",
     whatToPrepare: [
@@ -191,6 +195,7 @@ export const SEED_TASKS: Task[] = [
     aiHelperAllowed: true,
     estimatedMinutes: 30,
     routes: "all",
+    excludeRoutes: ["graduate"], // about landing in the UK
     whyItMatters:
       "A UK phone number is needed for almost every admin task — bank verification texts, GP registration, HMRC, and WhatsApp groups. Relying on international roaming is expensive and unreliable.",
     whatToPrepare: [
@@ -224,6 +229,7 @@ export const SEED_TASKS: Task[] = [
     aiHelperAllowed: false,
     estimatedMinutes: 10,
     routes: "all",
+    excludeRoutes: ["graduate"], // about landing in the UK
     whyItMatters:
       "Your family will be anxious. A quick message costs nothing and keeps communication lines open. Establishing a regular check-in routine in the first few weeks also gives you a safety net if anything goes wrong.",
     whatToPrepare: [
@@ -253,6 +259,7 @@ export const SEED_TASKS: Task[] = [
     aiHelperAllowed: false,
     estimatedMinutes: 60,
     routes: "all",
+    excludeRoutes: ["graduate"], // about landing in the UK
     whyItMatters:
       "Arriving at accommodation that is in poor condition or missing promised items is common. Reporting problems on day one — in writing — protects your deposit and your rights as a tenant. If you discover a serious problem, you need to know your options before you unpack.",
     whatToPrepare: [
@@ -320,6 +327,7 @@ export const SEED_TASKS: Task[] = [
     aiHelperAllowed: true,
     estimatedMinutes: 30,
     routes: "all",
+    excludeRoutes: ["graduate"], // graduates get GRD_D7_004 instead
     whyItMatters:
       "Your NI number is needed for employment, tax, state benefits, and many financial services. Without one, your employer can still pay you, but you'll be taxed at an emergency rate. Apply as soon as possible after arriving.",
     whatToPrepare: [
@@ -353,6 +361,7 @@ export const SEED_TASKS: Task[] = [
     aiHelperAllowed: true,
     estimatedMinutes: 60,
     routes: "all",
+    excludeRoutes: ["graduate"], // graduates get GRD_D7_003 (upgrade their student account) instead
     whyItMatters:
       "A UK bank account is essential for receiving salary payments, setting up direct debits, and accessing UK financial services. Without one, you will pay high international transfer fees and may struggle to pay rent or bills.",
     whatToPrepare: [
@@ -1951,8 +1960,8 @@ export const SEED_TASKS: Task[] = [
   },
   {
     taskId: "HCW_D7_001",
-    title: "Register with your professional regulatory body",
-    summary: "Register with the NMC, GMC, HCPC, or relevant body before or immediately after starting work.",
+    title: "Complete or confirm your professional registration",
+    summary: "If your registration with the NMC, GMC, HCPC or another regulator isn't finished yet, complete it. If it is, check it's active before you start work in a registered role.",
     stage: "D7",
     category: "Work",
     priority: "Very High",
@@ -1962,25 +1971,25 @@ export const SEED_TASKS: Task[] = [
     estimatedMinutes: 120,
     routes: ["health_and_care"],
     whyItMatters:
-      "You cannot legally practice in the UK without registration with your professional regulatory body. NMC (nurses), GMC (doctors), HCPC (allied health professionals), and Social Work England all have specific requirements for international applicants.",
+      "You can't work as a registered nurse, midwife, doctor or allied health professional in the UK until your regulator has registered you. Timing differs by profession. The GMC says doctors can work as a doctor once their registration is approved. Many internationally educated nurses take the NMC's practical exam (OSCE) after arriving, and the NMC gives you two years from confirming your eligibility to complete registration. HCPC timelines vary by application.",
     riskWarning:
-      "Starting clinical duties before registration is confirmed isn't just a professional conduct issue — it can also breach the conditions your Health and Care Worker visa was sponsored under. If registration is delayed, tell your employer and check gov.uk rather than starting early.",
+      "Working in a registered role before your registration is confirmed is a serious professional conduct issue. If your registration is delayed, tell your employer and agree what you can do in the meantime, rather than starting registered duties early.",
     whatToPrepare: [
       "Proof of your qualifications (certified translations if not in English)",
       "Certificate of Good Standing from your home country regulatory body",
       "Evidence of English language proficiency (usually OET or IELTS)",
     ],
     stepsToTake: [
-      "Check your specific regulatory body's website for the international registration process.",
-      "Submit all required documentation — timelines vary from weeks to months.",
-      "Your employer should be supporting this process — contact their HR if not.",
-      "Once registered, keep your registration number safe — you will need it regularly.",
+      "Check where you are in your regulator's international registration process on its website.",
+      "If you still have steps to finish, such as the NMC's OSCE, agree the dates with your employer; many employers support this.",
+      "If you're already registered, log in to your regulator account and confirm your registration is active.",
+      "Keep your registration number safe; you'll need it regularly.",
     ],
     commonMistakes: [
-      "Starting work before registration is confirmed — this is illegal.",
-      "Submitting translations that are not certified — all documents in foreign languages must be officially translated.",
+      "Starting registered duties (for example as a registered nurse or doctor) before your registration is confirmed.",
+      "Submitting translations that are not certified; documents in other languages must be officially translated.",
     ],
-    sourceSignpost: "nmc.org.uk (nurses), gmc-uk.org (doctors), hcpc-uk.org (allied health)",
+    sourceSignpost: "nmc.org.uk (nurses and midwives), gmc-uk.org (doctors), hcpc-uk.org (allied health professionals); gov.uk/health-care-worker-visa; your employer's international recruitment team",
   },
   {
     taskId: "HCW_D7_002",
@@ -2610,8 +2619,8 @@ export const SEED_TASKS: Task[] = [
   },
   {
     taskId: "GRD_D7_004",
-    title: "Update your National Insurance number status",
-    summary: "If you did not work during your studies, you may still need your NI number now that you are job seeking — apply or confirm it now.",
+    title: "Check you have a National Insurance number",
+    summary: "You'll need a National Insurance number for work. You may already have one from your studies; if not, apply online now that you're job seeking.",
     stage: "D7",
     category: "Local Admin",
     priority: "High",
@@ -2621,20 +2630,20 @@ export const SEED_TASKS: Task[] = [
     estimatedMinutes: 20,
     routes: ["graduate"],
     whyItMatters:
-      "Every worker in the UK needs a National Insurance number. As a graduate route holder, you have the right to work. If you do not already have an NI number, you must apply for one — you can start work using a letter from HMRC while the number is being issued, but employers need to know you have applied.",
+      "GOV.UK says you can apply for a National Insurance number if you live in the UK, have the right to work, and are working, looking for work or have a job offer. As a Graduate visa holder you have the right to work. You can start a job before your number arrives if you can prove your right to work, but it can take up to 4 weeks to arrive after you've proved your identity, so check now rather than when you get an offer.",
     whatToPrepare: [
       "Your passport",
-      "Your eVisa",
+      "Access to your UKVI account (where your eVisa is)",
     ],
     stepsToTake: [
-      "Check if you already have an NI number — it may have been issued when you were a student working part-time.",
-      "If you do not have one, apply online at gov.uk — search 'Apply for a National Insurance number'.",
-      "HMRC will send you a letter confirming your application — share this with employers during the application process.",
+      "Check whether you already have a number: look in your UKVI account, or on the back of your old BRP if you had one.",
+      "If you don't have one, apply online at gov.uk (search 'Apply for a National Insurance number'). You must be in the UK to apply.",
+      "If a job starts before your number arrives, you can still start work by proving your right to work, for example with a share code from your UKVI account.",
     ],
     commonMistakes: [
-      "Not applying before starting a job search — employers ask for your NI number during the hiring process.",
+      "Waiting until you have a job offer to apply, when the number can take up to 4 weeks to arrive.",
     ],
-    sourceSignpost: "gov.uk — 'National Insurance: introduction'; hmrc.gov.uk — 'Apply for a National Insurance number'",
+    sourceSignpost: "gov.uk/apply-national-insurance-number; gov.uk/prove-right-to-work",
   },
   {
     taskId: "GRD_D7_005",
@@ -3687,7 +3696,7 @@ export const SEED_TASKS: Task[] = [
     estimatedMinutes: 30,
     routes: ["founder"],
     whyItMatters:
-      "Your endorsing body has approved a specific business idea. They need to know when the company has been legally formed — this notification starts the milestone clock and allows them to begin their oversight role. Failing to notify them can be treated as a lapse in your endorsement obligations.",
+      "Your endorsing body approved a specific business idea, so keep them informed as it takes shape. Telling them your company is registered keeps their records up to date and starts your evidence trail for the meetings you'll need after 12 and 24 months. Check your endorsement letter for anything else your endorsing body asks you to report.",
     whatToPrepare: [
       "Your Certificate of Incorporation (from Companies House)",
       "Your Company Registration Number",
@@ -3697,12 +3706,12 @@ export const SEED_TASKS: Task[] = [
       "Download your Certificate of Incorporation from your Companies House online account.",
       "Email your endorsing body with: your name, endorsement reference, company name, Company Registration Number, and registered office address.",
       "Ask for written confirmation that they have updated their records.",
-      "Request your first milestone review date.",
+      "Ask when your 12-month meeting will be.",
       "Keep a copy of this communication — it is your first evidence log entry.",
     ],
     commonMistakes: [
       "Assuming the endorsing body is notified automatically by Companies House — they are not. You must contact them directly.",
-      "Not requesting a milestone review date in this first communication — it sets the schedule for your endorsement.",
+      "Not asking when your 12-month meeting will be, so it catches you by surprise.",
     ],
     sourceSignpost: "Your endorsement letter; companieshouse.gov.uk",
   },
@@ -3772,7 +3781,7 @@ export const SEED_TASKS: Task[] = [
   },
   {
     taskId: "FND_D30_003",
-    title: "Begin your evidence log — innovation, viability, scalability",
+    title: "Start your evidence log: innovation, viability and scalability",
     summary: "Start logging business activity against the three criteria your endorsing body will assess: innovation, viability, and scalability.",
     stage: "D30",
     category: "Work",
@@ -3924,36 +3933,36 @@ export const SEED_TASKS: Task[] = [
   },
   {
     taskId: "FND_D90_001",
-    title: "Attend your first milestone review with your endorsing body",
-    summary: "Meet with your Innovator Founder endorsing body for your first business milestone check-in.",
+    title: "Plan for your 12-month meeting with your endorsing body",
+    summary: "Your first required meeting with your endorsing body is after 12 months. Find out when it will be and start preparing the evidence you'll show.",
     stage: "D90",
     category: "Work",
     priority: "Very High",
     required: true,
     active: true,
     aiHelperAllowed: false,
-    estimatedMinutes: 120,
+    estimatedMinutes: 30,
     routes: ["founder"],
     whyItMatters:
-      "The Innovator Founder visa requires regular milestone check-ins with your endorsing body. Missing these or failing to show progress against your business plan can result in your endorsement being withdrawn — which affects your visa.",
+      "GOV.UK says Innovator Founder visa holders need to meet their endorsing body after 12 months and 24 months to show they're making progress with their business. Each meeting costs £500, paid directly to the endorsing body. Your visa may be cut short if your endorsement is withdrawn.",
     riskWarning:
-      "Missing this milestone review, or failing to show real progress against your endorsed business plan, can lead to your endorsement being withdrawn — which directly affects your Innovator Founder visa. Check gov.uk's Innovator Founder guidance if a review is ever delayed or unclear.",
+      "Missing your 12-month meeting, or not being able to show real progress against your endorsed business plan, can lead to your endorsement being withdrawn, which can cut your Innovator Founder visa short. Check gov.uk's Innovator Founder guidance if a meeting is ever delayed or unclear.",
     whatToPrepare: [
-      "Evidence of business progress (company registration, financial records, contracts, product development updates)",
+      "Your endorsement letter and your endorsing body's contact details",
       "Your original business plan",
-      "Any changes to the business plan and reasons for them",
+      "Your evidence log of business progress (company registration, financial records, contracts, product development updates)",
     ],
     stepsToTake: [
-      "Contact your endorsing body to schedule your milestone review.",
-      "Prepare a clear summary of what you have achieved since arriving in the UK.",
-      "Be honest about challenges — endorsing bodies expect pivots but not inactivity.",
-      "Get confirmation in writing that the review has been completed.",
+      "Ask your endorsing body when your 12-month meeting will be, and put it in your calendar.",
+      "Budget for the £500 meeting fee.",
+      "Keep adding to your evidence log so you have clear progress to show at the meeting.",
+      "Note any changes to your business plan and the reasons for them; endorsing bodies expect pivots but not inactivity.",
     ],
     commonMistakes: [
-      "Waiting to be contacted by the endorsing body — you should proactively schedule the review.",
-      "Presenting only plans rather than evidence of real action.",
+      "Waiting to be contacted by the endorsing body instead of asking early when your meeting will be.",
+      "Leaving evidence until just before the meeting, so you can only present plans rather than real action.",
     ],
-    sourceSignpost: "Your endorsing body's website and your initial endorsement letter.",
+    sourceSignpost: "gov.uk/innovator-founder-visa; your endorsing body's website and your endorsement letter.",
   },
   {
     taskId: "FND_D90_002",
@@ -4263,8 +4272,8 @@ export const SEED_TASKS: Task[] = [
   },
   {
     taskId: "FAM_D7_001",
-    title: "Enrol your children in local school",
-    summary: "If you have school-age children, contact your local authority to enrol them in a suitable school.",
+    title: "Apply for school places through your local council",
+    summary: "If you have school-age children, apply for school places through your local council. You can apply mid-year (an in-year application).",
     stage: "D7",
     category: "Local Admin",
     priority: "High",
@@ -4326,7 +4335,7 @@ export const SEED_TASKS: Task[] = [
   },
   {
     taskId: "FAM_D7_003",
-    title: "Register ALL family members with an NHS GP",
+    title: "Register every family member with an NHS GP",
     summary: "Register every member of your household with a local NHS GP surgery as soon as you have your UK address confirmed.",
     stage: "D7",
     category: "Health",

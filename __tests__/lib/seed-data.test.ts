@@ -32,6 +32,46 @@ describe("seed-data", () => {
     expect(policeTaskTitles).toHaveLength(0);
   });
 
+  it("does not promise an Innovator Founder endorsing body review in the first 90 days", () => {
+    // GOV.UK: founders meet their endorsing body "after 12 months and 24 months"
+    // (gov.uk/innovator-founder-visa, checked 26 November 2026).
+    const early = SEED_TASKS.filter(
+      (t) =>
+        t.active &&
+        Array.isArray(t.routes) &&
+        t.routes.includes("founder") &&
+        ["PRE", "D1", "D7", "D30", "D90"].includes(t.stage) &&
+        /\b(first milestone review|milestone clock|attend your .*review)\b/i.test(
+          [t.title, t.summary, t.whyItMatters, ...t.stepsToTake, ...(t.commonMistakes ?? [])].join(" "),
+        ),
+    );
+    expect(early.map((t) => t.taskId)).toEqual([]);
+  });
+
+  it("describes the Innovator Founder meetings as after 12 and 24 months", () => {
+    const meetingTask = SEED_TASKS.find((t) => t.taskId === "FND_D90_001");
+    expect(meetingTask?.whyItMatters).toMatch(/after 12 months and 24 months/);
+  });
+
+  it("does not say you need an HMRC letter to start work before your National Insurance number arrives", () => {
+    // GOV.UK: "You can start work before you receive your National Insurance number if
+    // you can prove you have the right to work in the UK." (gov.uk/apply-national-insurance-number)
+    const claims = SEED_TASKS.filter((t) =>
+      /start work using a letter from HMRC|share this with employers/i.test(
+        [t.whyItMatters, ...t.stepsToTake].join(" "),
+      ),
+    );
+    expect(claims.map((t) => t.taskId)).toEqual([]);
+  });
+
+  it("only warns against working in a *registered* health role before professional registration", () => {
+    // Many internationally educated nurses take the NMC's OSCE after arriving, so a blanket
+    // "starting work before registration is illegal" is wrong.
+    const task = SEED_TASKS.find((t) => t.taskId === "HCW_D7_001");
+    expect(task?.commonMistakes.join(" ")).not.toMatch(/starting work before registration is confirmed/i);
+    expect(task?.whyItMatters).toMatch(/registered nurse, midwife, doctor or allied health professional/);
+  });
+
   it("should have no tasks without sourceSignpost that contain eVisa/UKVI guidance", () => {
     const tasksWithoutSource = SEED_TASKS.filter(
       (t) =>

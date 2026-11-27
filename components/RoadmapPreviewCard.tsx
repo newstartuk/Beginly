@@ -5,44 +5,52 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Check, Zap } from "lucide-react";
 import Logo from "@/components/Logo";
 
-type Task = { task: string; day: string; done: boolean; active?: boolean };
+/** One task shown on the card. Long titles wrap to two lines, then end with "…". */
+export type RoadmapTask = { task: string; day: string };
 
-const STEPS: { readiness: number; tasks: Task[] }[] = [
-  {
-    readiness: 68,
-    tasks: [
-      { task: "Open a UK bank account", day: "Day 1", done: true },
-      { task: "Get a UK SIM card", day: "Day 2", done: true },
-      { task: "Register with a local GP", day: "Day 7", done: false, active: true },
-      { task: "Apply for National Insurance number", day: "Day 10", done: false },
-    ],
-  },
-  {
-    readiness: 82,
-    tasks: [
-      { task: "Open a UK bank account", day: "Day 1", done: true },
-      { task: "Get a UK SIM card", day: "Day 2", done: true },
-      { task: "Register with a local GP", day: "Day 7", done: true },
-      { task: "Apply for National Insurance number", day: "Day 10", done: false, active: true },
-    ],
-  },
+type Task = RoadmapTask & { done: boolean; active?: boolean };
+
+const DEFAULT_TASKS: RoadmapTask[] = [
+  { task: "Open a UK bank account", day: "Day 1" },
+  { task: "Get a UK SIM card", day: "Day 2" },
+  { task: "Register with a local GP", day: "Day 7" },
+  { task: "Apply for National Insurance number", day: "Day 10" },
 ];
+
+/**
+ * The card plays two moments on a loop: first the opening two tasks are done
+ * and the third is in progress, then the third is done and the fourth is next.
+ */
+function buildSteps(tasks: RoadmapTask[]): { readiness: number; tasks: Task[] }[] {
+  return [
+    { readiness: 68, tasks: tasks.map((t, i) => ({ ...t, done: i < 2, active: i === 2 })) },
+    { readiness: 82, tasks: tasks.map((t, i) => ({ ...t, done: i < 3, active: i === 3 })) },
+  ];
+}
 
 const STEP_HOLD_MS = 3200;
 
-export default function RoadmapPreviewCard({ location = "Manchester · Arrived 2 weeks ago" }: { location?: string }) {
+export default function RoadmapPreviewCard({
+  location = "Manchester · Arrived 2 weeks ago",
+  tasks = DEFAULT_TASKS,
+}: {
+  location?: string;
+  /** Four tasks for the card to play through. Defaults to the general arrival checklist. */
+  tasks?: RoadmapTask[];
+}) {
+  const steps = buildSteps(tasks);
   const shouldReduceMotion = useReducedMotion();
   const [stepIndex, setStepIndex] = useState(0);
 
   useEffect(() => {
     if (shouldReduceMotion) return;
     const id = setInterval(() => {
-      setStepIndex((i) => (i + 1) % STEPS.length);
+      setStepIndex((i) => (i + 1) % steps.length);
     }, STEP_HOLD_MS);
     return () => clearInterval(id);
   }, [shouldReduceMotion]);
 
-  const step = STEPS[stepIndex];
+  const step = steps[stepIndex];
   const completedOutOf40 = Math.round((step.readiness / 100) * 40);
   const entranceTransition = shouldReduceMotion ? { duration: 0 } : undefined;
 
@@ -133,7 +141,7 @@ export default function RoadmapPreviewCard({ location = "Manchester · Arrived 2
                 </motion.div>
                 <div className="flex-1 min-w-0">
                   <motion.p
-                    className="text-xs font-semibold truncate"
+                    className="text-xs font-semibold line-clamp-2"
                     animate={{
                       color: "#0D2036",
                       opacity: t.done ? 0.5 : 1,
