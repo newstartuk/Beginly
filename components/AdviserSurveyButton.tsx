@@ -15,7 +15,7 @@ export default function AdviserSurveyButton({
 }) {
   return (
     // Typeform uses this size on desktop and goes full screen on phones.
-    <PopupButton id={formId} className={className} width={720} height={850}>
+    <PopupButton id={formId} className={className} width={720} height={650}>
       {children}
     </PopupButton>
   );
