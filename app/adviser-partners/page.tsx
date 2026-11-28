@@ -5,7 +5,8 @@ import {
   Scale, ShieldCheck, ClipboardList,
 } from "lucide-react";
 import Logo from "@/components/Logo";
-import AdviserSurveyButton from "@/components/AdviserSurveyButton";
+// Typeform pop-up, paused while the survey runs on Google Forms.
+// import AdviserSurveyButton from "@/components/AdviserSurveyButton";
 import EmailFoundersButton from "@/components/EmailFoundersButton";
 
 export const metadata: Metadata = {
@@ -17,12 +18,16 @@ export const metadata: Metadata = {
 
 const FOUNDERS_EMAIL = process.env.FOUNDERS_EMAIL?.trim();
 
-function parseTypeformId(raw: string | undefined): string {
-  const value = (raw ?? "").trim();
-  const fromUrl = value.match(/\/to\/([A-Za-z0-9]+)/);
-  return fromUrl ? fromUrl[1] : value;
-}
-const TYPEFORM_ID = parseTypeformId(process.env.ADVISER_TYPEFORM_ID);
+// function parseTypeformId(raw: string | undefined): string {
+//   const value = (raw ?? "").trim();
+//   const fromUrl = value.match(/\/to\/([A-Za-z0-9]+)/);
+//   return fromUrl ? fromUrl[1] : value;
+// }
+// const TYPEFORM_ID = parseTypeformId(process.env.ADVISER_TYPEFORM_ID);
+
+
+// buttons are hidden until it's set, so they never link nowhere.
+const SURVEY_URL = process.env.ADVISER_GOOGLE_FORM_URL?.trim();
 
 const RECEIVE = [
   {
@@ -62,10 +67,16 @@ export default function AdvisersPage() {
             <span className="block sm:hidden"><Logo variant="lockup" size={38} /></span>
             <span className="hidden sm:block"><Logo variant="lockup" size={52} tagline /></span>
           </Link>
-          <AdviserSurveyButton formId={TYPEFORM_ID}
+          {/* <AdviserSurveyButton formId={TYPEFORM_ID}
             className="btn-primary text-sm py-1.5 px-4">
             Take the survey
-          </AdviserSurveyButton>
+          </AdviserSurveyButton> */}
+          {SURVEY_URL && (
+            <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer"
+              className="btn-primary text-sm py-1.5 px-4">
+              Take the survey
+            </a>
+          )}
         </div>
       </header>
 
@@ -159,12 +170,20 @@ export default function AdvisersPage() {
                   survey or email us.
                 </p>
                 <div className="flex gap-3 justify-center flex-wrap">
-                  <AdviserSurveyButton formId={TYPEFORM_ID}
+                  {/* <AdviserSurveyButton formId={TYPEFORM_ID}
                     className="btn-primary text-sm px-7 py-3 inline-flex items-center gap-2">
                     <ClipboardList className="w-4 h-4" />
                     Take the adviser survey
                     <ArrowRight className="w-4 h-4" />
-                  </AdviserSurveyButton>
+                  </AdviserSurveyButton> */}
+                  {SURVEY_URL && (
+                    <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer"
+                      className="btn-primary text-sm px-7 py-3 inline-flex items-center gap-2">
+                      <ClipboardList className="w-4 h-4" />
+                      Take the adviser survey
+                      <ArrowRight className="w-4 h-4" />
+                    </a>
+                  )}
                   {FOUNDERS_EMAIL && (
                     <EmailFoundersButton email={FOUNDERS_EMAIL} subject="Beginly adviser design partner" />
                   )}
